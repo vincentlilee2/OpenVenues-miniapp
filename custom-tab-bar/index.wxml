@@ -1,0 +1,28 @@
+<view class="tab-bar">
+  <view class="tab-item"
+        style="color:{{selected === 0 ? '#fde68a' : 'rgba(255,255,255,0.95)'}};font-weight:{{selected === 0 ? '700' : '600'}};"
+        data-idx="0" data-path="/pages/index/index"
+        bindtap="switchTab">
+    <image src="{{selected === 0 ? '/static/tab-home-a.png' : '/static/tab-home.png'}}"
+           style="width:56rpx;height:56rpx;filter:brightness(0) invert(1) {{selected === 0 ? 'sepia(1) saturate(8) hue-rotate(-10deg)' : ''}};opacity:{{selected === 0 ? '1' : '0.9'}};margin-bottom:6rpx;"></image>
+    <text>首页</text>
+  </view>
+
+  <view class="tab-item"
+        style="color:{{selected === 1 ? '#fde68a' : 'rgba(255,255,255,0.95)'}};font-weight:{{selected === 1 ? '700' : '600'}};"
+        data-idx="1" data-path="/pages/order-list/order-list"
+        bindtap="switchTab">
+    <image src="{{selected === 1 ? '/static/tab-order-a.png' : '/static/tab-order.png'}}"
+           style="width:56rpx;height:56rpx;filter:brightness(0) invert(1) {{selected === 1 ? 'sepia(1) saturate(8) hue-rotate(-10deg)' : ''}};opacity:{{selected === 1 ? '1' : '0.9'}};margin-bottom:6rpx;"></image>
+    <text>订单</text>
+  </view>
+
+  <view class="tab-item"
+        style="color:{{selected === 2 ? '#fde68a' : 'rgba(255,255,255,0.95)'}};font-weight:{{selected === 2 ? '700' : '600'}};"
+        data-idx="2" data-path="/pages/my/my"
+        bindtap="switchTab">
+    <image src="{{selected === 2 ? '/static/tab-my-a.png' : '/static/tab-my.png'}}"
+           style="width:56rpx;height:56rpx;filter:brightness(0) invert(1) {{selected === 2 ? 'sepia(1) saturate(8) hue-rotate(-10deg)' : ''}};opacity:{{selected === 2 ? '1' : '0.9'}};margin-bottom:6rpx;"></image>
+    <text>我的</text>
+  </view>
+</view>

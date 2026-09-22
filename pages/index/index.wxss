@@ -1,0 +1,158 @@
+.brand {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8rpx 4rpx 20rpx;
+}
+.brand-name {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+.city {
+  font-size: 26rpx;
+  color: var(--muted);
+  background: rgba(58, 125, 68, 0.08);
+  padding: 8rpx 22rpx;
+  border-radius: 999rpx;
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  padding: 36rpx 32rpx;
+  border-radius: 20rpx;
+  margin-bottom: 28rpx;
+}
+.banner:active {
+  opacity: 0.9;
+}
+.banner-main { flex: 1; min-width: 0; }
+.banner-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+.banner-sub {
+  font-size: 24rpx;
+  opacity: 0.85;
+}
+.banner-cta {
+  display: flex;
+  align-items: center;
+  margin-left: 16rpx;
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.22);
+  flex-shrink: 0;
+}
+.banner-cta-text { font-size: 24rpx; color: #fff; }
+.banner-arrow { font-size: 32rpx; color: #fff; margin-left: 6rpx; line-height: 1; }
+
+.venue-card {
+  background: #fff;
+  border-radius: 20rpx;
+  overflow: hidden;
+  margin-bottom: 28rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06);
+}
+
+.venue-cover-wrap {
+  position: relative;
+  width: 100%;
+  height: 380rpx;
+  background: #e5e7eb;
+}
+.venue-cover {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+}
+.venue-cover--placeholder {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.placeholder-text {
+  color: #fff;
+  font-size: 60rpx;
+  font-weight: 600;
+  opacity: 0.6;
+}
+
+.venue-fav {
+  position: absolute;
+  top: 20rpx;
+  left: 20rpx;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+}
+
+.venue-nav {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  background: var(--primary);
+  color: #fff;
+  padding: 8rpx 20rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+}
+
+.venue-body {
+  padding: 24rpx 28rpx 28rpx;
+}
+.venue-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6rpx;
+  display: flex;
+  align-items: baseline;
+  gap: 12rpx;
+}
+.venue-court-count {
+  font-size: 22rpx;
+  font-weight: 400;
+  color: var(--primary);
+  background: rgba(58, 125, 68, 0.1);
+  padding: 4rpx 14rpx;
+  border-radius: 16rpx;
+}
+.venue-addr {
+  font-size: 26rpx;
+  color: var(--muted);
+  margin-bottom: 12rpx;
+}
+.venue-courts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+.court-chip {
+  font-size: 22rpx;
+  color: var(--text);
+  background: #f3f4f6;
+  padding: 4rpx 14rpx;
+  border-radius: 14rpx;
+}
+
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 80rpx 0;
+}
+
+.container { padding-bottom: 140rpx; }

@@ -1,0 +1,173 @@
+.date-tabs {
+  white-space: nowrap;
+  background: #fff;
+  padding: 14rpx 0;
+  margin: 0 -24rpx 8rpx;
+  border-bottom: 1rpx solid var(--border);
+}
+.date-tab {
+  display: inline-block;
+  width: 130rpx;
+  text-align: center;
+  padding: 12rpx 0;
+  border-radius: 12rpx;
+  margin: 0 8rpx;
+  color: var(--muted);
+  font-size: 26rpx;
+}
+.date-tab.active {
+  background: var(--primary);
+  color: #fff;
+}
+.date-week { font-size: 24rpx; opacity: 0.8; }
+.date-day { font-size: 32rpx; font-weight: 600; margin-top: 4rpx; }
+
+/* 节假日价格提示条 */
+.holiday-tip {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 12rpx;
+  padding: 14rpx 20rpx;
+  margin-bottom: 14rpx;
+  font-size: 24rpx;
+}
+.holiday-tip-icon { font-size: 28rpx; }
+
+/* ===== 网格画布：全部绝对定位，位置由 grid.js 算好 =====
+   不用 CSS Grid / flex 流式布局：小程序对 grid 跨行跨列支持不稳，
+   显式 grid-row 与自动流混用时格子会被甩进隐式列，整片错位。 */
+.grid-wrap {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 12rpx 0;
+  margin-bottom: 20rpx;
+}
+.grid-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+.gcanvas {
+  position: relative;
+  display: inline-block;
+}
+
+.gc-head {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.gc-time {
+  position: absolute;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 8rpx;
+  font-size: 20rpx;
+  color: var(--muted);
+  box-sizing: border-box;
+}
+
+.gc-slot {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  color: #fff;
+  border-radius: 8rpx;
+  box-sizing: border-box;
+}
+.gs-available { background: var(--slot-available); }
+.gs-selected { background: var(--slot-selected); }
+.gs-booked { background: var(--slot-booked); }
+.gs-mine { background: var(--slot-mine); }
+.gs-closed { background: #f1f2f4; }
+/* 已过去的时段：置灰、不可点（不允许再预约） */
+.gs-past { background: #eceef0; border: 1rpx dashed #dcdfe3; }
+.gc-past { font-size: 22rpx; color: #b3b8bf; letter-spacing: 1rpx; }
+.gc-price { font-weight: 600; }
+.gc-ico { font-size: 34rpx; font-weight: 700; }
+
+/* 畅打浮层：在所属场地列内纵向跨整段，盖住被锁的格子 */
+.gc-promo {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 6rpx 4rpx;
+  border-radius: 10rpx;
+  overflow: hidden;
+  background: linear-gradient(160deg, #8b5cf6, #6d28d9);
+  color: #fff;
+  box-shadow: 0 2rpx 8rpx rgba(109, 40, 217, 0.25);
+}
+.gc-promo:active { opacity: 0.88; }
+.gp-name {
+  font-size: 20rpx;
+  opacity: 0.95;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.gp-signed { font-size: 20rpx; margin-top: 4rpx; opacity: 0.95; }
+.gp-price { font-size: 26rpx; font-weight: 700; margin-top: 2rpx; }
+.gp-cta {
+  font-size: 18rpx;
+  margin-top: 6rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 16rpx;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  font-size: 22rpx;
+  color: var(--muted);
+  flex-wrap: wrap;
+  padding: 4rpx 0;
+}
+.lg {
+  width: 28rpx;
+  height: 28rpx;
+  border-radius: 4rpx;
+  margin-left: 12rpx;
+}
+.lg-past { background: #eceef0; border: 1rpx dashed #dcdfe3; }
+.lg-booked { background: var(--slot-booked); }
+.lg-available { background: var(--slot-available); }
+.lg-selected { background: var(--slot-selected); }
+.lg-mine { background: var(--slot-mine); }
+.lg-promo { background: var(--slot-promo); }
+
+.hint {
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--muted);
+  padding: 10rpx 0 16rpx;
+}
+
+.book-btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  padding: 0;
+}
+
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 80rpx 0;
+}

@@ -1,0 +1,27 @@
+.status-card {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  border-radius: 16rpx;
+  padding: 36rpx 32rpx;
+  margin-bottom: 20rpx;
+}
+.status-text { font-size: 40rpx; font-weight: 600; }
+.status-no { font-size: 24rpx; margin-top: 8rpx; opacity: 0.85; font-family: monospace; }
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding: 14rpx 0;
+  font-size: 28rpx;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+.row.big { font-size: 32rpx; font-weight: 500; padding: 20rpx 0; }
+.label { color: var(--muted); }
+.amount { color: #b45309; font-size: 40rpx; font-weight: 700; }
+
+.actions {
+  margin-top: 40rpx;
+}
+.danger { color: var(--danger); border-color: var(--danger); }
+
+.empty { text-align: center; color: var(--muted); padding: 80rpx 0; }

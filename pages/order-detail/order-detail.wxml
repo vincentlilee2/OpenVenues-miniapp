@@ -1,0 +1,33 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+  <block wx:elif="{{order}}">
+    <view class="status-card">
+      <view class="status-text">{{statusText}}</view>
+      <view class="status-no">订单号 {{order.order_no}}</view>
+    </view>
+
+    <view class="card">
+      <view class="row"><text class="label">场地</text><text>{{order.venue_name}}</text></view>
+      <view class="row"><text class="label">地址</text><text>{{order.venue_address || '地址待补充'}}</text></view>
+      <view class="row"><text class="label">日期</text><text>{{order.booking_date}}</text></view>
+      <view class="row"><text class="label">时段</text><text>{{order.start_time}} - {{order.end_time}}</text></view>
+      <view class="row"><text class="label">时长</text><text>{{durationText}}</text></view>
+      <view class="row" wx:if="{{order.source === 'promo'}}"><text class="label">来源</text><text>🎯 畅打活动：{{promoTitle}}</text></view>
+      <view class="row" wx:else><text class="label">来源</text><text>⏰ 散客预约</text></view>
+    </view>
+
+    <view class="card">
+      <view class="row"><text class="label">联系人</text><text>{{order.contact_name}}</text></view>
+      <view class="row"><text class="label">电话</text><text>{{order.contact_phone}}</text></view>
+      <view class="row" wx:if="{{order.remark}}"><text class="label">备注</text><text>{{order.remark}}</text></view>
+    </view>
+
+    <view class="card">
+      <view class="row big"><text>合计</text><text class="amount">¥{{order.total_price}}</text></view>
+    </view>
+
+    <view class="actions" wx:if="{{canCancel}}">
+      <button class="btn-outline danger" bindtap="onCancel">取消订单</button>
+    </view>
+  </block>
+</view>

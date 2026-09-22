@@ -1,0 +1,51 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+  <block wx:elif="{{venue}}">
+    <!-- 海报 -->
+    <view class="cover">
+      <view wx:if="{{venue.cover}}" class="cover-img" style="background-image:url({{venue.cover}})"></view>
+      <view wx:else class="cover-placeholder">
+        <text>{{venue.name}}</text>
+      </view>
+    </view>
+
+    <!-- 场馆信息 -->
+    <view class="card">
+      <view class="venue-name">{{venue.name}}</view>
+      <view class="row"><text class="label">📍 地址</text><text>{{venue.address || '地址待补充'}}</text></view>
+      <view class="row" wx:if="{{venue.contact_phone}}">
+        <text class="label">📞 电话</text>
+        <text bindtap="callPhone">{{venue.contact_phone}}</text>
+      </view>
+      <view class="row" wx:if="{{venue.description}}">
+        <text class="label">📝 说明</text>
+        <text>{{venue.description}}</text>
+      </view>
+      <view class="row">
+        <text class="label">📋 场地</text>
+        <text>{{venue.court_count}} 个（每个独立预约）</text>
+      </view>
+    </view>
+
+    <!-- 场地列表 -->
+    <view class="card">
+      <view class="title">本馆场地</view>
+      <view class="court-list">
+        <view wx:for="{{venue.courts}}" wx:key="id" class="court-item">
+          <view class="court-name">{{item.name}}</view>
+          <view class="court-cap">容纳 {{item.max_capacity}} 人</view>
+          <view class="court-status {{item.status === 'active' ? 'on' : 'off'}}">
+            {{item.status === 'active' ? '营业中' : '已停用'}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮（参考截图：约课/约场/畅打） -->
+    <view class="actions">
+      <button class="btn-warn" hover-class="btn-hover" bindtap="onBookLesson">约课</button>
+      <button class="btn-outline btn-action" hover-class="btn-hover" bindtap="onBookVenue">约场</button>
+      <button class="btn-primary btn-action" hover-class="btn-hover" bindtap="onPromoList">畅打</button>
+    </view>
+  </block>
+</view>

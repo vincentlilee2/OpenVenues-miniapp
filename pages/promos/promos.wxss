@@ -1,0 +1,70 @@
+.hero {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  padding: 40rpx 32rpx 50rpx;
+  margin: 0 -24rpx 28rpx;
+  color: #fff;
+}
+.hero-title { font-size: 40rpx; font-weight: 600; margin-bottom: 8rpx; }
+.hero-sub { font-size: 26rpx; opacity: 0.85; }
+
+.promo-card {
+  background: #fff;
+  border-radius: 20rpx;
+  overflow: hidden;
+  margin-bottom: 28rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06);
+}
+
+.promo-cover {
+  position: relative;
+  width: 100%;
+  height: 360rpx;
+}
+.cover-img { width: 100%; height: 100%; }
+.cover-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.cp-line1 { font-size: 60rpx; font-weight: 700; text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.2); }
+.cp-line2 { font-size: 26rpx; margin-top: 8rpx; opacity: 0.9; }
+
+.promo-tag {
+  position: absolute;
+  top: 20rpx;
+  padding: 6rpx 20rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+}
+.promo-tag.expired {
+  left: 20rpx;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+}
+.promo-tag.price {
+  right: 20rpx;
+  background: var(--gold);
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.promo-body { padding: 24rpx 28rpx 28rpx; }
+.promo-title { font-size: 32rpx; font-weight: 600; margin-bottom: 14rpx; }
+.promo-meta {
+  display: flex;
+  gap: 20rpx;
+  font-size: 24rpx;
+  margin-bottom: 8rpx;
+}
+.meta-people { color: var(--primary); font-weight: 500; }
+.meta-min { color: #b45309; }
+.promo-loc, .promo-time { font-size: 24rpx; color: var(--muted); margin-top: 4rpx; }
+
+.empty { text-align: center; color: var(--muted); padding: 80rpx 0; }

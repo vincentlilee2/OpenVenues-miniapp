@@ -1,0 +1,193 @@
+.user-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+}
+.avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+  margin-right: 24rpx;
+}
+.user-info { flex: 1; }
+.user-name { font-size: 32rpx; font-weight: 600; }
+.user-phone { font-size: 24rpx; color: var(--muted); margin-top: 6rpx; }
+
+/* ===== 微信登录 ===== */
+.set-profile-hint {
+  display: inline-block;
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: var(--primary);
+  text-decoration: underline;
+}
+.avatar-img {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  margin-right: 24rpx;
+  background: #f3f4f6;
+}
+.uid-tag {
+  margin-left: 12rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 999rpx;
+  background: rgba(58, 125, 68, 0.1);
+  color: var(--primary);
+  font-size: 20rpx;
+}
+.wx-login-btn {
+  width: 100%;
+  height: 92rpx;
+  line-height: 92rpx;
+  border-radius: 16rpx;
+  margin-bottom: 28rpx;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 500;
+  border: none;
+}
+.wx-login-btn::after { border: none; }
+.wx-icon { margin-right: 8rpx; }
+
+/* ===== 头像昵称编辑 ===== */
+.profile-editor {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  margin-bottom: 28rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+}
+.pe-title { font-size: 28rpx; font-weight: 600; margin-bottom: 18rpx; }
+.avatar-picker {
+  background: transparent;
+  padding: 0;
+  line-height: normal;
+  margin: 0 0 18rpx 0;
+  display: flex;
+}
+.avatar-picker::after { border: none; }
+.avatar-preview {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  background: #f3f4f6;
+}
+.avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  color: var(--muted);
+  text-align: center;
+  padding: 10rpx;
+  box-sizing: border-box;
+}
+/* 昵称输入：外层 flex 撑高 + 内层 input 定高，避免 input 自身盒模型把文字裁掉 */
+.nickname-field {
+  display: flex;
+  align-items: center;
+  height: 88rpx;
+  padding: 0 24rpx;
+  border: 1rpx solid var(--border);
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+  background: #fff;
+}
+.nickname-input {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  font-size: 28rpx;
+  color: var(--text);
+}
+.pe-actions { display: flex; gap: 16rpx; }
+.pe-btn {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  margin: 0;
+}
+.pe-btn::after { border: none; }
+.pe-cancel { background: #f3f4f6; color: var(--text); }
+.pe-save { background: var(--primary); color: #fff; }
+
+.shortcuts {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx 20rpx;
+  margin-bottom: 28rpx;
+  display: flex;
+  justify-content: space-around;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+}
+.sc { display: flex; flex-direction: column; align-items: center; }
+.sc-icon {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 24rpx;
+  background: rgba(58, 125, 68, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+  margin-bottom: 10rpx;
+}
+.sc-label { font-size: 26rpx; color: var(--text); }
+
+.section { margin-bottom: 20rpx; }
+.section-title {
+  font-size: 24rpx;
+  color: var(--muted);
+  padding: 0 8rpx 12rpx;
+}
+
+.list-card {
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+.list-item:last-child { border-bottom: none; }
+.li-icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #fff;
+  margin-right: 20rpx;
+}
+.li-icon-blue { background: #3b82f6; }
+.li-icon-green { background: var(--primary); }
+.li-icon-orange { background: #f59e0b; }
+.li-icon-purple { background: #8b5cf6; font-style: italic; font-weight: 600; }
+
+.li-body { flex: 1; }
+.li-title { font-size: 28rpx; font-weight: 500; }
+.li-sub { font-size: 24rpx; color: var(--muted); margin-top: 4rpx; }
+.li-arrow { font-size: 32rpx; color: var(--muted); }
+
+.container { padding-bottom: 140rpx; }

@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "OpenVenues",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "custom-tab-bar": "/custom-tab-bar/index"
+  }
+}

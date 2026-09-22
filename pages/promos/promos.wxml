@@ -1,0 +1,30 @@
+<view class="container">
+  <view class="hero">
+    <view class="hero-title">精选活动</view>
+    <view class="hero-sub">发现精彩活动，立即报名参与</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+  <view wx:elif="{{promos.length === 0}}" class="empty">暂无活动</view>
+
+  <view wx:for="{{promos}}" wx:key="id" class="promo-card" bindtap="openDetail" data-id="{{item.id}}">
+    <view class="promo-cover">
+      <image wx:if="{{item.cover}}" src="{{item.cover}}" mode="aspectFill" class="cover-img"></image>
+      <view wx:else class="cover-placeholder">
+        <view class="cp-line1">活动畅打</view>
+        <view class="cp-line2">{{item.start_time}} - {{item.end_time}}</view>
+      </view>
+      <view wx:if="{{item.expired}}" class="promo-tag expired">已截止</view>
+      <view wx:else class="promo-tag price">¥{{item.price_per_person}}</view>
+    </view>
+    <view class="promo-body">
+      <view class="promo-title">{{item.title}}</view>
+      <view class="promo-meta">
+        <text class="meta-people">👥 {{item.signed_up}}/{{item.max_capacity}}人</text>
+        <text class="meta-min">{{item.min_participants}}人成团</text>
+      </view>
+      <view class="promo-loc">📍 {{item.venueText}}</view>
+      <view class="promo-time">🕐 {{item.createdText}}</view>
+    </view>
+  </view>
+</view>

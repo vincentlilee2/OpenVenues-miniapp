@@ -1,0 +1,59 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+
+  <block wx:elif="{{promo}}">
+    <view class="cover">
+      <image wx:if="{{promo.cover}}" src="{{promo.cover}}" mode="aspectFill" class="cover-img"></image>
+      <view wx:else class="cover-placeholder">
+        <view class="cp-line1">{{promo.title}}</view>
+        <view class="cp-line2">{{promo.start_time}} - {{promo.end_time}}</view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="title">{{promo.title}}</view>
+      <view class="meta-row"><text>📅 日期</text><text>{{promo.promo_date}}</text></view>
+      <view class="meta-row"><text>⏰ 时段</text><text>{{promo.start_time}} - {{promo.end_time}}</text></view>
+      <view class="meta-row"><text>📍 场地</text><text>{{courtText}}</text></view>
+      <view class="meta-row"><text>👥 报名</text><text>{{promo.signed_up}}/{{promo.max_capacity}} 人</text></view>
+      <view class="meta-row"><text>🎯 成团</text><text>{{promo.min_participants}} 人成团</text></view>
+      <view class="meta-row"><text>💰 人均价</text><text class="price">¥{{promo.price_per_person}}</text></view>
+      <view class="meta-row"><text>⏳ 截止时间</text><text>{{deadlineText}}</text></view>
+      <view class="desc" wx:if="{{promo.description}}">{{promo.description}}</view>
+    </view>
+
+    <view class="card">
+      <view class="title">报名</view>
+      <view class="form-row">
+        <text class="form-label">报名人数（含自己）</text>
+        <view class="stepper">
+          <view class="step-btn" bindtap="dec">−</view>
+          <view class="step-num">{{participantCount}}</view>
+          <view class="step-btn" bindtap="inc">+</view>
+        </view>
+        <view class="hint">单笔最多 {{promo.max_per_signup}} 人</view>
+      </view>
+      <view class="form-row">
+        <text class="form-label">姓名</text>
+        <input class="input" placeholder="联系人姓名" maxlength="20" value="{{form.booker_name}}" bindinput="onInput" data-k="booker_name" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">电话</text>
+        <input class="input" placeholder="11位手机号" maxlength="11" type="number" value="{{form.booker_phone}}" bindinput="onInput" data-k="booker_phone" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">参与人姓名（选填，换行分隔）</text>
+        <textarea class="textarea" placeholder="例如：张三\n李四\n王五" maxlength="300" value="{{form.participant_names_text}}" bindinput="onInput" data-k="participant_names_text"></textarea>
+      </view>
+
+      <view class="total-row">
+        <text>合计</text>
+        <text class="total-price">¥{{totalPrice}}</text>
+      </view>
+
+      <button class="btn-primary submit-btn" bindtap="onSubmit" disabled="{{submitting || isExpired}}">
+        {{isExpired ? '已截止' : (submitting ? '提交中...' : '立即报名')}}
+      </button>
+    </view>
+  </block>
+</view>

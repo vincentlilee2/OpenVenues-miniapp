@@ -1,0 +1,72 @@
+<view class="container">
+  <!-- 日期 Tab (今天起 7 天) -->
+  <scroll-view class="date-tabs" scroll-x="true" enhanced="true" show-scrollbar="{{false}}">
+    <view wx:for="{{dateTabs}}" wx:key="date" class="date-tab {{item.date === activeDate ? 'active' : ''}}"
+          bindtap="onDateTap" data-date="{{item.date}}">
+      <view class="date-week">{{item.weekdayLabel}}</view>
+      <view class="date-day">{{item.day}}</view>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+
+  <!-- 节假日价格提示 -->
+  <view wx:if="{{holidayPrice}}" class="holiday-tip">
+    <text class="holiday-tip-icon">🎉</text>
+    <text>节假日价格 · 当日按节假日标准计价</text>
+  </view>
+
+  <!-- 时段网格：绝对定位画布（位置由 grid.js 算好），横向可滚动 -->
+  <view class="grid-wrap" wx:if="{{rows.length}}">
+    <scroll-view class="grid-scroll" scroll-x="true" enhanced="true" show-scrollbar="{{false}}">
+      <view class="gcanvas" style="width:{{geo.gridW}}rpx; height:{{geo.canvasH}}rpx;">
+
+        <!-- 表头：场地名 -->
+        <view wx:for="{{heads}}" wx:key="id" class="gc-head"
+              style="left:{{item.left}}rpx; width:{{item.width}}rpx; top:0; height:{{geo.headH}}rpx;">{{item.name}}</view>
+
+        <!-- 每行：时间列 + 各场地格子 -->
+        <block wx:for="{{rows}}" wx:key="key" wx:for-item="row">
+          <view class="gc-time" style="left:0; width:{{geo.timeW}}rpx; top:{{row.top}}rpx; height:{{geo.rowH}}rpx;">{{row.label}}</view>
+          <view wx:for="{{row.cells}}" wx:key="cid" wx:for-item="c"
+                class="gc-slot gs-{{c.status}}"
+                style="left:{{c.left}}rpx; width:{{c.width}}rpx; top:{{c.top}}rpx; height:{{c.height}}rpx;"
+                data-status="{{c.status}}" data-cid="{{c.cid}}" data-slot="{{c.slot}}"
+                bindtap="onSlotTap">
+            <text wx:if="{{c.status === 'available'}}" class="gc-price">{{c.price}}</text>
+            <text wx:elif="{{c.status === 'selected'}}" class="gc-ico">✓</text>
+            <text wx:elif="{{c.status === 'mine'}}" class="gc-ico">●</text>
+            <text wx:elif="{{c.status === 'past'}}" class="gc-past">已过</text>
+          </view>
+        </block>
+
+        <!-- 畅打浮层：在自己的场地列内，纵向跨整段小时 -->
+        <view wx:for="{{promos}}" wx:key="pid" class="gc-promo"
+              style="left:{{item.left}}rpx; width:{{item.width}}rpx; top:{{item.top}}rpx; height:{{item.height}}rpx;"
+              bindtap="onPromoTap" data-promo-id="{{item.promoId}}">
+          <view class="gp-name">{{item.name}}</view>
+          <view class="gp-signed">{{item.signed}}/{{item.maxCap}}人</view>
+          <view class="gp-price">{{item.priceLabel}}</view>
+          <view class="gp-cta" wx:if="{{item.minParticipants > 1}}">≥{{item.minParticipants}}人成团</view>
+        </view>
+
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 图例 -->
+  <view class="legend">
+    <view class="lg lg-booked"></view><text>已定</text>
+    <view class="lg lg-past"></view><text>已过</text>
+    <view class="lg lg-available"></view><text>可选</text>
+    <view class="lg lg-selected"></view><text>已选择</text>
+    <view class="lg lg-mine"></view><text>我的预定</text>
+    <view class="lg lg-promo"></view><text>畅打</text>
+  </view>
+
+  <view class="hint">最多选 {{maxCourts}} 个场地（{{selectedCount}}/{{maxCourts}}）</view>
+
+  <button class="btn-primary book-btn" bindtap="onBook" disabled="{{selectedCount === 0}}">
+    立即预约
+  </button>
+</view>

@@ -1,0 +1,55 @@
+.cover {
+  width: 100%;
+  height: 360rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+  margin-bottom: 24rpx;
+}
+.cover-img { width: 100%; height: 100%; }
+.cover-placeholder {
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: #fff;
+}
+.cp-line1 { font-size: 48rpx; font-weight: 700; }
+.cp-line2 { font-size: 26rpx; margin-top: 8rpx; opacity: 0.9; }
+
+.title { font-size: 36rpx; font-weight: 600; margin-bottom: 16rpx; }
+.meta-row {
+  display: flex; justify-content: space-between;
+  font-size: 26rpx; padding: 10rpx 0;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+.meta-row .price { color: #b45309; font-weight: 600; font-size: 30rpx; }
+.desc { margin-top: 16rpx; font-size: 26rpx; color: var(--text); line-height: 1.6; }
+
+.form-row { margin: 24rpx 0; }
+.form-label { font-size: 26rpx; color: var(--muted); margin-bottom: 10rpx; display: block; }
+.input { width: 100%; padding: 16rpx; border: 1rpx solid var(--border); border-radius: 10rpx; font-size: 28rpx; }
+.textarea { width: 100%; min-height: 120rpx; padding: 16rpx; border: 1rpx solid var(--border); border-radius: 10rpx; font-size: 26rpx; }
+
+.stepper { display: inline-flex; align-items: center; }
+.step-btn {
+  width: 60rpx; height: 60rpx;
+  background: var(--primary); color: #fff;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 36rpx;
+}
+.step-num {
+  min-width: 80rpx; text-align: center;
+  font-size: 32rpx; font-weight: 600; margin: 0 20rpx;
+}
+.hint { display: inline-block; margin-left: 24rpx; color: var(--muted); font-size: 24rpx; }
+
+.total-row {
+  display: flex; justify-content: space-between;
+  padding: 24rpx 0; border-top: 1rpx solid var(--border);
+  margin-top: 20rpx;
+}
+.total-price { font-size: 40rpx; font-weight: 700; color: #b45309; }
+
+.submit-btn { width: 100%; height: 88rpx; line-height: 88rpx; padding: 0; }
+
+.empty { text-align: center; color: var(--muted); padding: 80rpx 0; }

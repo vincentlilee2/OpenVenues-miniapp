@@ -1,0 +1,26 @@
+<view class="container">
+  <view class="status-tabs">
+    <view wx:for="{{statusTabs}}" wx:key="k" class="st-tab {{item.k === activeStatus ? 'active' : ''}}"
+          bindtap="onStatusTap" data-k="{{item.k}}">{{item.label}}</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+  <view wx:elif="{{orders.length === 0}}" class="empty">暂无订单</view>
+
+  <view wx:for="{{orders}}" wx:key="id" class="order-card status-{{item.status}}" bindtap="openDetail" data-id="{{item.id}}">
+    <view class="order-head">
+      <text class="order-no">#{{item.order_no}}</text>
+      <text class="badge badge-{{item.status}}">{{item.statusText}}</text>
+    </view>
+    <view class="order-body">
+      <view class="venue-name">{{item.venue_name}}<text class="court-name" wx:if="{{item.court_name}}"> · {{item.court_name}}</text></view>
+      <view class="order-time">📅 {{item.timeText}}<text class="order-duration">（{{item.durationText}}）</text></view>
+      <view class="order-source">{{item.sourceText}}</view>
+    </view>
+    <view class="order-foot">
+      <text class="amount">¥{{item.total_price}}</text>
+      <text wx:if="{{item.cancelable}}" class="cancel-link" catchtap="onCancel" data-id="{{item.id}}">取消</text>
+    </view>
+  </view>
+</view>
+<custom-tab-bar></custom-tab-bar>

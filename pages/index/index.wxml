@@ -1,0 +1,49 @@
+<view class="container">
+  <!-- 顶部品牌区 -->
+  <view class="brand">
+    <view class="brand-name">🎾 OpenVenues</view>
+    <view class="city">📍 全部场馆 ▾</view>
+  </view>
+
+  <!-- 横幅：点击进入畅打活动列表 -->
+  <view class="banner" bindtap="openPromos">
+    <view class="banner-main">
+      <view class="banner-title">在线预约 · 畅打活动</view>
+      <view class="banner-sub">{{promoSubText}}</view>
+    </view>
+    <view class="banner-cta">
+      <text class="banner-cta-text">活动列表</text>
+      <text class="banner-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 加载/空 -->
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+  <view wx:elif="{{loadError}}" class="empty">
+    <view>{{loadError}}</view>
+    <view style="margin-top:16rpx;color:var(--primary);text-decoration:underline" bindtap="retryLoad">点此重试</view>
+  </view>
+  <view wx:elif="{{venues.length === 0}}" class="empty">暂无场馆</view>
+
+  <!-- 场馆卡片列表（参考截图：场馆 = 一卡，含若干场地） -->
+  <view wx:for="{{venues}}" wx:key="id" class="venue-card" bindtap="openDetail" data-id="{{item.id}}">
+    <view class="venue-cover-wrap">
+      <view wx:if="{{item.cover}}" class="venue-cover" style="background-image:url({{item.cover}})"></view>
+      <view wx:else class="venue-cover venue-cover--placeholder">
+        <text class="placeholder-text">{{item.name}}</text>
+      </view>
+      <view class="venue-fav" catchtap="toggleFav" data-id="{{item.id}}">♡</view>
+      <view class="venue-nav" catchtap="openMap" data-id="{{item.id}}">⊕ 导航</view>
+    </view>
+    <view class="venue-body">
+      <view class="venue-name">{{item.name}}
+        <text class="venue-court-count">{{item.court_count}} 场地</text>
+      </view>
+      <view class="venue-addr">📍 {{item.address || '地址待补充'}}</view>
+      <!-- 场地缩略标签 -->
+      <view class="venue-courts" wx:if="{{item.courts && item.courts.length}}">
+        <text wx:for="{{item.courts}}" wx:key="id" wx:for-item="c" class="court-chip">{{c.name}}</text>
+      </view>
+    </view>
+  </view>
+</view>

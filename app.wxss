@@ -1,0 +1,109 @@
+/* OpenVenues 全局样式（与参考截图一致的绿色主题） */
+page {
+  --primary: #3a7d44;
+  --primary-dark: #2d6235;
+  --primary-light: #4ea25a;
+  --gold: #c9a961;
+  --gold-soft: #f0d68c;
+  --bg: #f5f7f5;
+  --card: #fff;
+  --border: #e5e7eb;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --danger: #dc2626;
+  --warn: #d97706;
+  --slot-available: #4ea25a;
+  --slot-booked: #d1d5db;
+  --slot-selected: #f59e0b;
+  --slot-mine: #fbbf24;
+  --slot-promo: #8b5cf6;
+
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 28rpx;
+}
+
+.container {
+  padding: 24rpx;
+  padding-bottom: 60rpx;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  border-radius: 999rpx;
+  padding: 20rpx 40rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
+
+.btn-primary[disabled] {
+  opacity: 0.5;
+}
+
+.btn-outline {
+  background: #fff;
+  color: var(--primary);
+  border: 2rpx solid var(--primary);
+  border-radius: 999rpx;
+  padding: 18rpx 40rpx;
+  font-size: 30rpx;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-warn {
+  background: var(--gold-soft);
+  color: #7a5c10;
+  border-radius: 999rpx;
+  padding: 20rpx 40rpx;
+  font-size: 30rpx;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-row {
+  display: flex;
+  align-items: center;
+}
+
+.text-muted {
+  color: var(--muted);
+}
+
+.text-danger {
+  color: var(--danger);
+}
+
+.text-warn {
+  color: var(--warn);
+}
+
+.badge {
+  display: inline-block;
+  padding: 4rpx 14rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+}
+
+.badge-pending { background: #fef3c7; color: #92400e; }
+.badge-confirmed { background: #d1fae5; color: #065f46; }
+.badge-cancelled { background: #fee2e2; color: #991b1b; }
+.badge-completed { background: #dbeafe; color: #1e40af; }
+.badge-refunded { background: #ede9fe; color: #6b21a8; }
+.badge-no_show { background: #f3e8ff; color: #6b21a8; }

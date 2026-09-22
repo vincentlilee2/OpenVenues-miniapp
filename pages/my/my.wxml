@@ -1,0 +1,116 @@
+<view class="container">
+  <!-- 用户卡片：未登录显示一键登录按钮，已登录显示微信身份 -->
+  <view class="user-card">
+    <block wx:if="{{!loggedIn}}">
+      <view class="avatar">👤</view>
+      <view class="user-info">
+        <view class="user-name">未登录</view>
+        <view class="user-phone">登录后可预约、报名畅打、查看订单</view>
+      </view>
+    </block>
+    <block wx:else>
+      <image wx:if="{{avatar}}" class="avatar-img" src="{{avatar}}" mode="aspectFill"></image>
+      <view wx:else class="avatar">👤</view>
+      <view class="user-info">
+        <view class="user-name">{{nickname || '微信用户'}}</view>
+        <view class="user-phone">{{statusText}}<text wx:if="{{uidShort}}" class="uid-tag">ID {{uidShort}}</text></view>
+        <view wx:if="{{needProfile}}" class="set-profile-hint" bindtap="openEditor">点此设置微信头像昵称 ›</view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 未登录：一键登录 -->
+  <button wx:if="{{!loggedIn}}" class="wx-login-btn" bindtap="onLogin" loading="{{loggingIn}}">
+    <text class="wx-icon">✔</text> 微信一键登录
+  </button>
+
+  <!-- 头像昵称编辑面板 -->
+  <view wx:if="{{editing}}" class="profile-editor">
+    <view class="pe-title">更新微信头像昵称</view>
+    <button class="avatar-picker" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+      <image wx:if="{{form.avatar}}" class="avatar-preview" src="{{form.avatar}}" mode="aspectFill"></image>
+      <view wx:else class="avatar-preview avatar-placeholder">点击选择微信头像</view>
+    </button>
+    <view class="nickname-field">
+      <input class="nickname-input" type="nickname" placeholder="点击填入微信昵称" value="{{form.nickname}}" bindinput="onNicknameInput" bindblur="onNicknameInput" />
+    </view>
+    <view class="pe-actions">
+      <button class="pe-btn pe-cancel" bindtap="cancelEdit">取消</button>
+      <button class="pe-btn pe-save" bindtap="saveProfile" loading="{{saving}}">保存</button>
+    </view>
+  </view>
+
+  <!-- 快捷入口 -->
+  <view class="shortcuts">
+    <view class="sc" bindtap="goOrders">
+      <view class="sc-icon">📋</view>
+      <view class="sc-label">我的订单</view>
+    </view>
+    <view class="sc" bindtap="goPromos">
+      <view class="sc-icon">🎯</view>
+      <view class="sc-label">畅打活动</view>
+    </view>
+  </view>
+
+  <!-- 服务分组 -->
+  <view class="section">
+    <view class="section-title">我的服务</view>
+    <view class="list-card">
+      <view class="list-item" bindtap="goOrders" data-status="confirmed">
+        <view class="li-icon li-icon-blue">⏰</view>
+        <view class="li-body">
+          <view class="li-title">我的预约</view>
+          <view class="li-sub">查看已确认订单</view>
+        </view>
+        <view class="li-arrow">›</view>
+      </view>
+      <view class="list-item" bindtap="goOrders" data-status="completed">
+        <view class="li-icon li-icon-green">✓</view>
+        <view class="li-body">
+          <view class="li-title">历史订单</view>
+          <view class="li-sub">已完成订单</view>
+        </view>
+        <view class="li-arrow">›</view>
+      </view>
+      <view class="list-item" bindtap="openEditor">
+        <view class="li-icon li-icon-purple">👤</view>
+        <view class="li-body">
+          <view class="li-title">微信头像昵称</view>
+          <view class="li-sub">{{nickname ? nickname : '使用微信头像和昵称'}}</view>
+        </view>
+        <view class="li-arrow">›</view>
+      </view>
+      <view class="list-item" bindtap="openFeedback">
+        <view class="li-icon li-icon-orange">📝</view>
+        <view class="li-body">
+          <view class="li-title">意见反馈</view>
+          <view class="li-sub">提交您的建议或问题</view>
+        </view>
+        <view class="li-arrow">›</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 关于 -->
+  <view class="section">
+    <view class="section-title">关于</view>
+    <view class="list-card">
+      <view class="list-item">
+        <view class="li-icon li-icon-purple">i</view>
+        <view class="li-body">
+          <view class="li-title">OpenVenues {{version}}</view>
+          <view class="li-sub">场馆预定小程序</view>
+        </view>
+      </view>
+      <view class="list-item" wx:if="{{loggedIn}}" bindtap="onLogout">
+        <view class="li-icon li-icon-orange">⎋</view>
+        <view class="li-body">
+          <view class="li-title">退出登录</view>
+          <view class="li-sub">清除本机登录状态</view>
+        </view>
+        <view class="li-arrow">›</view>
+      </view>
+    </view>
+  </view>
+</view>
+<custom-tab-bar></custom-tab-bar>
