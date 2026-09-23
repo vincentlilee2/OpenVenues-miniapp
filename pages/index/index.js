@@ -33,9 +33,6 @@ Page({
         ...v,
         defaultCover: venueCovers.byId(v.id),
       }));
-      console.log('[index.load] venues.length=', venues.length,
-        'A.defaultCover.length=', venues[0] && venues[0].defaultCover ? venues[0].defaultCover.length : 0,
-        'A.defaultCover head=', venues[0] && venues[0].defaultCover ? venues[0].defaultCover.slice(0, 80) : '(empty)');
       this.setData({ venues, loading: false, loadError: '' });
     } catch (e) {
       const msg = e.error || ('网络错误 ' + e.status);
