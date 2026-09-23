@@ -1,5 +1,9 @@
 const api = require('../../api/index.js');
+const config = require('../../config.js');
 const time = require('../../utils/time.js');
+
+// 默认畅打海报（与后端 static/promos/default.jpg 对应）
+const DEFAULT_PROMO_COVER = `${config.apiBase.replace(/\/$/, '')}/static/promos/default.jpg`;
 
 Page({
   data: {
@@ -31,6 +35,11 @@ Page({
     try {
       const p = await api.getPromo(this._id);
       const isExpired = time.isPast(p.signup_deadline);
+      // cover: 相对路径 → 绝对 URL；空 → 默认海报
+      const apiBase = config.apiBase.replace(/\/$/, '');
+      let cover = p.cover || '';
+      if (cover && cover.startsWith('/')) cover = apiBase + cover;
+      p.cover = cover || DEFAULT_PROMO_COVER;
       this.setData({
         promo: p,
         loading: false,
