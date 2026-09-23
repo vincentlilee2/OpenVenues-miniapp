@@ -20,6 +20,7 @@
     <view class="order-foot">
       <text class="amount">¥{{item.total_price}}</text>
       <text wx:if="{{item.cancelable}}" class="cancel-link" catchtap="onCancel" data-id="{{item.id}}">取消</text>
+      <text wx:elif="{{item.cancelHint}}" class="cancel-hint">{{item.cancelHint}}</text>
     </view>
   </view>
 </view>

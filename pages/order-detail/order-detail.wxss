@@ -23,5 +23,6 @@
   margin-top: 40rpx;
 }
 .danger { color: var(--danger); border-color: var(--danger); }
+.cancel-hint { margin-top: 24rpx; font-size: 24rpx; color: var(--muted); text-align: center; }
 
 .empty { text-align: center; color: var(--muted); padding: 80rpx 0; }

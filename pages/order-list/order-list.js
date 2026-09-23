@@ -1,4 +1,5 @@
 const api = require('../../api/index.js');
+const { cancelInfoOf, confirmContentOf } = require('../../utils/cancel.js');
 
 const STATUS_TABS = [
   { k: 'all', label: '全部' },
@@ -59,14 +60,19 @@ Page({
         data = data.filter((o) => o.status === this.data.activeStatus);
       }
       // 模板里不能调用 Page 方法（{{statusLabel(x)}} 会渲染成空白），派生字段一律在这里算好
-      const orders = (data || []).map((o) => ({
-        ...o,
-        statusText: STATUS_LABEL[o.status] || o.status,
-        sourceText: o.source === 'promo' ? `🎯 ${o.promo_title || '畅打活动'}` : '⏰ 散客预约',
-        timeText: `${o.booking_date} · ${o.start_time}-${o.end_time}`,
-        durationText: o.duration_hours > 1 ? `${o.duration_hours} 小时` : '1 小时',
-        cancelable: canCancel(o),
-      }));
+      const orders = (data || []).map((o) => {
+        const ci = cancelInfoOf(o); // 后端按场馆规则判定；拿不到字段时按旧行为兜底
+        return {
+          ...o,
+          statusText: STATUS_LABEL[o.status] || o.status,
+          sourceText: o.source === 'promo' ? `🎯 ${o.promo_title || '畅打活动'}` : '⏰ 散客预约',
+          timeText: `${o.booking_date} · ${o.start_time}-${o.end_time}`,
+          durationText: o.duration_hours > 1 ? `${o.duration_hours} 小时` : '1 小时',
+          cancelable: ci.allowed,
+          // 只在「进行中的订单被规则挡住」时给原因，已完成/已取消的不啰嗦
+          cancelHint: !ci.allowed && ['pending', 'confirmed'].indexOf(o.status) >= 0 ? ci.reason : '',
+        };
+      });
       this.setData({ orders, loading: false });
     } catch (e) {
       this.setData({ loading: false });
@@ -87,10 +93,11 @@ Page({
 
   async onCancel(e) {
     const id = e.currentTarget.dataset.id;
+    const order = (this.data.orders || []).filter((o) => String(o.id) === String(id))[0];
     const ok = await new Promise((resolve) => {
       wx.showModal({
         title: '确认取消订单',
-        content: '取消后将释放该时段，确定要取消吗？',
+        content: confirmContentOf(order), // 含扣费说明（按场馆的取消规则）
         confirmText: '确认取消',
         cancelText: '再想想',
         confirmColor: '#dc2626',
@@ -108,9 +115,4 @@ Page({
   },
 });
 
-// 开始前 2 小时内不允许取消
-function canCancel(o) {
-  if (['pending', 'confirmed'].indexOf(o.status) < 0) return false;
-  const startAt = new Date(`${o.booking_date}T${o.start_time}:00`).getTime();
-  return startAt - Date.now() > 2 * 3600 * 1000;
-}
+// 取消判定已统一到 utils/cancel.js（后端按场馆规则返回，旧行为兜底）

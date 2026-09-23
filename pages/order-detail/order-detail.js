@@ -1,5 +1,6 @@
 const api = require('../../api/index.js');
 const { courtTextOf } = require('../../utils/order-display.js');
+const { cancelInfoOf, confirmContentOf } = require('../../utils/cancel.js');
 
 const STATUS_LABEL = {
   pending: '待确认',
@@ -22,6 +23,7 @@ Page({
     this.setData({ loading: true });
     try {
       const o = await api.orderDetail(this._id);
+      const ci = cancelInfoOf(o); // 后端按场馆规则判定（拿不到字段则旧行为兜底）
       this.setData({
         order: o,
         loading: false,
@@ -32,8 +34,8 @@ Page({
         promoTitle: (o.promo && o.promo.title) || '',
         // 具体场地（不是只显示场馆名）；场馆级畅打显示「全部场地」
         courtText: courtTextOf(o),
-        canCancel: ['pending', 'confirmed'].includes(o.status) &&
-          new Date(`${o.booking_date}T${o.start_time}:00`).getTime() - Date.now() > 2 * 3600 * 1000,
+        canCancel: ci.allowed,
+        cancelHint: !ci.allowed && ['pending', 'confirmed'].includes(o.status) ? ci.reason : '',
       });
     } catch (e) {
       this.setData({ loading: false });
@@ -47,7 +49,7 @@ Page({
     const ok = await new Promise((resolve) => {
       wx.showModal({
         title: '确认取消订单',
-        content: '取消后将释放该时段，确定要取消吗？',
+        content: confirmContentOf(this.data.order), // 含扣费说明（按场馆的取消规则）
         confirmText: '确认取消',
         cancelText: '再想想',
         confirmColor: '#dc2626',

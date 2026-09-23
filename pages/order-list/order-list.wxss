@@ -86,6 +86,7 @@
 }
 .amount { font-size: 34rpx; font-weight: 700; color: #b45309; }
 .cancel-link { font-size: 26rpx; color: var(--danger); }
+.cancel-hint { font-size: 22rpx; color: var(--muted); margin-left: 12rpx; }
 
 .empty { text-align: center; color: var(--muted); padding: 80rpx 0; }
 
