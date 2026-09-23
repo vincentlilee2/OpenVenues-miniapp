@@ -7,7 +7,8 @@
     </view>
 
     <view class="card">
-      <view class="row"><text class="label">场地</text><text>{{order.venue_name}}</text></view>
+      <view class="row"><text class="label">场馆</text><text>{{order.venue_name}}</text></view>
+      <view class="row"><text class="label">场地</text><text>{{courtText}}</text></view>
       <view class="row"><text class="label">地址</text><text>{{order.venue_address || '地址待补充'}}</text></view>
       <view class="row"><text class="label">日期</text><text>{{order.booking_date}}</text></view>
       <view class="row"><text class="label">时段</text><text>{{order.start_time}} - {{order.end_time}}</text></view>

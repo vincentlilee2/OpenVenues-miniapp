@@ -1,4 +1,5 @@
 const api = require('../../api/index.js');
+const { courtTextOf } = require('../../utils/order-display.js');
 
 const STATUS_LABEL = {
   pending: '待确认',
@@ -29,6 +30,8 @@ Page({
         sourceText: o.source === 'promo' ? `🎯 ${(o.promo && o.promo.title) || '畅打活动'}` : '⏰ 散客预约',
         durationText: o.duration_hours > 1 ? `${o.duration_hours} 小时` : '1 小时',
         promoTitle: (o.promo && o.promo.title) || '',
+        // 具体场地（不是只显示场馆名）；场馆级畅打显示「全部场地」
+        courtText: courtTextOf(o),
         canCancel: ['pending', 'confirmed'].includes(o.status) &&
           new Date(`${o.booking_date}T${o.start_time}:00`).getTime() - Date.now() > 2 * 3600 * 1000,
       });
