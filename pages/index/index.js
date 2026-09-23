@@ -82,18 +82,42 @@ Page({
     wx.showToast({ title: '已收藏（占位）', icon: 'none' });
   },
 
+  // 点「⊕ 导航」→ 打开微信内置地图页（wx.openLocation），用户可在那里直接发起导航。
+  // 注意：openLocation **必须**有经纬度，光有地址字符串是打不开地图的
+  //       （所以坐标由管理员在后台按地址解析后存进 venues.latitude/longitude）。
   openMap(e) {
     const id = e.currentTarget.dataset.id;
     const v = this.data.venues.find((x) => x.id === id);
-    if (!v?.address) {
-      wx.showToast({ title: '该场馆暂无地址', icon: 'none' });
+    if (!v) return;
+
+    const lat = Number(v.latitude);
+    const lng = Number(v.longitude);
+    // (0,0) 是几内亚湾，明显是占位值 → 当没坐标处理，别把用户导航到非洲
+    const hasCoord =
+      Number.isFinite(lat) && Number.isFinite(lng) && !(lat === 0 && lng === 0);
+
+    if (!hasCoord) {
+      wx.showModal({
+        title: '暂无定位',
+        content: v.address
+          ? `「${v.name}」还没有设置地图坐标，暂时打不开导航。\n地址：${v.address}\n（请管理员在本地后台的场馆编辑页补上坐标）`
+          : `「${v.name}」还没有填写地址，暂时无法导航。`,
+        showCancel: false,
+        confirmText: '知道了',
+      });
       return;
     }
+
     wx.openLocation({
-      latitude: 0,
-      longitude: 0,
+      latitude: lat,
+      longitude: lng,
       name: v.name,
-      address: v.address,
+      address: v.address || '',
+      scale: 16,
+      fail: (err) => {
+        console.error('[openMap] openLocation failed', err);
+        wx.showToast({ title: '打开地图失败', icon: 'none' });
+      },
     });
   },
 

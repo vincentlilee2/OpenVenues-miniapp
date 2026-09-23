@@ -133,16 +133,20 @@
   margin-bottom: 12rpx;
 }
 .venue-addr-text {
-  /* flex:0 1 auto —— 短地址时按钮紧跟文字；长地址时文字收缩加省略号，按钮不被挤走 */
-  flex: 0 1 auto;
+  /* 占满剩余宽度 → 导航按钮被推到行末右对齐。
+     flex:1 + min-width:0 是让 text-overflow:ellipsis 生效的关键；
+     white-space:nowrap 保证绝不折行。 */
+  flex: 1;
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-/* 导航按钮：跟在地址后面（行内胶囊），不再是封面图上的浮层 */
+/* 导航按钮：跟在地址后面（行内胶囊），右对齐且位置恒定——
+   flex-shrink:0 + white-space:nowrap 保证地址再长也不会挤动/挤压它 */
 .venue-nav {
   flex-shrink: 0;
+  white-space: nowrap;
   background: var(--primary);
   color: #fff;
   padding: 8rpx 20rpx;
