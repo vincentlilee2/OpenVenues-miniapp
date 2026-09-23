@@ -1,6 +1,7 @@
 const api = require('../../api/index.js');
 const config = require('../../config.js');
 const time = require('../../utils/time.js');
+const contact = require('../../utils/contact.js');
 
 // 默认畅打海报（与后端 static/promos/default.jpg 对应）
 const DEFAULT_PROMO_COVER = `${config.apiBase.replace(/\/$/, '')}/static/promos/default.jpg`;
@@ -18,16 +19,30 @@ Page({
 
   onLoad(opt) {
     this._id = opt.id;
-    // 预填上次填过的联系人信息
-    const cache = wx.getStorageSync('booker') || {};
-    this.setData({
-      form: {
-        booker_name: cache.booker_name || '',
-        booker_phone: cache.booker_phone || '',
-        participant_names_text: '',
-      },
-    });
+    this.setData({ form: { booker_name: '', booker_phone: '', participant_names_text: '' } });
+    this.fillContact();
     this.load();
+  },
+
+  // 自动填入联系人：本机上次填写 > 登录用户资料（昵称 / 手机号）
+  // 只填空字段，不覆盖用户已经改过的内容
+  async fillContact() {
+    try {
+      const c = await contact.resolveContact();
+      const form = { ...this.data.form };
+      let changed = false;
+      if (!String(form.booker_name || '').trim() && c.name) {
+        form.booker_name = c.name;
+        changed = true;
+      }
+      if (!String(form.booker_phone || '').trim() && c.phone) {
+        form.booker_phone = c.phone;
+        changed = true;
+      }
+      if (changed) this.setData({ form });
+    } catch (e) {
+      console.log('[promo-detail] 自动填入联系人失败：', e && (e.error || e.message));
+    }
   },
 
   async load() {
@@ -128,11 +143,8 @@ Page({
         booker_phone: form.booker_phone.trim(),
         participant_names,
       });
-      // 缓存联系人
-      wx.setStorageSync('booker', {
-        booker_name: form.booker_name,
-        booker_phone: form.booker_phone,
-      });
+      // 记到本机（下次自动填）+ 资料里没手机号时补上（跨设备也能自动填）
+      contact.persistContact(api, { name: form.booker_name, phone: form.booker_phone });
       wx.showToast({ title: '报名成功！', icon: 'success' });
       // order-list 是 tabBar 页且 switchTab 不支持 query，用 storage 传参
       wx.setStorageSync('order_filter', 'all');

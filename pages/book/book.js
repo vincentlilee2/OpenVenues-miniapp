@@ -2,6 +2,7 @@
 // 排版交给 grid.js（纯绝对定位，不用 CSS Grid），本文件只管取数 + 交互
 const api = require('../../api/index.js');
 const session = require('../../utils/session.js');
+const contact = require('../../utils/contact.js');
 const grid = require('./grid.js');
 const merge = require('./merge.js');
 
@@ -26,12 +27,15 @@ Page({
     loading: false,
     booking: false,
     uid: '',
+    contact_name: '',    // 联系人姓名（自动填入登录用户昵称，可改）
+    contact_phone: '',   // 联系人手机号（自动填入登录用户手机号，可改）
   },
 
   onLoad(opt) {
     this._venueId = Number(opt.venue_id);
     const uid = session.getUid();
     this.setData({ uid });
+    this.fillContact();
 
     // 日期 Tab（今天起 7 天）
     const tabs = [];
@@ -47,6 +51,25 @@ Page({
     this.setData({ dateTabs: tabs, activeDate: tabs[0].date });
 
     this.loadVenue();
+  },
+
+  // 自动填入联系人：本机上次填写 > 登录用户资料（昵称 / 手机号）
+  // 只填空字段，不覆盖用户已经改过的内容
+  async fillContact() {
+    try {
+      const c = await contact.resolveContact();
+      const patch = {};
+      if (!String(this.data.contact_name || '').trim() && c.name) patch.contact_name = c.name;
+      if (!String(this.data.contact_phone || '').trim() && c.phone) patch.contact_phone = c.phone;
+      if (Object.keys(patch).length) this.setData(patch);
+    } catch (e) {
+      console.log('[book] 自动填入联系人失败：', e && (e.error || e.message));
+    }
+  },
+
+  onContactInput(e) {
+    const k = e.currentTarget.dataset.k;
+    if (k) this.setData({ [k]: e.detail.value });
   },
 
   async loadVenue() {
@@ -163,6 +186,16 @@ Page({
     if (groups.length === 0) return;
     const totalHours = groups.reduce((s, g) => s + g.hours, 0);
 
+    // 联系人校验（此前这里没有输入框，直接写死假号 —— 场馆根本联系不到顾客）
+    const contactName = String(this.data.contact_name || '').trim();
+    const contactPhone = String(this.data.contact_phone || '').trim();
+    if (!contact.isName(contactName)) {
+      return wx.showToast({ title: '请填写联系人姓名', icon: 'none' });
+    }
+    if (!contact.isPhone(contactPhone)) {
+      return wx.showToast({ title: '请填写正确的 11 位手机号', icon: 'none' });
+    }
+
     const detail = groups
       .map((g) => {
         const court = this.data.courts.find((c) => c.id === g.court_id) || {};
@@ -191,8 +224,8 @@ Page({
           booking_date: activeDate,
           start_time: g.start_time,
           end_time: g.end_time,
-          contact_name: wx.getStorageSync('contact_name') || '本人',
-          contact_phone: wx.getStorageSync('contact_phone') || '13800138000',
+          contact_name: contactName,
+          contact_phone: contactPhone,
         });
         okCount++;
       } catch (e) {
@@ -202,6 +235,8 @@ Page({
     this.setData({ booking: false });
 
     if (okCount === groups.length) {
+      // 下单成功 → 记到本机（下次自动填）+ 资料里没手机号时补上（跨设备也能自动填）
+      contact.persistContact(api, { name: contactName, phone: contactPhone });
       wx.showToast({ title: `已预约 ${okCount} 单`, icon: 'success' });
       this.setData({ selectedKeys: {}, selectedCount: 0, totalPrice: 0 });
       this.loadAvailability();

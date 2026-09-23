@@ -171,3 +171,36 @@
   color: var(--muted);
   padding: 80rpx 0;
 }
+
+/* ===== 联系人（自动填入登录用户昵称/手机号）===== */
+.contact-card {
+  margin-top: 20rpx;
+}
+.contact-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+.form-row {
+  margin: 18rpx 0;
+}
+.form-label {
+  font-size: 26rpx;
+  color: var(--muted);
+  margin-bottom: 10rpx;
+  display: block;
+}
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16rpx;
+  border: 1rpx solid var(--border);
+  border-radius: 10rpx;
+  font-size: 28rpx;
+}
+.contact-tip {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: var(--muted);
+  line-height: 1.5;
+}
