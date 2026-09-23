@@ -85,12 +85,13 @@
   opacity: 0.6;
 }
 
-/* 浮层按钮的定位基准是同级的 .venue-cover-wrap（position: relative）——
-   所以这两个 view 必须写在 venue-cover-wrap 内部，否则会相对整页定位跑到页面顶部。 */
+/* ♡ 收藏：封面图左上角的浮层。
+   定位基准是同级的 .venue-cover-wrap（position: relative）——
+   必须写在 venue-cover-wrap 内部，否则会相对整页定位跑到页面顶部。 */
 .venue-fav {
   position: absolute;
   top: 20rpx;
-  right: 20rpx;
+  left: 20rpx;
   width: 56rpx;
   height: 56rpx;
   border-radius: 50%;
@@ -100,17 +101,6 @@
   align-items: center;
   justify-content: center;
   font-size: 32rpx;
-}
-
-.venue-nav {
-  position: absolute;
-  top: 20rpx;
-  left: 20rpx;
-  background: var(--primary);
-  color: #fff;
-  padding: 8rpx 20rpx;
-  border-radius: 999rpx;
-  font-size: 24rpx;
 }
 
 .venue-body {
@@ -133,10 +123,32 @@
   padding: 4rpx 14rpx;
   border-radius: 16rpx;
 }
+/* 地址行：地址文字 + 右侧「⊕ 导航」按钮 */
 .venue-addr {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
   font-size: 26rpx;
   color: var(--muted);
   margin-bottom: 12rpx;
+}
+.venue-addr-text {
+  /* flex:0 1 auto —— 短地址时按钮紧跟文字；长地址时文字收缩加省略号，按钮不被挤走 */
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* 导航按钮：跟在地址后面（行内胶囊），不再是封面图上的浮层 */
+.venue-nav {
+  flex-shrink: 0;
+  background: var(--primary);
+  color: #fff;
+  padding: 8rpx 20rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  line-height: 1.4;
 }
 .venue-courts {
   display: flex;
