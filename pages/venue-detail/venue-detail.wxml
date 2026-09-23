@@ -34,7 +34,8 @@
       <view class="court-list">
         <view wx:for="{{venue.courts}}" wx:key="id" class="court-item">
           <view class="court-name">{{item.name}}</view>
-          <view class="court-cap">容纳 {{item.max_capacity}} 人</view>
+          <!-- 容量是选填项：后台留空（NULL）时这里整行不显示 -->
+          <view class="court-cap" wx:if="{{item.max_capacity > 0}}">容纳 {{item.max_capacity}} 人</view>
           <view class="court-status {{item.status === 'active' ? 'on' : 'off'}}">
             {{item.status === 'active' ? '营业中' : '已停用'}}
           </view>
