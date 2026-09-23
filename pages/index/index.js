@@ -1,4 +1,5 @@
 const api = require('../../api/index.js');
+const config = require('../../config.js');
 const venueCovers = require('../../utils/venueCovers.js');
 
 Page({
@@ -28,10 +29,20 @@ Page({
     this.setData({ loading: true });
     try {
       const data = await api.listVenues();
-      // 给每个场馆附加默认 cover（如果服务器没传 cover）：按 id 取本地 SVG 数据 URI
-      const venues = (data || []).map((v) => ({
+      // 给每个场馆附加默认 cover（如果服务器没传 cover）：按 id 取远程 SVG URL
+      // 服务端返回的 cover 可能是相对路径 /uploads/covers/... 或绝对 URL，统一用 apiBase 拼绝对路径
+      const apiBase = config.apiBase.replace(/\/$/, '');
+      const venues = (data || []).map((v) => {
+        let cover = v.cover || '';
+        // 相对路径 → 拼绝对 URL（小程序 <image src> 不支持相对路径，会被拼到当前 pageframe URL）
+        if (cover && cover.startsWith('/')) cover = apiBase + cover;
+        return {
+          ...v,
+          cover, // 已是绝对 URL 或空
+        };
+      }).map((v) => ({
         ...v,
-        defaultCover: venueCovers.byId(v.id),
+        defaultCover: venueCovers.byId(v.id), // 兜底默认（已是绝对 URL）
       }));
       this.setData({ venues, loading: false, loadError: '' });
     } catch (e) {
