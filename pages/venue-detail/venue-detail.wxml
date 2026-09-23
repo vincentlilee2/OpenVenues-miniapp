@@ -3,7 +3,8 @@
   <block wx:elif="{{venue}}">
     <!-- 海报 -->
     <view class="cover">
-      <view wx:if="{{venue.cover}}" class="cover-img" style="background-image:url({{venue.cover}})"></view>
+      <image wx:if="{{venue.cover}}" class="cover-img" src="{{venue.cover}}" mode="aspectFill"></image>
+      <image wx:elif="{{venue.defaultCover}}" class="cover-img" src="{{venue.defaultCover}}" mode="aspectFill"></image>
       <view wx:else class="cover-placeholder">
         <text>{{venue.name}}</text>
       </view>

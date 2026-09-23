@@ -1,4 +1,6 @@
 const api = require('../../api/index.js');
+const config = require('../../config.js');
+const venueCovers = require('../../utils/venueCovers.js');
 
 Page({
   data: { venue: null, loading: true },
@@ -12,6 +14,11 @@ Page({
     this.setData({ loading: true });
     try {
       const v = await api.getVenue(this._id);
+      // cover：可能是相对路径 /uploads/... → 拼成绝对 URL（避免小程序 pageframe 错位）
+      const apiBase = config.apiBase.replace(/\/$/, '');
+      if (v && v.cover && v.cover.startsWith('/')) v.cover = apiBase + v.cover;
+      // defaultCover：按 venue.id 取本地 utils 拼好的远程 URL（绝对）
+      v.defaultCover = venueCovers.byId(this._id);
       this.setData({ venue: v, loading: false });
     } catch (e) {
       this.setData({ loading: false });
