@@ -1,21 +1,26 @@
 // OpenVenues 小程序全局配置
 //
+// ⚠️ 本文件在开源仓里是**占位版**：`your-domain` 需要换成你自己的后端域名。
+//    本地开发时把真实域名填进来即可（本仓用 git update-index --skip-worktree
+//    把本地真实值对 git 隐藏，push 上去的永远是这份占位版）。
+//    查看/取消隐藏：git ls-files -v config.js   →   'S' 表示已隐藏（skip-worktree）
+//                  git update-index --no-skip-worktree config.js
+//
 // 服务器地址按运行环境自动选择（不用手改）：
 //   · 开发者工具（模拟器跑在 Mac 上）→ 线上 HTTPS 域名（与真机/正式版同源）
 //   · 真机 / 体验版 / 正式版          → 线上 HTTPS 域名
 //
-// 重要：开发者工具和小程序真机**都**指向线上 API，本地 dev server 只用来跑后台看数据。
-// 这样：① 单一真源（线上 db），不会出现"两处各下一笔"造成的占用冲突
-//      ② 在 DevTools 里点预约 = 顾客真实在体验版点的同一份订单，本地立刻看到
+// 为什么开发者工具也走线上：① 单一真源（线上 db），不会出现"两处各下一笔"的占用冲突
+//                          ② 在 DevTools 里点预约 = 顾客在体验版点的同一份订单，本地立刻看到
 //
-// 正式域名：https://blog.mgarden.org.cn/venue-api（nginx → 本机 8810, pm2: openvenues-api）
 // 注意：该域名必须在小程序后台「开发管理 → 开发设置 → 服务器域名 → request 合法域名」里登记，
 //       否则真机/体验版直接拦掉请求。
-const DEVTOOLS_HOST = 'https://blog.mgarden.org.cn/venue-api';  // DevTools 也走线上（单一真源）
-const PROD_HOST = 'https://blog.mgarden.org.cn/venue-api';
+const DEVTOOLS_HOST = 'https://your-domain/venue-api';  // DevTools 也走线上（单一真源）
+const PROD_HOST = 'https://your-domain/venue-api';
 
 // 临时：想在本地 dev server 上自测订单 / 报名（不推荐，会和线上脱节）
-//      改回 'http://127.0.0.1:8810' + 把 server.js 启动时加 OPENVENUES_ALLOW_LOCAL_WRITE=1
+//      把 REAL_DEVICE_TARGET 改成 'lan'，并保证 LAN_HOST 是本机局域网 IP，
+//      同时后端启动时加 OPENVENUES_ALLOW_LOCAL_WRITE=1
 const LAN_HOST = 'http://YOUR_LAN_IP:8810';
 const REAL_DEVICE_TARGET = 'prod'; // 'prod' | 'lan'
 

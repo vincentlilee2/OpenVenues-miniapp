@@ -28,10 +28,27 @@ sed -i '' 's/YOUR_LAN_IP/192.168.1.x/' config.js   # ← 改成你的
 ## `config.js` 怎么选服务器地址
 
 ```js
-const DEVTOOLS_HOST = 'http://127.0.0.1:8810';      // 开发者工具模拟器
-const LAN_HOST      = 'http://YOUR_LAN_IP:8810';    // 真机与本机同 WiFi
-const PROD_HOST     = 'https://blog.mgarden.org.cn/venue-api'; // 体验版/正式版
-const REAL_DEVICE_TARGET = 'prod';                  // 'prod' | 'lan'
+const DEVTOOLS_HOST = 'https://your-domain/venue-api';  // 开发者工具（也走线上，单一真源）
+const LAN_HOST      = 'http://YOUR_LAN_IP:8810';         // 真机与本机同 WiFi（临时联调）
+const PROD_HOST     = 'https://your-domain/venue-api';   // 体验版/正式版
+const REAL_DEVICE_TARGET = 'prod';                       // 'prod' | 'lan'
+```
+
+**把 `your-domain` 换成你自己的后端域名**（后端仓 `OpenVenues-server` 的部署域名，含 `/venue-api` 前缀）。
+
+### 开源占位双轨（本项目约定）
+
+仓里提交的 `config.js` 与 `project.config.json` 是**占位版**（`your-domain` / `touristappid`），
+本地真实值靠 `git update-index --skip-worktree` 对 git 隐藏——本地开发照常，push 恒为占位。
+
+```bash
+# 看某个文件是否处于隐藏态（'S' 前缀 = skip-worktree 生效）
+git ls-files -v config.js project.config.json
+
+# 需要改「占位版」时先解除隐藏，改完再重新隐藏
+git update-index --no-skip-worktree config.js project.config.json
+#   ...编辑占位内容...
+git update-index --skip-worktree config.js project.config.json
 ```
 
 `REAL_DEVICE_TARGET = 'lan'` 时真机走 `LAN_HOST`（用于本地临时联调）。
