@@ -33,9 +33,12 @@
       <view wx:else class="venue-cover venue-cover--placeholder">
         <text class="placeholder-text">{{item.name}}</text>
       </view>
-    </view>
+      <!-- 浮层按钮：必须留在 .venue-cover-wrap 内部。
+           一旦被移出，离它最近的定位祖先是页面 → absolute 会相对整页定位，
+           两个按钮就会飘到页面顶部的品牌行上（2026-09-23 实测事故）。 -->
+      <view class="venue-nav" catchtap="openMap" data-id="{{item.id}}">⊕ 导航</view>
       <view class="venue-fav" catchtap="toggleFav" data-id="{{item.id}}">♡</view>
-    <view class="venue-nav" catchtap="openMap" data-id="{{item.id}}">⊕ 导航</view>
+    </view>
     <view class="venue-body">
       <view class="venue-name">{{item.name}}
         <text class="venue-court-count">{{item.court_count}} 场地</text>

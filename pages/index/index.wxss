@@ -85,10 +85,12 @@
   opacity: 0.6;
 }
 
+/* 浮层按钮的定位基准是同级的 .venue-cover-wrap（position: relative）——
+   所以这两个 view 必须写在 venue-cover-wrap 内部，否则会相对整页定位跑到页面顶部。 */
 .venue-fav {
   position: absolute;
   top: 20rpx;
-  left: 20rpx;
+  right: 20rpx;
   width: 56rpx;
   height: 56rpx;
   border-radius: 50%;
@@ -103,7 +105,7 @@
 .venue-nav {
   position: absolute;
   top: 20rpx;
-  right: 20rpx;
+  left: 20rpx;
   background: var(--primary);
   color: #fff;
   padding: 8rpx 20rpx;
