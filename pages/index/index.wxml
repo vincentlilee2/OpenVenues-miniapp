@@ -28,13 +28,14 @@
   <!-- 场馆卡片列表（参考截图：场馆 = 一卡，含若干场地） -->
   <view wx:for="{{venues}}" wx:key="id" class="venue-card" bindtap="openDetail" data-id="{{item.id}}">
     <view class="venue-cover-wrap">
-      <view wx:if="{{item.cover}}" class="venue-cover" style="background-image:url({{item.cover}})"></view>
+      <image wx:if="{{item.cover}}" class="venue-cover" src="{{item.cover}}" mode="aspectFill"></image>
+      <image wx:elif="{{item.defaultCover}}" class="venue-cover" src="{{item.defaultCover}}" mode="aspectFill"></image>
       <view wx:else class="venue-cover venue-cover--placeholder">
         <text class="placeholder-text">{{item.name}}</text>
       </view>
-      <view class="venue-fav" catchtap="toggleFav" data-id="{{item.id}}">♡</view>
-      <view class="venue-nav" catchtap="openMap" data-id="{{item.id}}">⊕ 导航</view>
     </view>
+      <view class="venue-fav" catchtap="toggleFav" data-id="{{item.id}}">♡</view>
+    <view class="venue-nav" catchtap="openMap" data-id="{{item.id}}">⊕ 导航</view>
     <view class="venue-body">
       <view class="venue-name">{{item.name}}
         <text class="venue-court-count">{{item.court_count}} 场地</text>
