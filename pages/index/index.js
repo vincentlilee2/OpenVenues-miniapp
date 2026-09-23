@@ -33,17 +33,14 @@ Page({
       // 服务端返回的 cover 可能是相对路径 /uploads/covers/... 或绝对 URL，统一用 apiBase 拼绝对路径
       const apiBase = config.apiBase.replace(/\/$/, '');
       const venues = (data || []).map((v) => {
-        let cover = v.cover || '';
-        // 相对路径 → 拼绝对 URL（小程序 <image src> 不支持相对路径，会被拼到当前 pageframe URL）
-        if (cover && cover.startsWith('/')) cover = apiBase + cover;
         return {
           ...v,
-          cover, // 已是绝对 URL 或空
+          // 背景图：服务端 cover 优先，其次服务端给的默认图（都不给就把 defaultCover 留空 →
+          // 模板走占位块；绝不再拼一个可能 404 的路径，那是"卡片空白"的元凶）
+          cover: venueCovers.absolute(v.cover, apiBase),
+          defaultCover: venueCovers.absolute(v.default_cover, apiBase),
         };
-      }).map((v) => ({
-        ...v,
-        defaultCover: venueCovers.byId(v.id), // 兜底默认（已是绝对 URL）
-      }));
+      });
       this.setData({ venues, loading: false, loadError: '' });
     } catch (e) {
       const msg = e.error || ('网络错误 ' + e.status);

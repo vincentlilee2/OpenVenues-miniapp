@@ -1,31 +1,30 @@
-// 三个场馆的默认实景背景图（mmx 图像生成）
-//   - 文件在 server/static/covers/tennis_001.jpg / basketball_001.jpg / pickleball_001.jpg
-//   - 用 mmx image generate 生成（prompt 见 scripts/gen-covers.sh）
-//   - 小程序端按 API_BASE 拼成 http://host/static/covers/tennis_001.jpg
-//   - 每张 250-500 KB，鸟瞰视角 / 无人物 / 球场细节清晰
+// 场馆封面 URL 组装（小程序端）
 //
-//   添加新赛事：在 admin 后台给 venue.cover 设 URL 即可（item.cover 优先）
+// ⚠️ 曾经这里是**按场馆 id 写死**的三张图（1/2/3），新场馆查不到就兜底到一个不存在的
+//    `/static/covers/tennis.svg`（线上 404）→ 首页那张卡片是加载失败的图。
+//    现在**数据来源唯一**：服务端 `/api/venues` 与 `/api/venues/:id` 返回的 `default_cover`
+//    （服务端会检查文件确实存在，不会给出 404 路径）。
+//
+// 优先级：venue.cover（后台指定/上传）> venue.default_cover（服务端给的默认图）> 空（前端走占位块）
 
-const config = require('../config.js');
+function absolute(url, apiBase) {
+  if (!url) return '';
+  if (String(url).startsWith('http')) return url;
+  const base = String(apiBase || '').replace(/\/$/, '');
+  return base + url;
+}
 
-function coversMap() {
-  const base = config.apiBase.replace(/\/$/, '');
-  return {
-    1: `${base}/static/covers/tennis_001.jpg`,
-    2: `${base}/static/covers/basketball_001.jpg`,
-    3: `${base}/static/covers/pickleball_001.jpg`,
-  };
+/**
+ * 某个场馆最终要显示的背景图 URL（绝对路径；没有则返回空串 → 模板走占位块）
+ * @param {object} venue 至少含 { cover, default_cover }
+ * @param {string} apiBase 例如 https://host/venue-api
+ */
+function of(venue, apiBase) {
+  if (!venue) return '';
+  return absolute(venue.cover, apiBase) || absolute(venue.default_cover, apiBase) || '';
 }
 
 module.exports = {
-  // 按 venue.id 拿 cover URL
-  byId(id) {
-    return coversMap()[id] || `${config.apiBase.replace(/\/$/, '')}/static/covers/tennis.svg`;
-  },
-  // 直接给三个固定键
-  A: () => coversMap()[1],
-  B: () => coversMap()[2],
-  C: () => coversMap()[3],
-  // 给 config 同步调试用
-  coversMap,
+  of: of,
+  absolute: absolute,
 };
