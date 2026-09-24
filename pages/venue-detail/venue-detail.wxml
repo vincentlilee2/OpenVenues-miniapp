@@ -8,6 +8,10 @@
       <view wx:else class="cover-placeholder">
         <text>{{venue.name}}</text>
       </view>
+      <!-- 转发小图标（2026-09-24）：右上角浮层。open-type="share" 触发 Page.onShareAppMessage。
+           注：分享到朋友圈只能从右上角「…」菜单发起（官方限制，页面内不能直接发起），
+               所以这里的小图标只做「转发给好友」。 -->
+      <button class="share-icon" open-type="share" hover-class="share-icon-hover">↗</button>
     </view>
 
     <!-- 场馆信息 -->
@@ -43,12 +47,11 @@
       </view>
     </view>
 
-    <!-- 操作按钮（参考截图：约课/约场/畅打；转发 2026-09-24 加） -->
+    <!-- 操作按钮（参考截图：约课/约场/畅打）——转发按钮已挪到海报右上角小图标（2026-09-24） -->
     <view class="actions">
       <button class="btn-warn" hover-class="btn-hover" bindtap="onBookLesson">约课</button>
       <button class="btn-outline btn-action" hover-class="btn-hover" bindtap="onBookVenue">约场</button>
       <button class="btn-primary btn-action" hover-class="btn-hover" bindtap="onPromoList">畅打</button>
-      <button class="btn-outline btn-action" open-type="share" hover-class="btn-hover">转发</button>
     </view>
   </block>
 </view>
