@@ -3,6 +3,7 @@ const config = require('../../config.js');
 const time = require('../../utils/time.js');
 const contact = require('../../utils/contact.js');
 const pay = require('../../utils/pay.js');
+const share = require('../../utils/share.js');
 
 // 默认畅打海报（与后端 static/promos/default.jpg 对应）
 const DEFAULT_PROMO_COVER = `${config.apiBase.replace(/\/$/, '')}/static/promos/default.jpg`;
@@ -18,7 +19,17 @@ Page({
     isExpired: false,
   },
 
+  // 转发 / 分享到朋友圈（2026-09-24）：官方要求朋友圈需 onShareAppMessage + onShareTimeline 同时实现
+  onShareAppMessage() {
+    return share.forPromo(this.data.promo, config.apiBase);
+  },
+  onShareTimeline() {
+    // 朋友圈不支持自定义 path（官方限制），timelineFor 会剥掉 path
+    return share.timelineFor(share.forPromo(this.data.promo, config.apiBase));
+  },
+
   onLoad(opt) {
+    share.enableShareMenu(); // 把「转发」「分享到朋友圈」挂到右上角菜单
     this._id = opt.id;
     this.setData({ form: { booker_name: '', booker_phone: '', participant_names_text: '' } });
     this.fillContact();

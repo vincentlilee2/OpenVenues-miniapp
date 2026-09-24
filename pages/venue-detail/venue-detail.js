@@ -1,11 +1,22 @@
 const api = require('../../api/index.js');
 const config = require('../../config.js');
 const venueCovers = require('../../utils/venueCovers.js');
+const share = require('../../utils/share.js');
 
 Page({
   data: { venue: null, loading: true },
 
+  // 转发 / 分享到朋友圈（2026-09-24）：官方要求朋友圈需 onShareAppMessage + onShareTimeline 同时实现
+  onShareAppMessage() {
+    return share.forVenue(this.data.venue, config.apiBase);
+  },
+  onShareTimeline() {
+    // 朋友圈不支持自定义 path（官方限制），timelineFor 会剥掉 path
+    return share.timelineFor(share.forVenue(this.data.venue, config.apiBase));
+  },
+
   onLoad(opt) {
+    share.enableShareMenu(); // 把「转发」「分享到朋友圈」挂到右上角菜单
     this._id = opt.id;
     this.load();
   },

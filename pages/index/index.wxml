@@ -1,7 +1,12 @@
 <view class="container">
   <!-- 顶部品牌区 -->
   <view class="brand">
-    <view class="brand-name">🎾 OpenVenues</view>
+    <view class="brand-left">
+      <view class="brand-name">🎾 OpenVenues</view>
+      <!-- 转发给好友（2026-09-24）：open-type="share" 触发 Page.onShareAppMessage；
+           朋友圈走右上角菜单（需页面实现 onShareTimeline） -->
+      <button class="brand-share" open-type="share" hover-class="share-hover">↗ 转发</button>
+    </view>
     <view class="city">📍 全部场馆 ▾</view>
   </view>
 

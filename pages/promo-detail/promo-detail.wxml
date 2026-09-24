@@ -54,6 +54,10 @@
       <button class="btn-primary submit-btn" bindtap="onSubmit" disabled="{{submitting || isExpired}}">
         {{isExpired ? '已截止' : (submitting ? '提交中...' : '立即报名')}}
       </button>
+
+      <!-- 转发给好友（2026-09-24）：<button open-type="share"> 会触发 Page.onShareAppMessage
+           注意：官方禁止「转发才能解锁」这类诱导，这里只是一个普通分享入口 -->
+      <button class="btn-outline share-btn" open-type="share" hover-class="btn-hover">转发给好友 / 分享到朋友圈</button>
     </view>
   </block>
 </view>

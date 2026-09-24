@@ -43,11 +43,12 @@
       </view>
     </view>
 
-    <!-- 操作按钮（参考截图：约课/约场/畅打） -->
+    <!-- 操作按钮（参考截图：约课/约场/畅打；转发 2026-09-24 加） -->
     <view class="actions">
       <button class="btn-warn" hover-class="btn-hover" bindtap="onBookLesson">约课</button>
       <button class="btn-outline btn-action" hover-class="btn-hover" bindtap="onBookVenue">约场</button>
       <button class="btn-primary btn-action" hover-class="btn-hover" bindtap="onPromoList">畅打</button>
+      <button class="btn-outline btn-action" open-type="share" hover-class="btn-hover">转发</button>
     </view>
   </block>
 </view>

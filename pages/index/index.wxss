@@ -9,6 +9,21 @@
   font-weight: 600;
   color: var(--primary-dark);
 }
+/* 转发按钮（2026-09-24）：跟在品牌名后面，做成小胶囊 */
+.brand-left { display: flex; align-items: center; gap: 14rpx; }
+.brand-share {
+  font-size: 22rpx;
+  line-height: 1.6;
+  color: var(--primary-dark);
+  background: rgba(0, 0, 0, 0.04);
+  border: 1rpx solid var(--border, #e5e7eb);
+  border-radius: 999rpx;
+  padding: 4rpx 18rpx;
+  margin: 0;
+  width: auto;
+  min-width: 0;
+}
+.share-hover { opacity: 0.7; }
 .city {
   font-size: 26rpx;
   color: var(--muted);
