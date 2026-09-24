@@ -25,4 +25,9 @@
 .danger { color: var(--danger); border-color: var(--danger); }
 .cancel-hint { margin-top: 24rpx; font-size: 24rpx; color: var(--muted); text-align: center; }
 
+/* 支付（2026-09-24）：待支付倒计时 / 已支付状态 / 说明 */
+.pay-todo { color: #b45309; font-weight: 600; }
+.pay-ok { color: #0a7; }
+.pay-note { font-size: 22rpx; color: var(--muted); }
+
 .empty { text-align: center; color: var(--muted); padding: 80rpx 0; }

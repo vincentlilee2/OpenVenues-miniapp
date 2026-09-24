@@ -88,6 +88,18 @@
 .cancel-link { font-size: 26rpx; color: var(--danger); }
 .cancel-hint { font-size: 22rpx; color: var(--muted); margin-left: 12rpx; }
 
+/* 支付（2026-09-24）：待支付倒计时 / 已支付状态 / 去支付按钮 */
+.pay-hint { font-size: 24rpx; color: #b45309; margin-top: 10rpx; font-weight: 600; }
+.pay-done { font-size: 24rpx; color: var(--ok, #0a7); margin-top: 10rpx; }
+.pay-link {
+  font-size: 26rpx;
+  color: #fff;
+  background: var(--ok, #0a7);
+  padding: 8rpx 26rpx;
+  border-radius: 999rpx;
+  margin-right: 16rpx;
+}
+
 .empty { text-align: center; color: var(--muted); padding: 80rpx 0; }
 
 .container { padding-bottom: 140rpx; }

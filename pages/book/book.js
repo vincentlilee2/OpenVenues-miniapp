@@ -3,6 +3,7 @@
 const api = require('../../api/index.js');
 const session = require('../../utils/session.js');
 const contact = require('../../utils/contact.js');
+const pay = require('../../utils/pay.js');
 const grid = require('./grid.js');
 const merge = require('./merge.js');
 
@@ -217,9 +218,10 @@ Page({
     this.setData({ booking: true });
     let okCount = 0;
     let failMsg = '';
+    const needPay = []; // 需要支付的订单（2026-09-24：下单即付）
     for (const g of groups) {
       try {
-        await api.createOrder({
+        const created = await api.createOrder({
           court_id: g.court_id,
           booking_date: activeDate,
           start_time: g.start_time,
@@ -228,6 +230,8 @@ Page({
           contact_phone: contactPhone,
         });
         okCount++;
+        const d = (created && created.data) || {};
+        if (d.need_pay) needPay.push({ id: d.id, total_price: d.total_price });
       } catch (e) {
         failMsg = e.error || '下单失败';
       }
@@ -237,7 +241,44 @@ Page({
     if (okCount === groups.length) {
       // 下单成功 → 记到本机（下次自动填）+ 资料里没手机号时补上（跨设备也能自动填）
       contact.persistContact(api, { name: contactName, phone: contactPhone });
-      wx.showToast({ title: `已预约 ${okCount} 单`, icon: 'success' });
+
+      // ===== 支付（2026-09-24）=====
+      //   下单即付：先按总金额确认一次，再逐单调起收银台（一单一付，微信侧一单一交易）
+      //   未开通支付的门店 need_pay 为 false → 走原来的"下单成功"提示，行为与历史一致
+      if (needPay.length) {
+        const sum = needPay.reduce((s, o) => s + Number(o.total_price || 0), 0).toFixed(2);
+        const goPay = await new Promise((resolve) =>
+          wx.showModal({
+            title: '预约成功，请完成支付',
+            content: `${needPay.length} 单合计 ¥${sum}。请在 15 分钟内完成支付 —— 超时订单自动关闭并释放场地。`,
+            confirmText: '立即支付',
+            cancelText: '稍后支付',
+            success: (r) => resolve(r.confirm),
+          })
+        );
+        if (goPay) {
+          let paidCount = 0;
+          let pendingCount = 0;
+          for (const o of needPay) {
+            const r = await pay.payOrder(o.id, { silent: true });
+            if (r.paid) paidCount++;
+            else if (r.pending) pendingCount++;
+          }
+          if (paidCount) wx.showToast({ title: `已支付 ${paidCount} 单`, icon: 'success' });
+          else if (pendingCount) {
+            await new Promise((resolve) =>
+              wx.showModal({
+                title: '支付结果确认中',
+                content: '微信已受理，入账可能需几秒。请稍后在「我的订单」查看；若未支付成功，15 分钟内可重新支付。',
+                showCancel: false,
+                success: resolve,
+              })
+            );
+          }
+        }
+      } else {
+        wx.showToast({ title: `已预约 ${okCount} 单`, icon: 'success' });
+      }
       this.setData({ selectedKeys: {}, selectedCount: 0, totalPrice: 0 });
       this.loadAvailability();
       wx.setStorageSync('order_filter', 'all');

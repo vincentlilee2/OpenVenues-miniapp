@@ -16,9 +16,12 @@
       <view class="venue-name">{{item.venue_name}}<text class="court-name" wx:if="{{item.court_name}}"> · {{item.court_name}}</text></view>
       <view class="order-time">📅 {{item.timeText}}<text class="order-duration">（{{item.durationText}}）</text></view>
       <view class="order-source">{{item.sourceText}}</view>
+      <view wx:if="{{item.needPay}}" class="pay-hint">⏳ 待支付 {{item.remainText}}（超时自动取消）</view>
+      <view wx:elif="{{item.payText}}" class="pay-done">{{item.payText}}</view>
     </view>
     <view class="order-foot">
       <text class="amount">¥{{item.total_price}}</text>
+      <text wx:if="{{item.needPay}}" class="pay-link" catchtap="onPay" data-id="{{item.id}}">去支付</text>
       <text wx:if="{{item.cancelable}}" class="cancel-link" catchtap="onCancel" data-id="{{item.id}}">取消</text>
       <text wx:elif="{{item.cancelHint}}" class="cancel-hint">{{item.cancelHint}}</text>
     </view>

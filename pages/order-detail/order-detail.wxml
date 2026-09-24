@@ -25,8 +25,24 @@
 
     <view class="card">
       <view class="row big"><text>合计</text><text class="amount">¥{{order.total_price}}</text></view>
+      <!-- 支付（2026-09-24） -->
+      <view class="row" wx:if="{{needPay}}">
+        <text class="label">支付</text>
+        <text class="pay-todo">待支付 {{remainText}}</text>
+      </view>
+      <view class="row" wx:elif="{{payText}}">
+        <text class="label">支付</text>
+        <text class="pay-ok">{{payText}}</text>
+      </view>
+      <view class="row" wx:if="{{needPay}}">
+        <text class="label"></text>
+        <text class="pay-note">请在 15 分钟内完成支付，超时订单自动关闭并释放场地</text>
+      </view>
     </view>
 
+    <view class="actions" wx:if="{{needPay}}">
+      <button class="btn-primary" bindtap="onPay">去支付 ¥{{order.total_price}}</button>
+    </view>
     <view class="actions" wx:if="{{canCancel}}">
       <button class="btn-outline danger" bindtap="onCancel">取消订单</button>
     </view>

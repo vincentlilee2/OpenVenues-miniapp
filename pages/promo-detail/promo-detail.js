@@ -2,6 +2,7 @@ const api = require('../../api/index.js');
 const config = require('../../config.js');
 const time = require('../../utils/time.js');
 const contact = require('../../utils/contact.js');
+const pay = require('../../utils/pay.js');
 
 // 默认畅打海报（与后端 static/promos/default.jpg 对应）
 const DEFAULT_PROMO_COVER = `${config.apiBase.replace(/\/$/, '')}/static/promos/default.jpg`;
@@ -137,7 +138,7 @@ Page({
         .split(/[\n,，]/)
         .map((s) => s.trim())
         .filter(Boolean);
-      await api.signupPromo(promo.id, {
+      const created = await api.signupPromo(promo.id, {
         participant_count: participantCount,
         booker_name: form.booker_name.trim(),
         booker_phone: form.booker_phone.trim(),
@@ -145,7 +146,29 @@ Page({
       });
       // 记到本机（下次自动填）+ 资料里没手机号时补上（跨设备也能自动填）
       contact.persistContact(api, { name: form.booker_name, phone: form.booker_phone });
-      wx.showToast({ title: '报名成功！', icon: 'success' });
+
+      // 支付（2026-09-24）：报名费下单即付（未开通支付 → need_pay 为 false，行为与历史一致）
+      const data = (created && created.data) || {};
+      if (data.need_pay) {
+        const r = await pay.handleAfterCreate({ id: data.order_id, need_pay: true, total_price: data.total_price }, 'promo');
+        if (r && r.paid) wx.showToast({ title: '报名成功，已支付', icon: 'success' });
+        else if (r && r.pending) {
+          await new Promise((resolve) =>
+            wx.showModal({
+              title: '支付结果确认中',
+              content: '微信已受理，入账可能需几秒。请稍后在「我的订单」查看；若未支付成功，15 分钟内可重新支付。',
+              showCancel: false,
+              success: resolve,
+            })
+          );
+        } else if (!r || !r.defered) {
+          wx.showToast({ title: '报名成功，待支付', icon: 'none' });
+        } else {
+          wx.showToast({ title: '报名成功，可稍后支付', icon: 'none' });
+        }
+      } else {
+        wx.showToast({ title: '报名成功！', icon: 'success' });
+      }
       // order-list 是 tabBar 页且 switchTab 不支持 query，用 storage 传参
       wx.setStorageSync('order_filter', 'all');
       wx.setStorageSync('order_filter_source', 'promo');

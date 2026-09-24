@@ -28,4 +28,12 @@ module.exports = {
     request({ url: '/api/orders/my' + (includeHidden ? '?include_hidden=1' : '') }),
   orderDetail: (id) => request({ url: `/api/orders/${id}` }),
   cancelOrder: (id) => request({ url: `/api/orders/${id}`, method: 'DELETE' }),
+
+  // ===== 微信支付（2026-09-24）=====
+  //   payConfig：探测本店是否开通了在线支付（未开通 → 前端不显示"去支付"）
+  //   payOrder：拿 wx.requestPayment 参数（服务端下单 + 用商户私钥签名，密钥不下发）
+  //   payStatus：查支付状态（sync=1 时服务端会主动向微信查单，用于回调延迟兜底）
+  payConfig: () => request({ url: '/api/pay/config', auth: false }),
+  payOrder: (id) => request({ url: `/api/orders/${id}/pay`, method: 'POST' }),
+  payStatus: (id, sync) => request({ url: `/api/pay/status/${id}` + (sync ? '?sync=1' : '') }),
 };

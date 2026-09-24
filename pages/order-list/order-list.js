@@ -1,4 +1,5 @@
 const api = require('../../api/index.js');
+const pay = require('../../utils/pay.js');
 const { cancelInfoOf, confirmContentOf } = require('../../utils/cancel.js');
 
 const STATUS_TABS = [
@@ -41,6 +42,63 @@ Page({
     }
     this.syncTabBar();
     this.load();
+    this.startPayTimer(); // 待支付倒计时（2026-09-24）
+  },
+
+  onHide() {
+    this.stopPayTimer();
+  },
+
+  onUnload() {
+    this.stopPayTimer();
+  },
+
+  // 待支付倒计时：只在本页可见时跑，30 秒一跳（够用且省电）。
+  // 注意用**服务端给的剩余秒数**递减，不解析时间串（库里是 UTC，客户端解析会差 8 小时）。
+  startPayTimer() {
+    this.stopPayTimer();
+    this._payTimer = setInterval(() => {
+      const orders = (this.data.orders || []).map((o) => {
+        if (!o.needPay) return o;
+        const left = Math.max(0, (o.payExpireInSec || 0) - 30);
+        return { ...o, payExpireInSec: left, remainText: pay.remainText(left) };
+      });
+      this.setData({ orders });
+      // 有订单刚过期 → 拉一次最新状态（服务端会把它关掉）
+      const expired = (this.data.orders || []).some((o) => o.needPay && (o.payExpireInSec || 0) <= 0);
+      if (expired) this.load();
+    }, 30000);
+  },
+
+  stopPayTimer() {
+    if (this._payTimer) {
+      clearInterval(this._payTimer);
+      this._payTimer = null;
+    }
+  },
+
+  // 去支付（订单列表里的待支付订单；2026-09-24）
+  async onPay(e) {
+    const id = e.currentTarget.dataset.id;
+    wx.showLoading({ title: '正在发起支付', mask: true });
+    const r = await pay.payOrder(id);
+    wx.hideLoading();
+    if (r.paid) {
+      wx.showToast({ title: '支付成功', icon: 'success' });
+      this.load();
+    } else if (r.cancelled) {
+      wx.showToast({ title: '已取消支付，订单仍可支付', icon: 'none' });
+    } else if (r.pending) {
+      wx.showModal({
+        title: '支付结果确认中',
+        content: '微信已受理，入账可能需几秒。稍后下拉刷新本页即可看到「已支付」。',
+        showCancel: false,
+      });
+      this.load();
+    } else {
+      wx.showModal({ title: '支付未完成', content: r.error || '请稍后重试', showCancel: false });
+      this.load();
+    }
   },
 
   // 每个 tab 页更新「自己那份」custom-tab-bar 实例（官方 API）
@@ -71,6 +129,11 @@ Page({
           cancelable: ci.allowed,
           // 只在「进行中的订单被规则挡住」时给原因，已完成/已取消的不啰嗦
           cancelHint: !ci.allowed && ['pending', 'confirmed'].indexOf(o.status) >= 0 ? ci.reason : '',
+          // 支付（2026-09-24）：待支付 → 显示倒计时 + 「去支付」；已支付/已退款 → 显示状态
+          needPay: !!o.need_pay,
+          payText: pay.payBadgeText(o),
+          payExpireInSec: o.pay_expire_in_sec || 0,
+          remainText: pay.remainText(o.pay_expire_in_sec),
         };
       });
       this.setData({ orders, loading: false });
@@ -106,8 +169,26 @@ Page({
     });
     if (!ok) return;
     try {
-      await api.cancelOrder(id);
-      wx.showToast({ title: '已取消', icon: 'success' });
+      const res = await api.cancelOrder(id);
+      // 支付（2026-09-24）：已支付的订单取消 → 服务端已按取消规则退款，这里把金额说清楚
+      const rf = res && res.refund;
+      if (rf && rf.amount_fen > 0) {
+        wx.showModal({
+          title: '已取消，退款已发起',
+          content: `将退回 ¥${rf.amount_yuan}（1-3 个工作日原路退回）。`,
+          showCancel: false,
+        });
+      } else if (rf && rf.error) {
+        wx.showModal({
+          title: '已取消，但退款需人工处理',
+          content: '订单已取消，退款发起失败，我们会在后台补退。如未到账请联系场馆。',
+          showCancel: false,
+        });
+      } else if (rf && rf.note) {
+        wx.showModal({ title: '已取消', content: rf.note, showCancel: false });
+      } else {
+        wx.showToast({ title: '已取消', icon: 'success' });
+      }
       this.load();
     } catch (e2) {
       wx.showModal({ title: '取消失败', content: e2.error || '请稍后再试', showCancel: false });
