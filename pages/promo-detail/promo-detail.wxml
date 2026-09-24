@@ -12,6 +12,7 @@
 
     <view class="card">
       <view class="title">{{promo.title}}</view>
+      <view wx:if="{{recurrenceTag}}" class="recurrence-tag">🔁 {{recurrenceTag}}</view>
       <view class="meta-row"><text>📅 日期</text><text>{{promo.promo_date}}</text></view>
       <view class="meta-row"><text>⏰ 时段</text><text>{{promo.start_time}} - {{promo.end_time}}</text></view>
       <view class="meta-row"><text>📍 场地</text><text>{{courtText}}</text></view>

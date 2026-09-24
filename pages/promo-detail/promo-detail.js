@@ -43,18 +43,28 @@ Page({
       const c = await contact.resolveContact();
       const form = { ...this.data.form };
       let changed = false;
-      if (!String(form.booker_name || '').trim() && c.name) {
+      if (!form.booker_name && c.name) {
         form.booker_name = c.name;
         changed = true;
       }
-      if (!String(form.booker_phone || '').trim() && c.phone) {
+      if (!form.booker_phone && c.phone) {
         form.booker_phone = c.phone;
         changed = true;
       }
       if (changed) this.setData({ form });
-    } catch (e) {
-      console.log('[promo-detail] 自动填入联系人失败：', e && (e.error || e.message));
-    }
+    } catch (_) { /* 静默：用户没登录也能正常填 */ }
+  },
+
+  onParticipantInput(e) {
+    this.setData({ participantCount: Number(e.detail.value) || 1 }, () => {
+      const p = this.data.promo;
+      if (p) this.setData({ totalPrice: +(p.price_per_person * this.data.participantCount).toFixed(2) });
+    });
+  },
+
+  onFormInput(e) {
+    const k = e.currentTarget.dataset.k;
+    this.setData({ [`form.${k}`]: e.detail.value });
   },
 
   async load() {
@@ -67,6 +77,16 @@ Page({
       let cover = p.cover || '';
       if (cover && cover.startsWith('/')) cover = apiBase + cover;
       p.cover = cover || DEFAULT_PROMO_COVER;
+      // 周期性标签（2026-09-24）：只有"实例"显示（用户在某个具体的周二/周四场次里能看到"我每周都有"）
+      let recurrenceTag = '';
+      if (p.is_recurrence_instance === 1 && p.parent_promo_id) {
+        const WD = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+        try {
+          const wd = JSON.parse(p.recurrence_weekdays || '[]');
+          const ds = (Array.isArray(wd) ? wd : []).sort((a, b) => a - b).map((d) => WD[d]).join('/');
+          recurrenceTag = ds ? '每周' + ds : '周期活动';
+        } catch (_) { recurrenceTag = '周期活动'; }
+      }
       this.setData({
         promo: p,
         loading: false,
@@ -75,6 +95,7 @@ Page({
         deadlineText: time.toLocalText(p.signup_deadline),
         courtText: p.venue_name ? (p.court_name ? `${p.venue_name} · ${p.court_name}` : `${p.venue_name}（全场）`) : '全场馆',
         totalPrice: +(p.price_per_person * this.data.participantCount).toFixed(2),
+        recurrenceTag,
       });
     } catch (e) {
       this.setData({ loading: false });
@@ -88,72 +109,58 @@ Page({
       wx.showToast({ title: `最多 ${max} 人`, icon: 'none' });
       return;
     }
-    const c = this.data.participantCount + 1;
-    this.setData({
-      participantCount: c,
-      totalPrice: +(this.data.promo.price_per_person * c).toFixed(2),
+    this.setData({ participantCount: this.data.participantCount + 1 }, () => {
+      const p = this.data.promo;
+      if (p) this.setData({ totalPrice: +(p.price_per_person * this.data.participantCount).toFixed(2) });
     });
   },
 
   dec() {
     if (this.data.participantCount <= 1) return;
-    const c = this.data.participantCount - 1;
-    this.setData({
-      participantCount: c,
-      totalPrice: +(this.data.promo.price_per_person * c).toFixed(2),
+    this.setData({ participantCount: this.data.participantCount - 1 }, () => {
+      const p = this.data.promo;
+      if (p) this.setData({ totalPrice: +(p.price_per_person * this.data.participantCount).toFixed(2) });
     });
   },
 
-  onInput(e) {
-    const k = e.currentTarget.dataset.k;
-    const form = { ...this.data.form, [k]: e.detail.value };
-    this.setData({ form });
-  },
-
-  formatTime(t) {
-    if (!t) return '';
-    const x = new Date(t);
-    if (Number.isNaN(x.getTime())) return t;
-    const m = String(x.getMonth() + 1).padStart(2, '0');
-    const d = String(x.getDate()).padStart(2, '0');
-    const hh = String(x.getHours()).padStart(2, '0');
-    const mm = String(x.getMinutes()).padStart(2, '0');
-    return `${x.getFullYear()}-${m}-${d} ${hh}:${mm}`;
+  onNamesInput(e) {
+    this.setData({ 'form.participant_names_text': e.detail.value });
   },
 
   async onSubmit() {
-    const { form, participantCount, promo } = this.data;
-    if (!form.booker_name.trim()) return wx.showToast({ title: '请填写姓名', icon: 'none' });
-    if (!/^1\d{10}$/.test(form.booker_phone.trim())) return wx.showToast({ title: '电话格式不对', icon: 'none' });
-
-    const remaining = promo.max_capacity - promo.signed_up;
-    if (participantCount > remaining) {
-      wx.showToast({ title: `剩余名额 ${remaining}`, icon: 'none' });
-      return;
+    if (this.data.submitting || this.data.isExpired) return;
+    const { promo, form, participantCount } = this.data;
+    const namesText = (form.participant_names_text || '').trim();
+    const names = namesText
+      ? namesText
+          .split(/[\n,，]/)
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+    if (names.length !== participantCount - 1 && names.length !== participantCount) {
+      // 容错：报名 N 人，名字列表可选填；如果填了，N-1（自己不算）或 N 都行
+      // 默认不强求填名字（之前就是这么做的）；这里只在填了名字但数不对时报错
+      if (namesText) {
+        return wx.showToast({
+          title: `已填 ${names.length} 个名字，报名人数 ${participantCount} 人，需填 ${participantCount - 1} 个（自己不算）`,
+          icon: 'none',
+          duration: 3500,
+        });
+      }
     }
-
-    const confirm = await new Promise((resolve) => {
-      wx.showModal({
-        title: '确认报名',
-        content: `${promo.title}\n人数：${participantCount}\n合计：¥${this.data.totalPrice}\n\n截止后未成团将自动退款并通知您。`,
-        confirmText: '确认报名',
-        cancelText: '再想想',
-        success: (r) => resolve(r.confirm),
-      });
-    });
-    if (!confirm) return;
-
+    if (!contact.isName(form.booker_name)) {
+      return wx.showToast({ title: '请填写报名人姓名', icon: 'none' });
+    }
+    if (!contact.isPhone(form.booker_phone)) {
+      return wx.showToast({ title: '请填写正确的 11 位手机号', icon: 'none' });
+    }
     this.setData({ submitting: true });
     try {
-      const participant_names = form.participant_names_text
-        .split(/[\n,，]/)
-        .map((s) => s.trim())
-        .filter(Boolean);
       const created = await api.signupPromo(promo.id, {
         participant_count: participantCount,
         booker_name: form.booker_name.trim(),
         booker_phone: form.booker_phone.trim(),
-        participant_names,
+        participant_names: names,
       });
       // 记到本机（下次自动填）+ 资料里没手机号时补上（跨设备也能自动填）
       contact.persistContact(api, { name: form.booker_name, phone: form.booker_phone });

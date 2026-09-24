@@ -17,6 +17,16 @@
 .cp-line2 { font-size: 26rpx; margin-top: 8rpx; opacity: 0.9; }
 
 .title { font-size: 36rpx; font-weight: 600; margin-bottom: 16rpx; }
+/* 周期性活动标签（2026-09-24）：详情页标题下方 */
+.recurrence-tag {
+  display: inline-block;
+  font-size: 22rpx;
+  color: #fff;
+  background: rgba(14, 165, 233, 0.92);
+  padding: 4rpx 16rpx;
+  border-radius: 999rpx;
+  margin-bottom: 16rpx;
+}
 .meta-row {
   display: flex; justify-content: space-between;
   font-size: 26rpx; padding: 10rpx 0;

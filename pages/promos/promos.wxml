@@ -16,6 +16,7 @@
       </view>
       <view wx:if="{{item.expired}}" class="promo-tag expired">已截止</view>
       <view wx:else class="promo-tag price">¥{{item.price_per_person}}</view>
+      <view wx:if="{{item.recurrenceTag}}" class="promo-tag recurrence">🔁 {{item.recurrenceTag}}</view>
     </view>
     <view class="promo-body">
       <view class="promo-title">{{item.title}}</view>

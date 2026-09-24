@@ -47,6 +47,14 @@
   background: rgba(0,0,0,0.6);
   color: #fff;
 }
+/* 周期性活动标签（2026-09-24）：海报右上 → 改为顶左下方，避免与「已截止」撞 */
+.promo-tag.recurrence {
+  top: 60rpx;       /* 排在已截止/价格标签下面 */
+  left: 20rpx;
+  background: rgba(14, 165, 233, 0.92); /* 天蓝，区别于黑色"已截止"和金黄"价格" */
+  color: #fff;
+  font-size: 22rpx;
+}
 .promo-tag.price {
   right: 20rpx;
   background: var(--gold);
