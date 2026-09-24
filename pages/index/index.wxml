@@ -1,12 +1,8 @@
 <view class="container">
-  <!-- 顶部品牌区 -->
+  <!-- 顶部品牌区（2026-09-24：首页不放"转发"按钮 —— 会破坏这一行的排版；
+       首页的转发走右上角「…」菜单，靠 index.js 里的 onShareAppMessage/onShareTimeline 生效） -->
   <view class="brand">
-    <view class="brand-left">
-      <view class="brand-name">🎾 OpenVenues</view>
-      <!-- 转发给好友（2026-09-24）：open-type="share" 触发 Page.onShareAppMessage；
-           朋友圈走右上角菜单（需页面实现 onShareTimeline） -->
-      <button class="brand-share" open-type="share" hover-class="share-hover">↗ 转发</button>
-    </view>
+    <view class="brand-name">🎾 OpenVenues</view>
     <view class="city">📍 全部场馆 ▾</view>
   </view>
 
