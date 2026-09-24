@@ -6,28 +6,7 @@
   overflow: hidden;
   margin-bottom: 20rpx;
   background: #e5e7eb;
-  position: relative; /* 转发小图标要相对海报定位（2026-09-24） */
 }
-/* 转发入口（海报右上角，2026-09-24）：白色磨砂胶囊「分享」。
-   为什么不用半透明黑圆 + ↗：深色封面照片上会糊成一块黑斑，且箭头有歧义（像外链/返回）。
-   白底 + 文字在深浅照片上都清晰，也是中文 App 的通用做法。 */
-.share-pill {
-  position: absolute;
-  top: 20rpx;
-  right: 20rpx;
-  padding: 8rpx 22rpx;
-  margin: 0;
-  font-size: 22rpx;
-  line-height: 1.5;
-  color: #1f2937;
-  background: rgba(255, 255, 255, 0.94);
-  border-radius: 999rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.16);
-  border: none;
-  backdrop-filter: blur(4rpx);
-}
-.share-pill::after { border: none; } /* 去掉 button 默认边框 */
-.share-pill-hover { background: #fff; box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2); }
 .cover-img {
   width: 100%;
   height: 100%;
@@ -49,8 +28,35 @@
   font-size: 40rpx;
   font-weight: 600;
   color: var(--text);
+  /* 名字与「分享」同一行：给名字让出弹性空间并允许省略号，
+     保证分享按钮位置固定（与"地址过长不挤走导航按钮"同一原则） */
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* 名字行（2026-09-24）：场馆名左、分享右 */
+.name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
   margin-bottom: 16rpx;
 }
+/* 「分享」入口：轻量文字按钮，右对齐、不抢视线（转发能力本身也一直在右上角「…」菜单里） */
+.share-link {
+  flex: none;
+  font-size: 24rpx;
+  line-height: 1.4;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  padding: 6rpx 0 6rpx 16rpx;
+  margin: 0;
+}
+.share-link::after { border: none; } /* 去掉 button 默认边框 */
+.share-link-hover { opacity: 0.55; }
 
 .row {
   display: flex;
