@@ -8,10 +8,12 @@
       <view wx:else class="cover-placeholder">
         <text>{{venue.name}}</text>
       </view>
-      <!-- 转发小图标（2026-09-24）：右上角浮层。open-type="share" 触发 Page.onShareAppMessage。
-           注：分享到朋友圈只能从右上角「…」菜单发起（官方限制，页面内不能直接发起），
-               所以这里的小图标只做「转发给好友」。 -->
-      <button class="share-icon" open-type="share" hover-class="share-icon-hover">↗</button>
+      <!-- 转发入口（2026-09-24）：海报右上角白色磨砂胶囊「分享」。
+           open-type="share" 触发 Page.onShareAppMessage。
+           设计取舍：不用「半透明黑圆 + ↗」——深色照片上会糊成一团、箭头还有歧义（像外链），
+           白底 + 文字在深浅照片上都清楚，也符合中文 App 的通用做法。
+           注：分享到朋友圈只能从右上角「…」菜单发起（官方限制），这里只做转发给好友。 -->
+      <button class="share-pill" open-type="share" hover-class="share-pill-hover">分享</button>
     </view>
 
     <!-- 场馆信息 -->

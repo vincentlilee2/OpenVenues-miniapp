@@ -8,27 +8,26 @@
   background: #e5e7eb;
   position: relative; /* 转发小图标要相对海报定位（2026-09-24） */
 }
-/* 转发小图标（海报右上角）：半透明圆底 + ↗ 字形，避免遮挡海报主体 */
-.share-icon {
+/* 转发入口（海报右上角，2026-09-24）：白色磨砂胶囊「分享」。
+   为什么不用半透明黑圆 + ↗：深色封面照片上会糊成一块黑斑，且箭头有歧义（像外链/返回）。
+   白底 + 文字在深浅照片上都清晰，也是中文 App 的通用做法。 */
+.share-pill {
   position: absolute;
   top: 20rpx;
   right: 20rpx;
-  width: 64rpx;
-  height: 64rpx;
-  line-height: 60rpx;
-  padding: 0;
+  padding: 8rpx 22rpx;
   margin: 0;
-  font-size: 34rpx;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.34);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(2rpx);
+  font-size: 22rpx;
+  line-height: 1.5;
+  color: #1f2937;
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 999rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.16);
+  border: none;
+  backdrop-filter: blur(4rpx);
 }
-.share-icon::after { border: none; } /* 去掉 button 默认边框 */
-.share-icon-hover { background: rgba(0, 0, 0, 0.5); }
+.share-pill::after { border: none; } /* 去掉 button 默认边框 */
+.share-pill-hover { background: #fff; box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2); }
 .cover-img {
   width: 100%;
   height: 100%;
