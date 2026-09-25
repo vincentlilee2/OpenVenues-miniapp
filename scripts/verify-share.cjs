@@ -117,25 +117,32 @@ for (const [page, expr] of [
 }
 
 console.log('\n--- 8) 页面内的转发入口 ---');
-// 畅打详情：报名按钮下方的次级按钮
+// 畅打详情：报名按钮**同一行右侧**的小「分享」（2026-09-25 用户要求：原为整行的「转发给好友/分享到朋友圈」）
 const promoWxml = read('pages/promo-detail/promo-detail.wxml');
 ok('畅打详情：有 open-type="share" 按钮', /open-type="share"/.test(promoWxml));
-ok('畅打详情：按钮有文案（含义清晰，官方指引）', /转发/.test(promoWxml));
+{
+  const noC = promoWxml.replace(/<!--[\s\S]*?-->/g, '');
+  const btns = [...noC.matchAll(/<button[^>]*>([\s\S]*?)<\/button>/g)].map((m) => m[1].replace(/\s+/g, ' ').trim());
+  ok('畅打详情的分享按钮文案是「分享」', btns.includes('分享'), JSON.stringify(btns));
+}
 
-// 场馆详情：转发入口在**场馆名称一行右侧**（2026-09-24 用户要求；试过海报右上角两版都被否）
+// 场馆详情：**不放**内联分享按钮（2026-09-25 用户要求「场馆详情页面的分享按钮 去掉」）
+//   ⚠️ 与 2026-09-24 的要求相反（那时要求放在名字行右侧、还试过海报浮层）—— **以用户最新要求为准**，
+//      别再"好心"加回去。去掉**不丢功能**：转发/朋友圈仍在右上角「…」菜单里。
 const venueWxml = read('pages/venue-detail/venue-detail.wxml');
 const venueWxss = read('pages/venue-detail/venue-detail.wxss');
+const venueJs = read('pages/venue-detail/venue-detail.js');
 const actionsBlock = (venueWxml.match(/<view class="actions">([\s\S]*?)<\/view>/) || [null, ''])[1];
 // 注意：name-row 里嵌套了 .venue-name 的 </view>，不能用"到第一个 </view> 为止"提取
 const nameRowBlock = (venueWxml.match(/<view class="name-row">([\s\S]*?)<view class="row"/) || [null, ''])[1];
 const coverBlock = (venueWxml.match(/<view class="cover">([\s\S]*?)<!-- 场馆信息 -->/) || [null, ''])[1];
-ok('★ 场馆详情：分享入口在场馆名称那一行里', /open-type="share"/.test(nameRowBlock), nameRowBlock.trim().slice(0, 120));
-ok('★ 分享入口在名字右侧（名字在前、分享在后）', /venue-name[\s\S]*?open-type="share"/.test(nameRowBlock));
-ok('★ 不再压在海报照片上', !/open-type="share"/.test(coverBlock), '海报块里还有分享按钮');
-ok('名字行是「左名右分享」布局（flex + space-between）', /\.name-row\s*\{[\s\S]*?display:\s*flex[\s\S]*?justify-content:\s*space-between/.test(venueWxss));
-ok('★ 名字过长会被省略号截断，不会把分享挤走', /\.venue-name\s*\{[\s\S]*?flex:\s*1[\s\S]*?min-width:\s*0[\s\S]*?text-overflow:\s*ellipsis/.test(venueWxss));
-ok('分享按钮不参与伸缩（flex: none）→ 位置固定', /\.share-link\s*\{[\s\S]*?flex:\s*none/.test(venueWxss));
-ok('分享按钮去掉了默认边框（::after）', /\.share-link::after\s*\{\s*border:\s*none/.test(venueWxss));
+ok('★ 场馆详情：名字行里没有内联分享按钮（用户 2026-09-25 要求去掉）', !/open-type="share"/.test(nameRowBlock), nameRowBlock.trim().slice(0, 120));
+ok('★ 也不再压在海报照片上', !/open-type="share"/.test(coverBlock), '海报块里还有分享按钮');
+ok('★ 去掉按钮不丢转发能力：onShareAppMessage + onShareTimeline + enableShareMenu 都还在',
+  /onShareAppMessage/.test(venueJs) && /onShareTimeline/.test(venueJs) && /enableShareMenu/.test(venueJs));
+ok('名字行仍是「左名右导航」布局（flex + space-between）', /\.name-row\s*\{[\s\S]*?display:\s*flex[\s\S]*?justify-content:\s*space-between/.test(venueWxss));
+ok('★ 名字过长会被省略号截断，不会把导航挤走', /\.venue-name\s*\{[\s\S]*?flex:\s*1[\s\S]*?min-width:\s*0[\s\S]*?text-overflow:\s*ellipsis/.test(venueWxss));
+ok('死样式已清（不再有 .share-link 规则）', !/\.share-link\s*\{/.test(venueWxss) && !/\.share-link-hover\s*\{/.test(venueWxss));
 ok('没有残留的海报浮层样式（.share-pill / .share-icon）', !/\.share-pill\b|\.share-icon\b/.test(venueWxss) && !/share-pill|share-icon/.test(venueWxml));
 ok('★ 底部操作区只剩 3 个按钮（约课/约场/畅打）', (actionsBlock.match(/<button/g) || []).length === 3, `实际 ${(actionsBlock.match(/<button/g) || []).length} 个`);
 ok('★ 底部操作区不许再出现「转发」', !/转发/.test(actionsBlock), actionsBlock.trim().slice(0, 80));

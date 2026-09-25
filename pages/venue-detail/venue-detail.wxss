@@ -44,23 +44,11 @@
   gap: 16rpx;
   margin-bottom: 16rpx;
 }
-/* 「分享」入口：轻量文字按钮，右对齐、不抢视线（转发能力本身也一直在右上角「…」菜单里） */
-.share-link {
-  flex: none;
-  font-size: 24rpx;
-  line-height: 1.4;
-  color: var(--muted);
-  background: transparent;
-  border: none;
-  padding: 6rpx 0 6rpx 16rpx;
-  margin: 0;
-}
-.share-link::after { border: none; } /* 去掉 button 默认边框 */
-.share-link-hover { opacity: 0.55; }
+/* 「分享」入口已按用户要求去掉（2026-09-25）—— 转发改走右上角「…」菜单，
+   所以这里不再保留 .share-link / .share-link-hover 规则（死样式一并删掉）。 */
 
-/* 「⊕ 导航」：与首页场馆卡上的导航按钮**同一套视觉**（主色胶囊），摆在「分享」右侧。
-   用户 2026-09-25 要求「在分享按钮右侧也添加对应的导航按钮」——
-   "对应"即指与首页卡片那个是同一件事，故样式对齐 index.wxss 的 .venue-nav。 */
+/* 「⊕ 导航」：与首页场馆卡上的导航按钮**同一套视觉**（主色胶囊），坐在名字行右侧。
+   2026-09-25：分享按钮已按用户要求去掉，这一行现在只有「名字 + ⊕ 导航」。 */
 .nav-link {
   flex: none;
   white-space: nowrap;

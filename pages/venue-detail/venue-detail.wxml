@@ -12,11 +12,12 @@
 
     <!-- 场馆信息 -->
     <view class="card">
-      <!-- 名字行：右侧放「分享」+「⊕ 导航」（2026-09-24/25 用户要求；不压海报照片、也不占底部按钮位）。
-           名字过长时**省略号截断**，绝不把右侧按钮挤走（与"地址过长不挤走导航按钮"同一原则）。 -->
+      <!-- 名字行：右侧只有「⊕ 导航」（2026-09-25 用户要求**去掉分享按钮**）。
+           ⚠️ 去掉内联分享按钮**不丢功能**：转发/分享到朋友圈仍在右上角「…」菜单里
+           （onShareAppMessage + onShareTimeline + enableShareMenu 都保留着，见本页 js 顶部）。
+           名字过长时**省略号截断**，绝不把右侧按钮挤走。 -->
       <view class="name-row">
         <view class="venue-name">{{venue.name}}</view>
-        <button class="share-link" open-type="share" hover-class="share-link-hover">分享</button>
         <view class="nav-link" hover-class="nav-link-hover" bindtap="openMap">⊕ 导航</view>
       </view>
       <view class="row"><text class="label">📍 地址</text><text>{{venue.address || '地址待补充'}}</text></view>

@@ -18,14 +18,14 @@ const js = read('pages/venue-detail/venue-detail.js');
 const indexWxml = read('pages/index/index.wxml');
 const navUtil = read('utils/nav.js');
 
-console.log('--- ① 位置：在名字行的「分享」右侧 ---');
+console.log('--- ① 位置：在名字行右侧（分享已按用户要求去掉）---');
 const nameRow = (wxml.match(/<view class="name-row">([\s\S]*?)<\/view>\s*<view class="row"/) || [])[1] || '';
 ok('取到名字行区块', nameRow.length > 0);
-const iShare = nameRow.indexOf('class="share-link"');
 const iNav = nameRow.indexOf('class="nav-link"');
-ok('名字行里有「分享」', iShare >= 0);
 ok('名字行里有「导航」', iNav >= 0);
-ok('★ 导航在分享右侧（DOM 顺序）', iShare >= 0 && iNav > iShare, 'share@' + iShare + ' nav@' + iNav);
+// ★ 2026-09-25 用户要求「场馆详情页面的分享按钮 去掉」→ 名字行里必须**没有**分享按钮。
+//   （与 2026-09-24「放在分享右侧」的历史相反，以最新要求为准；转发仍在右上角「…」菜单）
+ok('★ 名字行里已无「分享」按钮（用户要求去掉）', !/share-link|open-type="share"/.test(nameRow), nameRow.trim().slice(0, 120));
 ok('导航文案是「⊕ 导航」（与首页卡片一致）', /class="nav-link"[^>]*>\s*⊕\s*导航\s*</.test(nameRow));
 ok('导航用 bindtap="openMap"', /class="nav-link"[^>]*bindtap="openMap"/.test(nameRow));
 
