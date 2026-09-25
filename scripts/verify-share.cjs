@@ -149,6 +149,32 @@ ok('★ 首页品牌行排版未被破坏（无 brand-share / brand-left 残留�
 ok('首页品牌行仍是「品牌名 + 全部场馆」两项', /<view class="brand">[\s\S]{0,200}?brand-name[\s\S]{0,200}?city[\s\S]{0,40}?<\/view>/.test(homeWxml));
 ok('畅打详情页转发按钮样式已定义', /\.share-btn/.test(read('pages/promo-detail/promo-detail.wxss')));
 
+// ★ 畅打详情：分享收敛成「立即报名」行右侧的小按钮（2026-09-25 用户要求）
+//   原形态 = 报名按钮下方**整行**的「转发给好友 / 分享到朋友圈」（太大），现改成同行右侧窄按钮。
+//   这三条是防"又给我改回大按钮 / 又挪走"的钉子，别删。
+{
+  const promoWxml2 = read('pages/promo-detail/promo-detail.wxml');
+  const promoWxss2 = read('pages/promo-detail/promo-detail.wxss');
+  const row = (promoWxml2.match(/<view class="submit-row">([\s\S]*?)<\/view>\s*<\/view>/) || [null, ''])[1];
+  ok('★ 有报名行 .submit-row（立即报名 + 分享同一行）', !!row && row.includes('submit-btn'));
+  ok('★ 报名行里恰好 2 个 button（立即报名 + 分享）', (row.match(/<button/g) || []).length === 2, `实际 ${(row.match(/<button/g) || []).length} 个`);
+  ok('★ 分享在「立即报名」右侧（DOM 顺序：submit-btn → share-btn）', /submit-btn[\s\S]*?share-btn/.test(row));
+  ok('★ 分享文案就是「分享」（不再是「转发给好友 / 分享到朋友圈」）', />\s*分享\s*<\/button>/.test(row), (row.match(/share-btn[^>]*>([^<]*)</) || [])[1]);
+  // 只检查**按钮文案**里没有旧长文案。
+  // ⚠️ 断言前必须先剥掉 HTML 注释：注释里为解释原因写了 `<button open-type="share">`／「转发给好友」，
+  //    不剥离的话正则会把注释当成按钮内容（本次实测踩到）。
+  const noComments = promoWxml2.replace(/<!--[\s\S]*?-->/g, '');
+  const btnTexts = [...noComments.matchAll(/<button[^>]*>([\s\S]*?)<\/button>/g)].map((m) => m[1]);
+  ok('★ 旧的整行长文案已消失（按钮文案里没有「转发给好友」）', !btnTexts.some((t) => t.includes('转发给好友')), JSON.stringify(btnTexts.map((t) => t.replace(/\s+/g, ' ').trim())));
+  ok('分享仍是 open-type="share"（转发功能没丢）', /class="btn-outline share-btn" open-type="share"/.test(row));
+  ok('★ 报名行是 flex 行（不是两块各占一整行）', /\.submit-row\s*\{[\s\S]*?display:\s*flex/.test(promoWxss2));
+  ok('★ 立即报名占满剩余宽度（flex:1）', /\.submit-btn\s*\{[\s\S]*?flex:\s*1/.test(promoWxss2));
+  ok('★ 分享是窄的次级按钮（flex:none，不被拉伸）', /\.share-btn\s*\{[\s\S]*?flex:\s*none/.test(promoWxss2));
+  ok('★ 分享字号比报名小（26rpx）', /\.share-btn\s*\{[\s\S]*?font-size:\s*26rpx/.test(promoWxss2));
+  ok('两者等高（88rpx）→ 同一行不会一高一矮', /\.submit-btn\s*\{[\s\S]*?height:\s*88rpx/.test(promoWxss2) && /\.share-btn\s*\{[\s\S]*?height:\s*88rpx/.test(promoWxss2));
+  ok('分享不再有 margin-top（不会被顶到下一行）', !/\.share-btn\s*\{[^}]*margin-top/.test(promoWxss2));
+}
+
 console.log('\n--- 9) 不做诱导分享（官方明确禁止）---');
 const allJs = ['pages/promo-detail/promo-detail.js', 'pages/venue-detail/venue-detail.js', 'pages/index/index.js']
   .map(read)

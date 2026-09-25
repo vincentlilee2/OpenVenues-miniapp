@@ -52,13 +52,17 @@
         <text class="total-price">¥{{totalPrice}}</text>
       </view>
 
-      <button class="btn-primary submit-btn" bindtap="onSubmit" disabled="{{submitting || isExpired}}">
-        {{isExpired ? '已截止' : (submitting ? '提交中...' : '立即报名')}}
-      </button>
-
-      <!-- 转发给好友（2026-09-24）：<button open-type="share"> 会触发 Page.onShareAppMessage
-           注意：官方禁止「转发才能解锁」这类诱导，这里只是一个普通分享入口 -->
-      <button class="btn-outline share-btn" open-type="share" hover-class="btn-hover">转发给好友 / 分享到朋友圈</button>
+      <!-- 报名行（2026-09-25 用户要求）：立即报名占满剩余宽度，右侧放一个**小**的「分享」。
+           ⚠️ 文案只写「分享」的原因：<button open-type="share"> 只能触发「转发给好友」；
+              「分享到朋友圈」是微信官方限制 —— 只能在右上角「…」菜单里（onShareTimeline 已实现、
+              enableShareMenu 已开两个菜单）。旧文案「转发给好友 / 分享到朋友圈」里
+              「分享到朋友圈」这一半是点不出来的，属于误导，去掉。 -->
+      <view class="submit-row">
+        <button class="btn-primary submit-btn" bindtap="onSubmit" disabled="{{submitting || isExpired}}">
+          {{isExpired ? '已截止' : (submitting ? '提交中...' : '立即报名')}}
+        </button>
+        <button class="btn-outline share-btn" open-type="share" hover-class="btn-hover">分享</button>
+      </view>
     </view>
   </block>
 </view>
