@@ -144,6 +144,16 @@ const tick = () => new Promise((r) => setTimeout(r, 5));
     ok('★ 名称行显示收藏数 ♥ N', /class="venue-fav-count"[\s\S]{0,80}?♥ \{\{item\.fav_count\}\}/.test(wxml));
     ok('收藏数 0 时不显示（避免反向社会证明）', /wx:if="\{\{item\.fav_count > 0\}\}"/.test(wxml.replace(/\n\s*/g, ' ')));
     ok('.venue-fav.on 样式已定义', /\.venue-fav\.on\s*\{/.test(wxss));
+    // ★ 已收藏的视觉：用户明确要求「仍是暗色半透明圆圈背景，其中的心是红色」
+    //   （原版是整块红底白心，用户反馈「太生硬」）—— 这条是防回流钉子，别删
+    {
+      const onBlock = (wxss.match(/\.venue-fav\.on\s*\{[\s\S]*?\}/) || [''])[0];
+      ok('★ 已收藏：圆底仍是暗色半透明（不再是整块红底）', /background:\s*rgba\(0,\s*0,\s*0,\s*0\.35\)/.test(onBlock) && !/rgba\(220,\s*38,\s*38/.test(onBlock), onBlock.replace(/\s+/g, ' '));
+      ok('★ 已收藏：心是红色', /color:\s*#ff4d4f/i.test(onBlock), onBlock.replace(/\s+/g, ' '));
+      ok('★ 两态圆底一致（差别只在心的颜色）', /\.venue-fav\s*\{[\s\S]*?background:\s*rgba\(0,\s*0,\s*0,\s*0\.35\)/.test(wxss));
+      ok('★ 已收藏不改变尺寸（还是同一个圆）', !/(width|height|font-size)\s*:/.test(onBlock), onBlock.replace(/\s+/g, ' '));
+      ok('浅色照片上也有可读性兜底（text-shadow）', /text-shadow/.test(onBlock));
+    }
     ok('.venue-fav-count 样式已定义', /\.venue-fav-count\s*\{/.test(wxss));
     ok('♡ 仍在封面容器内（不能移出去，否则会飘到页顶）', /<view class="venue-cover-wrap">[\s\S]*?class="venue-fav/.test(wxml));
     ok('toggleFav 是 async（要 await 接口）', /async toggleFav\(e\)/.test(js));
