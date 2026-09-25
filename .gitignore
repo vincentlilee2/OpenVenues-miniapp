@@ -2,8 +2,8 @@
 node_modules/
 miniprogram_npm/
 
-# 工具脚本（不在打包范围内，但不该进 git）
-scripts/
+# 工具脚本：自 2026-09-25 起进仓（回归测试对维护有用）。
+# 进仓前已扫敏感值：不写真域名/口令/本机绝对路径，域名从 config.js 读（仓内是占位值）。
 
 # 开发者本地配置（个人 IP / 调试 token 等）
 project.private.config.json
