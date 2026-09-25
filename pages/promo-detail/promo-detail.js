@@ -1,6 +1,7 @@
 const api = require('../../api/index.js');
 const config = require('../../config.js');
 const time = require('../../utils/time.js');
+const promoUtils = require('../../utils/promos.js');
 const contact = require('../../utils/contact.js');
 const pay = require('../../utils/pay.js');
 const share = require('../../utils/share.js');
@@ -78,15 +79,8 @@ Page({
       if (cover && cover.startsWith('/')) cover = apiBase + cover;
       p.cover = cover || DEFAULT_PROMO_COVER;
       // 周期性标签（2026-09-24）：只有"实例"显示（用户在某个具体的周二/周四场次里能看到"我每周都有"）
-      let recurrenceTag = '';
-      if (p.is_recurrence_instance === 1 && p.parent_promo_id) {
-        const WD = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-        try {
-          const wd = JSON.parse(p.recurrence_weekdays || '[]');
-          const ds = (Array.isArray(wd) ? wd : []).sort((a, b) => a - b).map((d) => WD[d]).join('/');
-          recurrenceTag = ds ? '每周' + ds : '周期活动';
-        } catch (_) { recurrenceTag = '周期活动'; }
-      }
+      // 2026-09-25：映射收敛到 utils/promos.js（详情页与列表页共用，别再各写一份）
+      const recurrenceTag = promoUtils.recurrenceTagOf(p);
       this.setData({
         promo: p,
         loading: false,
