@@ -102,6 +102,11 @@
   justify-content: center;
   font-size: 32rpx;
 }
+/* 已收藏（2026-09-25 起是真状态）：♥ + 危险色底 —— 与未收藏的半透明黑底一眼可分 */
+.venue-fav.on {
+  background: rgba(220, 38, 38, 0.92);
+  color: #fff;
+}
 
 .venue-body {
   padding: 24rpx 28rpx 28rpx;
@@ -120,6 +125,16 @@
   font-weight: 400;
   color: var(--primary);
   background: rgba(58, 125, 68, 0.1);
+  padding: 4rpx 14rpx;
+  border-radius: 16rpx;
+}
+/* 被收藏数量（2026-09-25）：跟在「N 场地」后面，红心 + 数字才看得懂是收藏而不是场地 */
+.venue-fav-count {
+  margin-left: 10rpx;
+  font-size: 22rpx;
+  font-weight: 400;
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
   padding: 4rpx 14rpx;
   border-radius: 16rpx;
 }

@@ -8,10 +8,14 @@ module.exports = {
   logout: () => request({ url: '/api/auth/logout', method: 'POST' }),
   savePhone: (code) => request({ url: '/api/auth/phone', method: 'POST', data: { code } }),
 
-  listVenues: (type) => request({ url: '/api/venues' + (type ? `?type=${type}` : ''), auth: false }),
+  // optional：逛场馆列表不该被强制登录，但带了 token 就能顺带返回「我收藏了哪些」（favorited）
+  listVenues: (type) => request({ url: '/api/venues' + (type ? `?type=${type}` : ''), auth: 'optional' }),
   listTypes: () => request({ url: '/api/venues/types', auth: false }),
-  getVenue: (id) => request({ url: `/api/venues/${id}`, auth: false }),
+  getVenue: (id) => request({ url: `/api/venues/${id}`, auth: 'optional' }),
   venueCourts: (id) => request({ url: `/api/venues/${id}/courts`, auth: false }),
+  // 收藏（2026-09-25，服务端真收藏）：默认鉴权 → 会先确保登录；401 时自动重登重试
+  favoriteVenue: (id) => request({ url: `/api/venues/${id}/favorite`, method: 'POST' }),
+  unfavoriteVenue: (id) => request({ url: `/api/venues/${id}/favorite`, method: 'DELETE' }),
   // ⚠️ 没有「场馆级 availability」接口（后端只有 court 级）—— 别加 /api/venues/:id/availability，
   //    那个路径不存在会 404（2026-09-23 清理死方法时确认）。要按时段查就按场地查：
   courtAvailability: (courtId, date, uid) => {

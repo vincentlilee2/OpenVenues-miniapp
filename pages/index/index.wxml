@@ -35,12 +35,15 @@
         <text class="placeholder-text">{{item.name}}</text>
       </view>
       <!-- ♡ 收藏：留在 .venue-cover-wrap 内部（它才是 position:relative 基准）。
-           移出会导致 absolute 相对整页定位、按钮飘到页面顶部（2026-09-23 实测事故）。 -->
-      <view class="venue-fav" catchtap="toggleFav" data-id="{{item.id}}">♡</view>
+           移出会导致 absolute 相对整页定位、按钮飘到页面顶部（2026-09-23 实测事故）。
+           2026-09-25 起是真收藏（服务端存储）：未收藏 ♡，已收藏 ♥ 且底变红。 -->
+      <view class="venue-fav {{item.favorited ? 'on' : ''}}" catchtap="toggleFav" data-id="{{item.id}}">{{item.favorited ? '♥' : '♡'}}</view>
     </view>
     <view class="venue-body">
       <view class="venue-name">{{item.name}}
         <text class="venue-court-count">{{item.court_count}} 场地</text>
+        <!-- 被收藏数量（2026-09-25 用户要求标注）：0 时不显示 —— 「♥ 0」对顾客是反向的社会证明 -->
+        <text class="venue-fav-count" wx:if="{{item.fav_count > 0}}">♥ {{item.fav_count}}</text>
       </view>
       <!-- 导航按钮：跟在地址后面（同一行右侧），不再压在封面图上 -->
       <view class="venue-addr">

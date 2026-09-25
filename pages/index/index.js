@@ -87,8 +87,38 @@ Page({
     wx.navigateTo({ url: '/pages/promos/promos' });
   },
 
-  toggleFav() {
-    wx.showToast({ title: '已收藏（占位）', icon: 'none' });
+  // 点封面上的 ♡/♥ → 服务端真收藏/取消（2026-09-25；此前只是弹个 toast 的占位）
+  // 乐观更新 + 失败回滚：点下去立刻有反馈，但界面最终以**服务端返回值**为准
+  // （别人同时在收藏/取消时，本地猜的数会和库里不一致 —— 所以成功后再 setData 一次校正）
+  async toggleFav(e) {
+    const id = Number(e.currentTarget.dataset.id);
+    const i = this.data.venues.findIndex((v) => v.id === id);
+    if (i < 0) return;
+    // ⚠️ 必须在 setData **之前**把原值存成标量：
+    //    setData({'venues[i].favorited': x}) 改的就是 this.data.venues[i] 这个对象本身，
+    //    所以 cur.favorited 会跟着变 → 失败时拿它"回滚"等于把翻转后的值又写回去（实测踩到）。
+    const curFavorited = !!this.data.venues[i].favorited;
+    const curCount = Number(this.data.venues[i].fav_count || 0);
+    const next = !curFavorited;
+    this.setData({
+      [`venues[${i}].favorited`]: next,
+      [`venues[${i}].fav_count`]: Math.max(0, curCount + (next ? 1 : -1)),
+    });
+    try {
+      const r = next ? await api.favoriteVenue(id) : await api.unfavoriteVenue(id);
+      this.setData({
+        [`venues[${i}].favorited`]: !!r.favorited,
+        [`venues[${i}].fav_count`]: Number(r.fav_count || 0),
+      });
+      wx.showToast({ title: next ? '已收藏' : '已取消收藏', icon: 'none' });
+    } catch (err) {
+      // 回滚到点击前的状态（含被服务端拒绝的情况，如 token 过期且重登失败）
+      this.setData({
+        [`venues[${i}].favorited`]: curFavorited,
+        [`venues[${i}].fav_count`]: curCount,
+      });
+      wx.showToast({ title: (err && err.error) || '操作失败，请重试', icon: 'none' });
+    }
   },
 
   // 点「⊕ 导航」→ 打开微信内置地图页。

@@ -6,12 +6,16 @@ const session = require('../utils/session.js');
 function rawRequest(opts, retried) {
   return new Promise((resolve, reject) => {
     const headers = { 'content-type': 'application/json', ...(opts.header || {}) };
-    const needAuth = opts.auth !== false;
-    if (needAuth) {
+    // auth:false      → 公开接口，绝不带 token（也绝不因 401 去重登）
+    // auth:'optional' → **有 token 就带上**（服务端可选鉴权），但**不强制登录**、不重登重试
+    //   用途：场馆列表要顺带告诉前端「我收藏了哪些」，而第一次来的用户不该被拦在登录外
+    // 默认            → 必须先登录，带 token，401 时重新登录并重试
+    const needAuth = opts.auth !== false && opts.auth !== 'optional';
+    if (opts.auth !== false) {
       const token = session.getToken();
       if (token) headers.Authorization = 'Bearer ' + token;
     }
-    console.log('[request]', opts.method || 'GET', opts.url, needAuth ? '(auth)' : '');
+    console.log('[request]', opts.method || 'GET', opts.url, needAuth ? '(auth)' : opts.auth === 'optional' ? '(optional)' : '');
     wx.request({
       url: apiBase + opts.url,
       method: opts.method || 'GET',
@@ -48,8 +52,9 @@ function rawRequest(opts, retried) {
 }
 
 function request(opts) {
-  // 公开接口（auth:false）直接发；其余先确保已登录
-  if (opts.auth === false) return rawRequest(opts, true);
+  // 公开接口（auth:false）直接发；可选鉴权（'optional'）也直接发（带了 token 就带，没有就算了）；
+  // 其余先确保已登录
+  if (opts.auth === false || opts.auth === 'optional') return rawRequest(opts, true);
   return session.ready().then(
     () => rawRequest(opts, false),
     (e) => Promise.reject({ status: 401, error: (e && e.message) || '微信登录失败' })
