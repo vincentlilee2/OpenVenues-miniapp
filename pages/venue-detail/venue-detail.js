@@ -2,6 +2,7 @@ const api = require('../../api/index.js');
 const config = require('../../config.js');
 const venueCovers = require('../../utils/venueCovers.js');
 const share = require('../../utils/share.js');
+const nav = require('../../utils/nav.js');
 
 Page({
   data: { venue: null, loading: true },
@@ -54,5 +55,10 @@ Page({
     if (this.data.venue?.contact_phone) {
       wx.makePhoneCall({ phoneNumber: this.data.venue.contact_phone });
     }
+  },
+
+  // 点「⊕ 导航」→ 打开微信内置地图页（逻辑与首页卡片的导航完全一致，共用 utils/nav.js）
+  openMap() {
+    nav.openVenueMap(this.data.venue);
   },
 });

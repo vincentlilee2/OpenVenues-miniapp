@@ -58,6 +58,21 @@
 .share-link::after { border: none; } /* 去掉 button 默认边框 */
 .share-link-hover { opacity: 0.55; }
 
+/* 「⊕ 导航」：与首页场馆卡上的导航按钮**同一套视觉**（主色胶囊），摆在「分享」右侧。
+   用户 2026-09-25 要求「在分享按钮右侧也添加对应的导航按钮」——
+   "对应"即指与首页卡片那个是同一件事，故样式对齐 index.wxss 的 .venue-nav。 */
+.nav-link {
+  flex: none;
+  white-space: nowrap;
+  background: var(--primary);
+  color: #fff;
+  padding: 8rpx 20rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  line-height: 1.4;
+}
+.nav-link-hover { opacity: 0.7; }
+
 .row {
   display: flex;
   justify-content: space-between;
