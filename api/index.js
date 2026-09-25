@@ -16,6 +16,9 @@ module.exports = {
   // 收藏（2026-09-25，服务端真收藏）：默认鉴权 → 会先确保登录；401 时自动重登重试
   favoriteVenue: (id) => request({ url: `/api/venues/${id}/favorite`, method: 'POST' }),
   unfavoriteVenue: (id) => request({ url: `/api/venues/${id}/favorite`, method: 'DELETE' }),
+  // 我收藏的场馆（「我的 → 我的收藏」页）。路径刻意用 /my/favorites：
+  // /venues/favorites 会被 /venues/:id 先捕获（本仓在 settlement 上翻过车）
+  myFavorites: () => request({ url: '/api/my/favorites' }),
   // ⚠️ 没有「场馆级 availability」接口（后端只有 court 级）—— 别加 /api/venues/:id/availability，
   //    那个路径不存在会 404（2026-09-23 清理死方法时确认）。要按时段查就按场地查：
   courtAvailability: (courtId, date, uid) => {

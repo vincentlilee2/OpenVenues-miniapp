@@ -50,6 +50,10 @@
       <view class="sc-icon">🎯</view>
       <view class="sc-label">畅打活动</view>
     </view>
+    <view class="sc" bindtap="goFavorites">
+      <view class="sc-icon">♥</view>
+      <view class="sc-label">我的收藏</view>
+    </view>
   </view>
 
   <!-- 服务分组 -->

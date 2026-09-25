@@ -1,0 +1,40 @@
+/* 我的收藏（2026-09-25） */
+.page { padding: 24rpx; }
+
+.tip { font-size: 24rpx; color: var(--muted); margin: 0 4rpx 16rpx; }
+
+.fav {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  background: var(--card);
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+}
+.fav-cover { width: 160rpx; height: 110rpx; border-radius: 12rpx; flex: none; background: #eef2ee; }
+.fav-body { flex: 1; min-width: 0; }
+.fav-name {
+  font-size: 30rpx; font-weight: 600; color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.fav-meta { font-size: 24rpx; color: #dc2626; margin-top: 6rpx; }
+.fav-addr {
+  font-size: 24rpx; color: var(--muted); margin-top: 6rpx;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* 取消收藏：flex:none 保证不被名字挤走（与首页卡片同一原则） */
+.fav-heart {
+  flex: none; width: 64rpx; height: 64rpx; border-radius: 50%;
+  background: rgba(220, 38, 38, 0.1); color: #dc2626;
+  display: flex; align-items: center; justify-content: center; font-size: 32rpx;
+}
+
+/* 空态 */
+.empty-state { text-align: center; padding: 120rpx 40rpx; }
+.empty-icon { font-size: 96rpx; color: #d1d5db; line-height: 1; }
+.empty-title { font-size: 32rpx; color: var(--text); margin-top: 24rpx; font-weight: 600; }
+.empty-sub { font-size: 26rpx; color: var(--muted); margin-top: 12rpx; }
+.go-home { margin-top: 40rpx; }
+
+.empty { text-align: center; color: var(--muted); padding: 80rpx 0; }

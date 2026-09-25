@@ -154,6 +154,83 @@ const tick = () => new Promise((r) => setTimeout(r, 5));
     ok('request.js 支持 auth:\'optional\'（不强制登录、带 token）', /opts\.auth !== 'optional'/.test(reqSrc));
   }
 
+  console.log('\n--- 7) 「我的 → 我的收藏」页（2026-09-25 补做）---');
+  {
+    const appJson = JSON.parse(read('app.json'));
+    const myWxml = read('pages/my/my.wxml');
+    const myJs = read('pages/my/my.js');
+    const favWxml = read('pages/favorites/favorites.wxml');
+    const favJs = read('pages/favorites/favorites.js');
+    const favWxss = read('pages/favorites/favorites.wxss');
+    const apiSrc2 = read('api/index.js');
+
+    // —— 入口 ——
+    ok('★ app.json 注册了 pages/favorites/favorites', appJson.pages.includes('pages/favorites/favorites'), JSON.stringify(appJson.pages));
+    ok('★ 「我的」页有「我的收藏」入口', /bindtap="goFavorites"[\s\S]{0,80}我的收藏/.test(myWxml));
+    ok('★ 入口跳的是收藏页（navigateTo 非 tabBar 页）', /goFavorites\(\)\s*\{[\s\S]{0,120}navigateTo\(\{ url: '\/pages\/favorites\/favorites' \}\)/.test(myJs));
+    ok('快捷入口仍是 3 个（订单/畅打/收藏）', (myWxml.match(/class="sc"/g) || []).length === 3, (myWxml.match(/class="sc"/g) || []).length);
+
+    // —— 收藏页本身 ——
+    ok('页面调 api.myFavorites', /api\.myFavorites\(\)/.test(favJs));
+    ok('onShow 重新拉（从详情页返回能同步最新状态）', /onShow\(\)[\s\S]{0,120}this\.load\(\)/.test(favJs));
+    ok('★ 空态有出口（去首页按钮，不是死胡同）', /empty-state/.test(favWxml) && /bindtap="goHome"/.test(favWxml));
+    ok('空态文案里点了怎么收藏', /封面左上角的心/.test(favWxml));
+    ok('点整行进场馆详情', /bindtap="openVenue" data-id="\{\{item\.id\}\}"/.test(favWxml));
+    ok('★ 取消收藏用 catchtap（不冒泡进详情）', /catchtap="unheart"/.test(favWxml));
+    ok('页面上显示收藏数 ♥ N', /♥ \{\{item\.fav_count\}\}/.test(favWxml));
+    ok('封面有兜底样式（不破图）', /\.fav-cover/.test(favWxss) && /coverUrl/.test(favJs));
+    ok('api 暴露 myFavorites', /myFavorites:/.test(apiSrc2));
+
+    // —— 行为：假 wx 驱动真页面 ——
+    let favPage = null;
+    global.Page = (o) => { favPage = o; };
+    delete require.cache[require.resolve(path.join(ROOT, 'pages', 'favorites', 'favorites.js'))];
+    require(path.join(ROOT, 'pages', 'favorites', 'favorites.js'));
+
+    const inst = Object.create(favPage);
+    inst.data = { list: [], loading: true };
+    inst.setData = (patch) => Object.assign(inst.data, patch);
+
+    nextResponse = {
+      statusCode: 200,
+      data: {
+        ok: true,
+        data: [
+          { id: 1, name: '室外网球场', cover: '', default_cover: '/static/covers/tennis_001.jpg', court_count: 2, fav_count: 3, address: '北京市朝阳区' },
+          { id: 3, name: '室内匹克球馆', cover: '/uploads/venues/3.jpg', default_cover: '', court_count: 5, fav_count: 1, address: '' },
+        ],
+      },
+    };
+    calls.requests.length = 0;
+    await favPage.load.call(inst);
+    ok('★ load() 拉到 2 个收藏', inst.data.list.length === 2, inst.data.list.length);
+    ok('loading 归 false', inst.data.loading === false);
+    ok('请求的是 /api/my/favorites', /\/api\/my\/favorites$/.test(calls.requests[0]?.url || ''), calls.requests[0]?.url);
+    ok('★ 封面兜底：无 cover 用 default_cover 拼绝对地址', /^https?:\/\/.+\/static\/covers\/tennis_001\.jpg$/.test(inst.data.list[0].coverUrl), inst.data.list[0].coverUrl);
+    ok('★ 相对路径 cover 也拼成绝对地址', /^https?:\/\/.+\/uploads\/venues\/3\.jpg$/.test(inst.data.list[1].coverUrl), inst.data.list[1].coverUrl);
+    ok('场地数文案已备好', inst.data.list[0].venueText === '2 场地', inst.data.list[0].venueText);
+
+    // 取消收藏：立刻从列表移除 + 调 DELETE
+    calls.requests.length = 0; calls.toasts.length = 0;
+    nextResponse = { statusCode: 200, data: { ok: true, data: { favorited: false, fav_count: 2 } } };
+    await favPage.unheart.call(inst, { currentTarget: { dataset: { id: 1 } } });
+    await tick();
+    ok('★ 取消后从列表移除', inst.data.list.length === 1 && inst.data.list[0].id === 3, JSON.stringify(inst.data.list.map((v) => v.id)));
+    ok('发了 DELETE 请求', calls.requests[0]?.method === 'DELETE' && /\/api\/venues\/1\/favorite$/.test(calls.requests[0]?.url || ''), `${calls.requests[0]?.method} ${calls.requests[0]?.url}`);
+    ok('提示已取消收藏', calls.toasts.some((t) => t.title === '已取消收藏'));
+
+    // 失败 → 放回原位（拿调用前的快照比对，别手写期望顺序 —— 本次就写反过一次）
+    const inst2 = Object.create(favPage);
+    inst2.data = { list: inst.data.list.concat([{ id: 1, name: '室外网球场', fav_count: 3 }]), loading: false };
+    inst2.setData = (patch) => Object.assign(inst2.data, patch);
+    const beforeList = JSON.stringify(inst2.data.list);
+    nextResponse = { statusCode: 500, data: { ok: false, error: '炸了' } };
+    await favPage.unheart.call(inst2, { currentTarget: { dataset: { id: 3 } } });
+    await tick();
+    ok('★ 失败时把行放回原位（与调用前逐字节一致）', JSON.stringify(inst2.data.list) === beforeList, `${JSON.stringify(inst2.data.list.map((v) => v.id))} vs ${JSON.parse(beforeList).map((v) => v.id)}`);
+    ok('失败有提示', calls.toasts.some((t) => /炸了/.test(t.title || '')));
+  }
+
   console.log(`\n合计 ${pass} 通过 / ${fail} 失败`);
   process.exit(fail ? 1 : 0);
 })();

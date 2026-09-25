@@ -1,0 +1,30 @@
+<!-- 我的收藏（2026-09-25）：服务端真收藏的场馆列表 -->
+<view class="page">
+
+  <view wx:if="{{loading}}" class="empty">加载中…</view>
+
+  <!-- 空态：别让页面变死胡同，给「去首页」的出口 -->
+  <block wx:elif="{{list.length === 0}}">
+    <view class="empty-state">
+      <view class="empty-icon">♡</view>
+      <view class="empty-title">还没有收藏的场馆</view>
+      <view class="empty-sub">在首页点场馆封面左上角的心，就会出现在这里</view>
+      <button class="btn-primary go-home" hover-class="btn-hover" bindtap="goHome">去首页看看</button>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="tip">共 {{list.length}} 个收藏</view>
+    <view class="fav" wx:for="{{list}}" wx:key="id" bindtap="openVenue" data-id="{{item.id}}">
+      <image class="fav-cover" src="{{item.coverUrl}}" mode="aspectFill" />
+      <view class="fav-body">
+        <view class="fav-name">{{item.name}}</view>
+        <view class="fav-meta">{{item.venueText}} · ♥ {{item.fav_count}}</view>
+        <view class="fav-addr">📍 {{item.address || '地址待补充'}}</view>
+      </view>
+      <!-- 取消收藏：catchtap 防止冒泡去详情 -->
+      <view class="fav-heart" catchtap="unheart" data-id="{{item.id}}">♥</view>
+    </view>
+  </block>
+
+</view>

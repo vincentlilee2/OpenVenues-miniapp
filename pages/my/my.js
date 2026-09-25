@@ -170,6 +170,11 @@ Page({
     wx.navigateTo({ url: '/pages/promos/promos' });
   },
 
+  // 我的收藏（2026-09-25）：也不是 tabBar 页 → navigateTo
+  goFavorites() {
+    wx.navigateTo({ url: '/pages/favorites/favorites' });
+  },
+
   openFeedback() {
     wx.showModal({
       title: '意见反馈',
