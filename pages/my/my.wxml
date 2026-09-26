@@ -95,6 +95,10 @@
           <view class="li-sub">场馆预定小程序</view>
         </view>
       </view>
+      <!-- 简介（2026-09-26 用户要求）：放在版本号下面 -->
+      <view class="about-desc">
+        场馆预订小程序（OpenVenues）是由 记忆花园 旗下开发的一款开源免费微信小程序，代码托管在GitHub（github.com/vincentlilee2）。
+      </view>
       <view class="list-item" wx:if="{{loggedIn}}" bindtap="onLogout">
         <view class="li-icon li-icon-orange">⎋</view>
         <view class="li-body">

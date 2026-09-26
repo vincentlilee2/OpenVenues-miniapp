@@ -37,6 +37,16 @@
 }
 .user-settings-hover { opacity: 0.75; }
 
+/* 关于 → 简介（2026-09-26）：放在「OpenVenues 版本号」下面的一段说明 */
+.about-desc {
+  padding: 4rpx 0 18rpx;
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: var(--muted);
+  border-bottom: 1rpx solid var(--line);
+  margin-bottom: 6rpx;
+}
+
 /* ===== 微信登录 ===== */
 .set-profile-hint {
   display: inline-block;

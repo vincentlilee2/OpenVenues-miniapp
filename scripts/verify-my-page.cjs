@@ -129,5 +129,26 @@ console.log('\n--- ⑤ 防复发：旧文案 / 旧入口不得残留在其它页
   ok('★ 小程序里没有「我的预约 / 历史订单」旧文案残留', hits.length === 0, hits.join(', '));
 }
 
+console.log('\n--- ⑥ 关于：版本号 1.1.0 + 简介文案 ---');
+{
+  const config = require(path.join(ROOT, 'config.js'));
+  ok('★ config.js 版本号 = 1.1.0', config.version === '1.1.0', config.version);
+  ok('旧版本号 0.1.0 已不存在', !/0\.1\.0/.test(read('config.js').replace(/\/\/.*$/gm, '')));
+  ok('my.js 把 version 透出给页面', /version,/.test(js) && /\{\{\s*version\s*\}\}/.test(wxml));
+
+  const aboutBlock = (wxml.match(/<view class="section">\s*<view class="section-title">关于<\/view>([\s\S]*?)<\/view>\s*<\/view>\s*$/) || wxml.match(/关于<\/view>([\s\S]*)/) || [])[1] || '';
+  const text = noComment.replace(/\s+/g, '');
+  for (const [label, needle] of [
+    ['★ 含「场馆预订小程序（OpenVenues）」', '场馆预订小程序（OpenVenues）'],
+    ['★ 含「记忆花园 旗下开发」', '记忆花园旗下开发'],
+    ['★ 含「开源免费微信小程序」', '开源免费微信小程序'],
+    ['★ 含 GitHub 地址「github.com/vincentlilee2」', 'github.com/vincentlilee2'],
+  ]) {
+    ok(label, text.includes(needle.replace(/\s+/g, '')));
+  }
+  ok('★ 简介在「关于」区块内、且在版本号那行下面', aboutBlock.includes('记忆花园') && aboutBlock.indexOf('OpenVenues') < aboutBlock.indexOf('记忆花园'), aboutBlock.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120));
+  ok('样式有 .about-desc', /\.about-desc\s*\{/.test(wxss));
+}
+
 console.log(`\n合计：${pass} 过 / ${fail} 失败`);
 process.exit(fail ? 1 : 0);
