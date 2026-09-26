@@ -41,7 +41,9 @@ function forPromo(promo, apiBase) {
   const shortDate = String(promo.promo_date || '').slice(5); // 2026-09-28 → 09-28
   const time = promo.start_time && promo.end_time ? `${promo.start_time}-${promo.end_time}` : '';
   const price = promo.price_per_person ? `¥${promo.price_per_person}/人` : '';
-  const head = /畅打/.test(String(promo.title || '')) ? '🎯' : '🎯 畅打';
+  // 课程用 📚，畅打用 🎯（标题里已含「畅打」就不再重复那两个字）
+  const head =
+    promo.kind === 'course' ? '📚 课程' : /畅打/.test(String(promo.title || '')) ? '🎯' : '🎯 畅打';
   let title = [head, promo.title, price, shortDate].filter(Boolean).join(' · ');
   if (time && title.length + time.length + 3 <= 38) title += ' · ' + time;
   return {

@@ -1,0 +1,44 @@
+<view class="container">
+  <view class="hero">
+    <view class="hero-title">培训课程</view>
+    <view class="hero-sub">{{venueName || '选择课程，跟着教练系统学'}}</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+
+  <block wx:elif="{{empty}}">
+    <view class="empty">
+      <view>该场馆还没有培训课程</view>
+      <button class="btn-empty" hover-class="btn-hover" bindtap="goBack">返回看看场馆</button>
+    </view>
+  </block>
+
+  <view wx:for="{{courses}}" wx:key="id" class="course-card" bindtap="openDetail" data-id="{{item.id}}">
+    <view class="course-cover">
+      <image wx:if="{{item.cover}}" src="{{item.cover}}" mode="aspectFill" class="cover-img"></image>
+      <view wx:else class="cover-placeholder">
+        <view class="cp-line1">培训课程</view>
+        <view class="cp-line2">{{item.start_time}} - {{item.end_time}}</view>
+      </view>
+      <view wx:if="{{item.expired}}" class="course-tag expired">已截止</view>
+      <view wx:else class="course-tag price">¥{{item.price_per_person}}<text class="per">/人</text></view>
+      <view wx:if="{{item.recurrenceTag}}" class="course-tag recurrence">🔁 {{item.recurrenceTag}}</view>
+    </view>
+
+    <view class="course-body">
+      <view class="course-title">{{item.title}}</view>
+
+      <!-- 教练 / 课时（课程专属字段） -->
+      <view wx:if="{{item.coachChips.length}}" class="course-chips">
+        <text wx:for="{{item.coachChips}}" wx:for-item="chip" wx:key="*this" class="chip">{{chip}}</text>
+      </view>
+
+      <view class="course-meta">
+        <text class="meta-people">👥 已报 {{item.signed_up}}/{{item.max_capacity}}人</text>
+        <text class="meta-min">{{item.min_participants}}人成班</text>
+      </view>
+      <view class="course-loc">📍 {{item.venueText}}</view>
+      <view class="course-time">🕐 {{item.dateText}} {{item.start_time}} - {{item.end_time}}</view>
+    </view>
+  </view>
+</view>

@@ -37,8 +37,12 @@ Page({
     }
   },
 
+  // 约课（2026-09-25 上线）：进该场馆的「培训课程」列表页（课程由后台「培训课程」栏目发布）
+  //   之前是占位 toast「约课功能本期未上线」；现在点进真页面，报名走与畅打同一条链路。
+  //   带上馆名 → 列表页标题显示「XX馆 · 培训课程」，用户一眼知道看的是哪个馆的课。
   onBookLesson() {
-    wx.showToast({ title: '约课功能本期未上线', icon: 'none' });
+    const name = this.data.venue?.name ? `&venue_name=${encodeURIComponent(this.data.venue.name)}` : '';
+    wx.navigateTo({ url: `/pages/courses/courses?venue_id=${this._id}${name}` });
   },
 
   // 进入约场：传 venue_id，book 页拉该场馆下所有场地

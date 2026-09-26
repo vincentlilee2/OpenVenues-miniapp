@@ -4,6 +4,7 @@
     "pages/venue-detail/venue-detail",
     "pages/book/book",
     "pages/promos/promos",
+    "pages/courses/courses",
     "pages/promo-detail/promo-detail",
     "pages/order-list/order-list",
     "pages/order-detail/order-detail",

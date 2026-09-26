@@ -13,6 +13,9 @@
     <view class="card">
       <view class="title">{{promo.title}}</view>
       <view wx:if="{{recurrenceTag}}" class="recurrence-tag">🔁 {{recurrenceTag}}</view>
+      <!-- 课程专属（2026-09-25）：教练 / 课时数；畅打不显示这两行 -->
+      <view wx:if="{{isCourse && promo.coach}}" class="meta-row"><text>🧑‍🏫 教练</text><text>{{promo.coach}}</text></view>
+      <view wx:if="{{isCourse && promo.lesson_count}}" class="meta-row"><text>📚 课时</text><text>共 {{promo.lesson_count}} 节</text></view>
       <view class="meta-row"><text>📅 日期</text><text>{{promo.promo_date}}</text></view>
       <view class="meta-row"><text>⏰ 时段</text><text>{{promo.start_time}} - {{promo.end_time}}</text></view>
       <view class="meta-row"><text>📍 场地</text><text>{{courtText}}</text></view>

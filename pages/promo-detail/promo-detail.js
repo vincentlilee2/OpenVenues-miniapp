@@ -81,9 +81,13 @@ Page({
       // 周期性标签（2026-09-24）：只有"实例"显示（用户在某个具体的周二/周四场次里能看到"我每周都有"）
       // 2026-09-25：映射收敛到 utils/promos.js（详情页与列表页共用，别再各写一份）
       const recurrenceTag = promoUtils.recurrenceTagOf(p);
+      // 课程 / 畅打 共用本页（2026-09-25）：按 kind 切换标题与「教练/课时」两行
+      const isCourse = p.kind === 'course';
+      if (isCourse) wx.setNavigationBarTitle({ title: '课程详情' });
       this.setData({
         promo: p,
         loading: false,
+        isCourse,
         isExpired,
         // 模板里不能调用方法，格式化好的文本在这里算好
         deadlineText: time.toLocalText(p.signup_deadline),
