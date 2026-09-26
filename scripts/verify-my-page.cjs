@@ -136,18 +136,25 @@ console.log('\n--- ⑥ 关于：版本号 1.1.0 + 简介文案 ---');
   ok('旧版本号 0.1.0 已不存在', !/0\.1\.0/.test(read('config.js').replace(/\/\/.*$/gm, '')));
   ok('my.js 把 version 透出给页面', /version,/.test(js) && /\{\{\s*version\s*\}\}/.test(wxml));
 
-  const aboutBlock = (wxml.match(/<view class="section">\s*<view class="section-title">关于<\/view>([\s\S]*?)<\/view>\s*<\/view>\s*$/) || wxml.match(/关于<\/view>([\s\S]*)/) || [])[1] || '';
+  // ⚠️ 别用「嵌套 </view> 配对」的正则切区块（嵌套层数一变就切歪）→ 从「关于」标题切到文件末尾
+  const aboutBlock = wxml.slice(wxml.indexOf('<view class="section-title">关于</view>'));
   const text = noComment.replace(/\s+/g, '');
   for (const [label, needle] of [
-    ['★ 含「场馆预订小程序（OpenVenues）」', '场馆预订小程序（OpenVenues）'],
     ['★ 含「记忆花园 旗下开发」', '记忆花园旗下开发'],
     ['★ 含「开源免费微信小程序」', '开源免费微信小程序'],
     ['★ 含 GitHub 地址「github.com/vincentlilee2」', 'github.com/vincentlilee2'],
   ]) {
     ok(label, text.includes(needle.replace(/\s+/g, '')));
   }
-  ok('★ 简介在「关于」区块内、且在版本号那行下面', aboutBlock.includes('记忆花园') && aboutBlock.indexOf('OpenVenues') < aboutBlock.indexOf('记忆花园'), aboutBlock.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120));
-  ok('样式有 .about-desc', /\.about-desc\s*\{/.test(wxss));
+  // 2026-09-26 用户第二次调整：简介**替换**卡片里的「场馆预定小程序」副标题，不另起一段
+  ok('★ 简介是版本号那行的副标题（li-sub about-desc）', /li-title">OpenVenues \{\{version\}\}<\/view>\s*<!--[\s\S]*?-->\s*<view class="li-sub about-desc">记忆花园/.test(wxml), (aboutBlock.match(/li-sub[^>]*>[^<]*/) || [''])[0]);
+  ok('★ 已无独立的简介段落（不再另起一块放在卡片下面）', !/<\/view>\s*<view class="about-desc">/.test(noComment));
+  ok('★ 原标题「场馆预定小程序」已被替换掉', !/场馆预定小程序/.test(noComment));
+  ok('旧的长句式开头已不存在（不再以「场馆预订小程序（OpenVenues）是由」开头）', !/场馆预订小程序（OpenVenues）是由/.test(noComment));
+  ok('简介就在版本号那个 list-item 的 li-body 里（关于卡片仍是 2 个条目）', ((aboutBlock.match(/<view class="li-body">/g) || []).length === 2) && /li-body[\s\S]*?about-desc[\s\S]*?<\/view>\s*<\/view>\s*<view class="list-item"/.test(aboutBlock), (aboutBlock.match(/<view class="li-body">/g) || []).length);
+  // ⚠️ 要先**精确取出规则体**再判断，否则 `[\s\S]*?border-bottom` 会一路搜到后面别的规则里去（假红）
+  const aboutRule = (wxss.match(/\.about-desc\s*\{[\s\S]*?\}/) || [''])[0];
+  ok('样式 .about-desc 改为 li-sub 修饰（有 margin-top、无边框）', /margin-top:\s*6rpx/.test(aboutRule) && !/border-bottom/.test(aboutRule), aboutRule.replace(/\s+/g, ' ').slice(0, 80));
 }
 
 console.log(`\n合计：${pass} 过 / ${fail} 失败`);

@@ -37,14 +37,11 @@
 }
 .user-settings-hover { opacity: 0.75; }
 
-/* 关于 → 简介（2026-09-26）：放在「OpenVenues 版本号」下面的一段说明 */
+/* 关于 → 简介（2026-09-26）：作为「OpenVenues 版本号」的副标题（li-sub 的修饰类），
+   不是独立一段 —— 用户明确要求「替换卡片里的『场馆预定小程序』文字」。 */
 .about-desc {
-  padding: 4rpx 0 18rpx;
-  font-size: 24rpx;
+  margin-top: 6rpx;
   line-height: 1.7;
-  color: var(--muted);
-  border-bottom: 1rpx solid var(--line);
-  margin-bottom: 6rpx;
 }
 
 /* ===== 微信登录 ===== */
