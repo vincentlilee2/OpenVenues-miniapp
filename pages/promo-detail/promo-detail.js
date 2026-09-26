@@ -6,8 +6,9 @@ const contact = require('../../utils/contact.js');
 const pay = require('../../utils/pay.js');
 const share = require('../../utils/share.js');
 
-// 默认畅打海报（与后端 static/promos/default.jpg 对应）
+// 默认海报：畅打用 default.jpg，**课程用 course-default.jpg**（2026-09-26 用户提供）
 const DEFAULT_PROMO_COVER = `${config.apiBase.replace(/\/$/, '')}/static/promos/default.jpg`;
+const DEFAULT_COURSE_COVER = `${config.apiBase.replace(/\/$/, '')}/static/promos/course-default.jpg`;
 
 Page({
   data: {
@@ -73,16 +74,17 @@ Page({
     try {
       const p = await api.getPromo(this._id);
       const isExpired = time.isPast(p.signup_deadline);
-      // cover: 相对路径 → 绝对 URL；空 → 默认海报
+      // 课程 / 畅打 共用本页（2026-09-25）：按 kind 切换标题、默认海报与「教练/课时」两行
+      //   ⚠️ 必须**先**算出 isCourse —— 下面的默认海报要用它（对象/变量的求值顺序）
+      const isCourse = p.kind === 'course';
+      // cover: 相对路径 → 绝对 URL；空 → 默认海报（畅打 default.jpg / 课程 course-default.jpg）
       const apiBase = config.apiBase.replace(/\/$/, '');
       let cover = p.cover || '';
       if (cover && cover.startsWith('/')) cover = apiBase + cover;
-      p.cover = cover || DEFAULT_PROMO_COVER;
+      p.cover = cover || (isCourse ? DEFAULT_COURSE_COVER : DEFAULT_PROMO_COVER);
       // 周期性标签（2026-09-24）：只有"实例"显示（用户在某个具体的周二/周四场次里能看到"我每周都有"）
       // 2026-09-25：映射收敛到 utils/promos.js（详情页与列表页共用，别再各写一份）
       const recurrenceTag = promoUtils.recurrenceTagOf(p);
-      // 课程 / 畅打 共用本页（2026-09-25）：按 kind 切换标题与「教练/课时」两行
-      const isCourse = p.kind === 'course';
       if (isCourse) wx.setNavigationBarTitle({ title: '课程详情' });
       this.setData({
         promo: p,

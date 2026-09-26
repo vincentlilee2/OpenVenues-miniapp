@@ -203,7 +203,7 @@ console.log('\n--- ④ 边界：封面兜底 / 已截止 / 缺教练课时 / 周
   ok('★ 8 周实例折叠成 1 期（模版行也不展示）', inst.data.courses.length === 1, inst.data.courses.length);
   const c = inst.data.courses[0];
   ok('取的是最近一期 2026-09-28', c?.promo_date === '2026-09-28', c?.promo_date);
-  ok('★ 封面为空 → 兜底默认海报', /\/static\/promos\/default\.jpg$/.test(c?.cover || ''), c?.cover);
+  ok('★ 封面为空 → 兜底**课程**默认图', /\/static\/promos\/course-default\.jpg$/.test(c?.cover || ''), c?.cover);
   ok('★ 已过期 → expired=true（列表显示「已截止」）', c?.expired === true);
   ok('★ 没教练没课时 → 芯片数组为空（不渲染空行）', Array.isArray(c?.coachChips) && c.coachChips.length === 0, JSON.stringify(c?.coachChips));
   ok('周期课程不显示具体日期（改显示「按周期上课」）', c?.dateText === '按周期上课', c?.dateText);
@@ -274,6 +274,29 @@ console.log('\n--- ⑦ 分享标题按 kind 变 ---');
   ok('课程分享路径直达课程详情', course.path === '/pages/promo-detail/promo-detail?id=61', course.path);
   const promo = share.forPromo({ id: 785, kind: 'promo', title: '周一上午畅打', price_per_person: 50, promo_date: '2026-09-28', start_time: '09:00', end_time: '11:00' });
   ok('★ 畅打分享标题仍是 🎯（未被串味）', /^🎯/.test(promo.title), promo.title);
+}
+
+console.log('\n--- ⑧ 默认海报按 kind 分（2026-09-26 用户提供课程默认图）---');
+{
+  const cjs = read('pages/courses/courses.js');
+  const djs = read('pages/promo-detail/promo-detail.js');
+  ok('★ 课程列表页默认海报 = course-default.jpg', /DEFAULT_COVER = .*course-default\.jpg/.test(cjs), cjs.match(/DEFAULT_COVER = .*/)?.[0]);
+  ok('畅打列表页仍用 default.jpg（未被串味）', /DEFAULT_PROMO_COVER = .*\/static\/promos\/default\.jpg/.test(read('pages/promos/promos.js')));
+  ok('★ 详情页两个默认图常量都在', /DEFAULT_PROMO_COVER/.test(djs) && /DEFAULT_COURSE_COVER/.test(djs));
+  ok('★ 详情页按 kind 选默认图', /isCourse \? DEFAULT_COURSE_COVER : DEFAULT_PROMO_COVER/.test(djs), djs.match(/p\.cover = .*/)?.[0]);
+  // 动态：空封面时，课程用课程图、畅打用畅打图
+  const page = grabPage('pages/promo-detail/promo-detail.js');
+  const inst = makeInst(page, { promo: null, loading: true, participantCount: 1, form: {} });
+  inst._id = '1';
+  const base = { promo_date: '2026-11-11', start_time: '14:00', end_time: '16:00', price_per_person: 120, signed_up: 1, max_capacity: 8, min_participants: 2, signup_deadline: '2099-01-01T00:00:00.000Z', cover: '' };
+  nextResponse = { statusCode: 200, data: { ok: true, data: { ...base, id: 61, kind: 'course', title: '课程' } } };
+  await inst.load();
+  await wait();
+  ok('★ 课程（无封面）→ 课程默认图', /course-default\.jpg$/.test(inst.data.promo?.cover || ''), inst.data.promo?.cover);
+  nextResponse = { statusCode: 200, data: { ok: true, data: { ...base, id: 785, kind: 'promo', title: '畅打' } } };
+  await inst.load();
+  await wait();
+  ok('★ 畅打（无封面）→ 畅打默认图（未被串味）', /\/static\/promos\/default\.jpg$/.test(inst.data.promo?.cover || ''), inst.data.promo?.cover);
 }
 
 console.log(`\n合计：${pass} 过 / ${fail} 失败`);

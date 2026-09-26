@@ -7,8 +7,9 @@ const config = require('../../config.js');
 const time = require('../../utils/time.js');
 const promoUtils = require('../../utils/promos.js');
 
-// 默认海报（与后端 static/promos/default.jpg 对应）
-const DEFAULT_COVER = `${config.apiBase.replace(/\/$/, '')}/static/promos/default.jpg`;
+// 默认海报：**课程默认图**（2026-09-26 用户提供）—— 与后端 static/promos/course-default.jpg 对应
+//   （畅打列表仍用 static/promos/default.jpg，两者互不影响）
+const DEFAULT_COVER = `${config.apiBase.replace(/\/$/, '')}/static/promos/course-default.jpg`;
 
 Page({
   data: { courses: [], loading: true, venueName: '', empty: false },
