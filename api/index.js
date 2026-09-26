@@ -30,7 +30,7 @@ module.exports = {
   getPromo: (id) => request({ url: `/api/promos/${id}`, auth: false }),
   // 培训课程（2026-09-25）：与畅打同一张表（venue_promos.kind='course'），后端给了独立入口
   listCourses: (venueId) => request({ url: '/api/courses' + (venueId ? `?venue_id=${venueId}` : ''), auth: false }),
-  // 场馆介绍（2026-09-26）：独立表 venue_articles；纯文章，无报名
+  // 服务介绍（2026-09-26）：独立表 venue_articles；纯文章，无报名
   listArticles: (venueId) => request({ url: '/api/articles' + (venueId ? `?venue_id=${venueId}` : ''), auth: false }),
   getArticle: (id) => request({ url: `/api/articles/${id}`, auth: false }),
   signupPromo: (id, payload) => request({ url: `/api/promos/${id}/signup`, method: 'POST', data: payload }),

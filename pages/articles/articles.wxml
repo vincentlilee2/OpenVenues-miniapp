@@ -1,7 +1,7 @@
-<!-- 场馆介绍列表（2026-09-26）—— 纯文章列表，点进文章详情 -->
+<!-- 服务介绍列表（2026-09-26）—— 纯文章列表，点进文章详情 -->
 <view class="container">
   <view class="hero">
-    <view class="hero-title">场馆介绍</view>
+    <view class="hero-title">服务介绍</view>
     <view class="hero-sub">{{venueName || '了解场馆与课程背后的事'}}</view>
   </view>
 

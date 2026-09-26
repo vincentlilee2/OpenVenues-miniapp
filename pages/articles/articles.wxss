@@ -1,4 +1,4 @@
-/* 场馆介绍列表（2026-09-26） */
+/* 服务介绍列表（2026-09-26） */
 .hero {
   background: linear-gradient(135deg, var(--primary), var(--primary-light));
   padding: 40rpx 32rpx 50rpx;

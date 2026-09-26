@@ -1,8 +1,8 @@
-// 场馆介绍（文章，2026-09-26）小程序侧验证
+// 服务介绍（文章，2026-09-26）小程序侧验证
 //   覆盖：
 //   ① 接口接线（listArticles / getArticle）与新页注册
 //   ② 文章详情页：正文分段渲染、发布时间、封面绝对 URL、**没有报名按钮/表单/价格**（纯展示）
-//   ③ 场馆介绍列表页：按场馆过滤、摘要、点进文章页、空态
+//   ③ 服务介绍列表页：按场馆过滤、摘要、点进文章页、空态
 //   ④ 「活动与课程」页：文章**排在活动列表最后**，卡片是文章变体，点它进文章页
 //   ⑤ 场馆详情页：名字行右侧换成「介绍…」、导航挪到「地址」行右侧、地址**完整可折行不截断**
 // 手法：假 wx + 真页面文件 + 真 api/request.js
@@ -138,7 +138,7 @@ const apiBase = config.apiBase.replace(/\/$/, '');
     ok('★ 后端没给 paragraphs 时按换行兜底拆段（空行忽略）', JSON.stringify(inst2.data.paragraphs) === JSON.stringify(['A', 'B', 'C']), JSON.stringify(inst2.data.paragraphs));
   }
 
-  console.log('\n--- ③ 场馆介绍列表页 ---');
+  console.log('\n--- ③ 服务介绍列表页 ---');
   {
     const js = read('pages/articles/articles.js');
     ok('★ 按 venue_id 过滤请求', /listArticles\(this\._venueId\)/.test(js));
@@ -236,9 +236,33 @@ const apiBase = config.apiBase.replace(/\/$/, '');
     ok('地址行顶部对齐（多行地址不歪）', /\.row-addr\s*\{[\s\S]*?align-items:\s*flex-start/.test(wxss));
     ok('导航按钮 flex:none（永远不会被长地址挤变形）', /\.nav-link\s*\{[\s\S]*?flex:\s*none/.test(wxss));
     ok('有 .intro-link 样式', /\.intro-link\s*\{/.test(wxss));
-    ok('★ js 有 openIntro 且跳场馆介绍列表（带 venue_id）', /openIntro\(\)[\s\S]{0,220}\/pages\/articles\/articles\?venue_id=\$\{this\._id\}/.test(js));
+    ok('★ js 有 openIntro 且跳服务介绍列表（带 venue_id）', /openIntro\(\)[\s\S]{0,220}\/pages\/articles\/articles\?venue_id=\$\{this\._id\}/.test(js));
     ok('★ 名字行仍是 flex + space-between（左名右按钮）', /\.name-row\s*\{[\s\S]*?display:\s*flex[\s\S]*?justify-content:\s*space-between/.test(wxss));
     ok('名称仍会被省略号截断（不挤走按钮）', /\.venue-name\s*\{[\s\S]*?text-overflow:\s*ellipsis/.test(wxss));
+  }
+
+  console.log('\n--- ⑥ 文案统一为「服务介绍」（2026-09-26 用户要求改名：场馆介绍 → 服务介绍）---');
+  {
+    const artsJson = JSON.parse(read('pages/articles/articles.json'));
+    const artJson = JSON.parse(read('pages/article/article.json'));
+    ok('★ 列表页导航栏标题 = 服务介绍', artsJson.navigationBarTitleText === '服务介绍', artsJson.navigationBarTitleText);
+    ok('★ 文章页导航栏标题 = 服务介绍', artJson.navigationBarTitleText === '服务介绍', artJson.navigationBarTitleText);
+    ok('★ 列表页 hero 标题 = 服务介绍', /<view class="hero-title">服务介绍<\/view>/.test(read('pages/articles/articles.wxml')));
+    ok('★ 活动列表里文章卡的角标 = 服务介绍', /<view class="tag art-tag">服务介绍<\/view>/.test(read('pages/activity/activity.wxml')));
+    ok('★ 文章页兜底标题 = 服务介绍', (read('pages/article/article.js').match(/'服务介绍'/g) || []).length >= 2);
+    // 防复发：小程序里不该再有「场馆介绍」这套旧文案
+    let leftovers = [];
+    for (const dir of ['pages', 'api', 'utils', 'custom-tab-bar']) {
+      const walk = (p) => {
+        for (const e of fs.readdirSync(path.join(ROOT, p), { withFileTypes: true })) {
+          const rel = path.join(p, e.name);
+          if (e.isDirectory()) walk(rel);
+          else if (/\.(wxml|json|js|wxss)$/.test(e.name) && read(rel).includes('场馆介绍')) leftovers.push(rel);
+        }
+      };
+      if (fs.existsSync(path.join(ROOT, dir))) walk(dir);
+    }
+    ok('★ 防复发：小程序里没有「场馆介绍」旧文案残留', leftovers.length === 0, leftovers.join(', '));
   }
 
   console.log(`\n合计：${pass} 过 / ${fail} 失败`);

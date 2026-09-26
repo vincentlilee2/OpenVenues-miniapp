@@ -92,10 +92,10 @@ const wait = () => new Promise((r) => setTimeout(r, 5));
     ok('★ 周期标签已不再用 top/left 定位', /top:\s*auto/.test(recRule) && /left:\s*auto/.test(recRule), recRule.replace(/\s+/g, ' ').slice(0, 110));
     ok('价格标签仍在右上（没被一起挪走）', /\.tag\.price\s*\{[\s\S]*?right:\s*20rpx/.test(actWxss));
     // ⚠️ 别让右下角与别的东西重叠：封面里只应有三类标签（已截止/价格/周期）
-    // ⚠️ 标签数从 3 → 4（2026-09-26 活动列表末尾加了场馆介绍卡，它自带一个「场馆介绍」标）。
+    // ⚠️ 标签数从 3 → 4（2026-09-26 活动列表末尾加了服务介绍卡，它自带一个「服务介绍」标）。
     //    活动/课程卡本身仍是 3 类（已截止/价格/周期）—— 这里分别断言，别只看总数。
     const tagAll = (actWxml.match(/class="tag /g) || []).length;
-    ok('★ 标签共 4 个：活动卡 3 类 + 文章卡 1 个「场馆介绍」标', tagAll === 4 && /class="tag art-tag"/.test(actWxml), tagAll);
+    ok('★ 标签共 4 个：活动卡 3 类 + 文章卡 1 个「服务介绍」标', tagAll === 4 && /class="tag art-tag"/.test(actWxml), tagAll);
     // 自定义 tabBar（app.json 里 custom:true → 真正渲染的是组件）
     const tb = read('custom-tab-bar/index.wxml');
     ok('★ 自定义 tabBar 第二格也改成了活动', /data-path="\/pages\/activity\/activity"/.test(tb) && /<text>活动<\/text>/.test(tb));
@@ -160,7 +160,7 @@ const wait = () => new Promise((r) => setTimeout(r, 5));
     ok('★ 课程卡片有教练/课时芯片', c.chips.length === 2 && /张教练/.test(c.chips[0]) && /共 8 节/.test(c.chips[1]), JSON.stringify(c.chips));
     ok('★ 课程文案是「N人成班」（不是成团）', c.metaSub === '4人成班', c.metaSub);
     ok('★ 课程空封面 → 课程默认图', /course-default\.jpg$/.test(c.cover), c.cover);
-    // 2026-09-26：活动列表末尾还会拉场馆介绍文章 → 3 个接口各拉一次（切段用已拉到的数据，不再请求）
+    // 2026-09-26：活动列表末尾还会拉服务介绍文章 → 3 个接口各拉一次（切段用已拉到的数据，不再请求）
     ok('切段不重复请求接口（用已拉到的数据渲染）', calls.requests.length === 3, calls.requests.length);
   }
 
@@ -200,7 +200,7 @@ const wait = () => new Promise((r) => setTimeout(r, 5));
       setTimeout(() => {
         if (isPromos) o.fail && o.fail({ errMsg: 'boom' });
         else if (isCourses) o.success && o.success({ statusCode: 200, data: { ok: true, data: [{ id: 61, kind: 'course', title: '课程', promo_date: '2026-11-05', start_time: '14:00', end_time: '16:00', price_per_person: 1, signed_up: 0, max_capacity: 8, min_participants: 2, signup_deadline: '2099-01-01T00:00:00.000Z', is_recurrence_instance: 0, recurrence_kind: 'none' }] } });
-        // 场馆介绍（2026-09-26 起这个页面还会拉文章）→ 这里返回空，别把课程行当成文章
+        // 服务介绍（2026-09-26 起这个页面还会拉文章）→ 这里返回空，别把课程行当成文章
         else o.success && o.success({ statusCode: 200, data: { ok: true, data: [] } });
       }, 0);
     };

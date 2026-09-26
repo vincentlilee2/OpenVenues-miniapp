@@ -55,7 +55,7 @@ Page({
     wx.navigateTo({ url: `/pages/promos/promos?venue_id=${this._id}` });
   },
 
-  // 「介绍…」（2026-09-26）：进该场馆的**场馆介绍**文章列表（纯文章，点进去无报名）
+  // 「介绍…」（2026-09-26）：进该场馆的**服务介绍**文章列表（纯文章，点进去无报名）
   //   带馆名 → 列表页标题显示「XX馆 · 介绍」
   openIntro() {
     const name = this.data.venue?.name ? `&venue_name=${encodeURIComponent(this.data.venue.name)}` : '';

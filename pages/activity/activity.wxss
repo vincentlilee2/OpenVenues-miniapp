@@ -94,7 +94,7 @@
 
 .empty { text-align: center; color: var(--muted); padding: 80rpx 0; }
 
-/* ── 场馆介绍（文章）卡（2026-09-26）：排在活动列表最后，视觉上区别于可报名活动 ── */
+/* ── 服务介绍（文章）卡（2026-09-26）：排在活动列表最后，视觉上区别于可报名活动 ── */
 .art-cover { height: 300rpx; }
 .art-ph { font-size: 72rpx; }
 .art-tag {

@@ -42,12 +42,12 @@
     </view>
   </view>
 
-  <!-- 场馆介绍（文章）卡：排在活动列表最后；无价格/无已报/无成团 —— 点进纯文章页 -->
+  <!-- 服务介绍（文章）卡：排在活动列表最后；无价格/无已报/无成团 —— 点进纯文章页 -->
   <view wx:else class="card art-card" bindtap="openDetail" data-id="{{item.id}}" data-kind="article">
     <view class="card-cover art-cover">
       <image wx:if="{{item.cover}}" src="{{item.cover}}" mode="aspectFill" class="cover-img"></image>
       <view wx:else class="cover-placeholder"><text class="art-ph">📖</text></view>
-      <view class="tag art-tag">场馆介绍</view>
+      <view class="tag art-tag">服务介绍</view>
     </view>
     <view class="card-body">
       <view class="card-title">{{item.title}}</view>
