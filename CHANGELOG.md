@@ -34,7 +34,7 @@
 
 #### 对应后端
 
-- [vincentlilee2/OpenVenues-server v0.1.0](https://github.com/vincentlilee2/OpenVenues-server/releases/tag/v0.1.0)（同步发布）
+- 配套后端 v0.1.0 同步发布（后端为私有仓，不在本公开仓内）
 
 ---
 

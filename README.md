@@ -1,8 +1,8 @@
 # OpenVenues 场馆预定小程序 · 微信小程序客户端
 
-按小时订场 + 畅打团购，配合 [`OpenVenues-server`](../OpenVenues-server) 后端使用。
+按小时订场 + 畅打团购，需要配合一套 OpenVenues 后端服务使用（本仓只含小程序端，后端不在本公开仓内）。
 
-> **两个仓必须都 clone**：本仓是小程序端，API 在 [OpenVenues-server](https://github.com/vincentlilee2/OpenVenues-server) 里。
+> **本仓只含小程序端**：需要你自己部署配套的 OpenVenues 后端（提供场馆 / 活动 / 订单 / 文章等 API）。后端源码与部署说明**不在本公开仓**。
 
 ## 5 步跑起来
 
@@ -16,7 +16,7 @@ cd OpenVenues-miniapp
 #    注意：project.config.json 已写好 AppID，导入时按提示选择「测试号」或填自己的 AppID
 
 # 3) 启动后端（在另一个终端）
-#    详见 OpenVenues-server/README.md 的 5 步说明
+#    按配套后端的部署说明起服务（默认监听 127.0.0.1:8810；后端不在本仓）
 
 # 4) 改 config.js：填你的 Mac 局域网 IP（真机预览时需要）
 #    或者把 REAL_DEVICE_TARGET 改为 'prod' → 走线上
@@ -34,7 +34,7 @@ const PROD_HOST     = 'https://your-domain/venue-api';   // 体验版/正式版
 const REAL_DEVICE_TARGET = 'prod';                       // 'prod' | 'lan'
 ```
 
-**把 `your-domain` 换成你自己的后端域名**（后端仓 `OpenVenues-server` 的部署域名，含 `/venue-api` 前缀）。
+**把 `your-domain` 换成你自己部署的后端域名**（含路径前缀，示例里用 `/venue-api`）。
 
 ### 开源占位双轨（本项目约定）
 
@@ -92,8 +92,8 @@ env -u PYTHONPATH node scripts/verify-login.mjs
 
 ## 上传体验版 / 正式
 
-按微信开发者工具要求：先在公众平台登记 request/downloadFile 合法域名（正式域名见 `OpenVenues-server/README.md`），然后「上传」按钮即可。
+按微信开发者工具要求：先在公众平台登记 request/downloadFile 合法域名（填你自己部署的后端域名），然后「上传」按钮即可。
 
 ---
 
-参考后端仓的 README：[OpenVenues-server](https://github.com/vincentlilee2/OpenVenues-server)
+配套后端（OpenVenues-server）是私有仓，未随本仓开源；小程序端的接口调用集中在 `api/index.js`，可按它对接自建后端。
