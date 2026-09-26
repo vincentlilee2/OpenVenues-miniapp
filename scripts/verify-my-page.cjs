@@ -157,5 +157,27 @@ console.log('\n--- ⑥ 关于：版本号 1.1.0 + 简介文案 ---');
   ok('样式 .about-desc 改为 li-sub 修饰（有 margin-top、无边框）', /margin-top:\s*6rpx/.test(aboutRule) && !/border-bottom/.test(aboutRule), aboutRule.replace(/\s+/g, ' ').slice(0, 80));
 }
 
+console.log('\n--- ⑦ 我的服务：办卡充值入口（新增，内容占位）---');
+{
+  const service = wxml.slice(wxml.indexOf('<view class="section-title">我的服务</view>'), wxml.indexOf('<view class="section-title">关于</view>'));
+  ok('★「我的服务」里有「办卡充值」条目', /li-title">办卡充值</.test(service), (service.match(/li-title">[^<]*/g) || []).join(' / '));
+  ok('★ 位置在「我的订单」下面（用户要求）', service.indexOf('我的订单') < service.indexOf('办卡充值') && service.indexOf('我的订单') >= 0, `订单@${service.indexOf('我的订单')} 办卡@${service.indexOf('办卡充值')}`);
+  ok('带图标与说明副标题', /li-icon[^>]*>💳</.test(service) && /li-sub">会员卡 \/ 储值充值（功能开发中）/.test(service));
+  ok('点它走 openCardRecharge', /class="list-item" bindtap="openCardRecharge"/.test(service));
+  ok('js 有 openCardRecharge 且是占位提示', /openCardRecharge\(\)\s*\{[\s\S]{0,220}wx\.showToast\(/.test(js), (js.match(/openCardRecharge\(\)[\s\S]{0,120}/) || [''])[0].replace(/\n\s*/g, ' '));
+  ok('js 里留了接入真页面的 TODO（以后换 navigateTo 即可）', /TODO[\s\S]{0,120}navigateTo/.test(js));
+  if (page && typeof page.openCardRecharge === 'function') {
+    calls.navs.length = 0;
+    const toasts = [];
+    const origToast = global.wx.showToast;
+    global.wx.showToast = (o) => toasts.push(o);
+    page.openCardRecharge.call({ data: {}, setData() {} });
+    global.wx.showToast = origToast;
+    ok('★ 真调 openCardRecharge() → 弹「开发中」提示且不跳页', toasts.length === 1 && /开发中/.test(toasts[0].title || '') && calls.navs.length === 0, JSON.stringify(toasts));
+  } else {
+    console.log('     ⚠ 没拿到 page 对象 → 动态断言跳过（静态断言已覆盖）');
+  }
+}
+
 console.log(`\n合计：${pass} 过 / ${fail} 失败`);
 process.exit(fail ? 1 : 0);

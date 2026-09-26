@@ -73,6 +73,16 @@
         </view>
         <view class="li-arrow">›</view>
       </view>
+      <!-- 办卡充值（2026-09-26 新增）：入口先落位，**内容占位**（点一下先给提示，
+           以后接会员卡/储值充值页时，把 my.js 的 openCardRecharge 改成 navigateTo 即可） -->
+      <view class="list-item" bindtap="openCardRecharge">
+        <view class="li-icon li-icon-green">💳</view>
+        <view class="li-body">
+          <view class="li-title">办卡充值</view>
+          <view class="li-sub">会员卡 / 储值充值（功能开发中）</view>
+        </view>
+        <view class="li-arrow">›</view>
+      </view>
       <view class="list-item" bindtap="openFeedback">
         <view class="li-icon li-icon-orange">📝</view>
         <view class="li-body">

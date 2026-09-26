@@ -176,6 +176,13 @@ Page({
     wx.navigateTo({ url: '/pages/courses/courses' });
   },
 
+  // 办卡充值（2026-09-26 新增入口，**内容占位**）
+  //   TODO(会员卡/储值)：做好页面后把这里换成
+  //   wx.navigateTo({ url: '/pages/card/card' }) —— 其余不用动
+  openCardRecharge() {
+    wx.showToast({ title: '办卡充值功能开发中，敬请期待', icon: 'none' });
+  },
+
   // 我的收藏（2026-09-25）：也不是 tabBar 页 → navigateTo
   goFavorites() {
     wx.navigateTo({ url: '/pages/favorites/favorites' });
