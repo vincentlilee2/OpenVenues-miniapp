@@ -56,8 +56,12 @@
 }
 .tag.expired { left: 20rpx; background: rgba(0,0,0,0.6); color: #fff; }
 .tag.recurrence {
-  top: 60rpx;              /* 排在价格/已截止下面，避免互相压住 */
-  left: 20rpx;
+  /* 2026-09-26 用户要求：从左上挪到**右下角** —— 原来 top:60rpx/left:20rpx 会压住
+     默认课程图顶部那行广告文字（「团课小班教学，快来报名！」） */
+  top: auto;
+  left: auto;
+  bottom: 20rpx;
+  right: 20rpx;
   background: rgba(14, 165, 233, 0.92);
   color: #fff;
   font-size: 22rpx;

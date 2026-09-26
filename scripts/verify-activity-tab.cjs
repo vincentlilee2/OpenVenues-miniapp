@@ -86,6 +86,13 @@ const wait = () => new Promise((r) => setTimeout(r, 5));
     ok('★ 活动页没有横幅（hero）节点', !/class="hero"/.test(actWxml));
     ok('★ 活动页 wxss 里 .hero 死样式已清', !/\.hero/.test(actWxss));
     ok('段选「活动 / 课程」仍在（内容切换器，不是横幅）', /data-seg="promo"/.test(actWxml) && /data-seg="course"/.test(actWxml));
+    // 周期标签位置（2026-09-26 用户要求）：右下角，别再用左上（会压住默认课程图顶部的广告文字）
+    const recRule = (actWxss.match(/\.tag\.recurrence\s*\{[\s\S]*?\}/) || [''])[0];
+    ok('★ 周期标签在右下角（bottom + right）', /bottom:\s*20rpx/.test(recRule) && /right:\s*20rpx/.test(recRule), recRule.replace(/\s+/g, ' ').slice(0, 110));
+    ok('★ 周期标签已不再用 top/left 定位', /top:\s*auto/.test(recRule) && /left:\s*auto/.test(recRule), recRule.replace(/\s+/g, ' ').slice(0, 110));
+    ok('价格标签仍在右上（没被一起挪走）', /\.tag\.price\s*\{[\s\S]*?right:\s*20rpx/.test(actWxss));
+    // ⚠️ 别让右下角与别的东西重叠：封面里只应有三类标签（已截止/价格/周期）
+    ok('封面里只有「已截止/价格/周期」三类标签', (actWxml.match(/class="tag /g) || []).length === 3, (actWxml.match(/class="tag /g) || []).length);
     // 自定义 tabBar（app.json 里 custom:true → 真正渲染的是组件）
     const tb = read('custom-tab-bar/index.wxml');
     ok('★ 自定义 tabBar 第二格也改成了活动', /data-path="\/pages\/activity\/activity"/.test(tb) && /<text>活动<\/text>/.test(tb));
