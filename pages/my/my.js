@@ -171,6 +171,11 @@ Page({
     wx.navigateTo({ url: '/pages/promos/promos' });
   },
 
+  // 培训课程（2026-09-26 用户要求）：「我的」页快捷入口 → 课程列表页（不带 venue_id = 看全部课程）
+  goCourses() {
+    wx.navigateTo({ url: '/pages/courses/courses' });
+  },
+
   // 我的收藏（2026-09-25）：也不是 tabBar 页 → navigateTo
   goFavorites() {
     wx.navigateTo({ url: '/pages/favorites/favorites' });

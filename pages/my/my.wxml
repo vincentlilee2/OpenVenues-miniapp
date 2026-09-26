@@ -16,6 +16,9 @@
         <view class="user-phone">{{statusText}}<text wx:if="{{uidShort}}" class="uid-tag">ID {{uidShort}}</text></view>
         <view wx:if="{{needProfile}}" class="set-profile-hint" bindtap="openEditor">点此设置微信头像昵称 ›</view>
       </view>
+      <!-- 设置（2026-09-26 用户要求）：原「我的服务 → 微信头像昵称」挪到这里，
+           点开的就是同一个编辑面板（openEditor → 微信头像/昵称选择 + 保存） -->
+      <view class="user-settings-btn" hover-class="user-settings-hover" bindtap="openEditor">设置</view>
     </block>
   </view>
 
@@ -40,11 +43,11 @@
     </view>
   </view>
 
-  <!-- 快捷入口 -->
+  <!-- 快捷入口（2026-09-26 用户要求：原来的「我的订单」换成「培训课程」→ 课程列表页） -->
   <view class="shortcuts">
-    <view class="sc" bindtap="goOrders">
-      <view class="sc-icon">📋</view>
-      <view class="sc-label">我的订单</view>
+    <view class="sc" bindtap="goCourses">
+      <view class="sc-icon">🎓</view>
+      <view class="sc-label">培训课程</view>
     </view>
     <view class="sc" bindtap="goPromos">
       <view class="sc-icon">🎯</view>
@@ -60,27 +63,13 @@
   <view class="section">
     <view class="section-title">我的服务</view>
     <view class="list-card">
+      <!-- 「我的预约」改名为「我的订单」（内容不变：仍是已确认订单）；「历史订单」已按用户要求去掉；
+           「微信头像昵称」已挪到顶部用户卡片右侧的「设置」按钮 -->
       <view class="list-item" bindtap="goOrders" data-status="confirmed">
         <view class="li-icon li-icon-blue">⏰</view>
         <view class="li-body">
-          <view class="li-title">我的预约</view>
+          <view class="li-title">我的订单</view>
           <view class="li-sub">查看已确认订单</view>
-        </view>
-        <view class="li-arrow">›</view>
-      </view>
-      <view class="list-item" bindtap="goOrders" data-status="completed">
-        <view class="li-icon li-icon-green">✓</view>
-        <view class="li-body">
-          <view class="li-title">历史订单</view>
-          <view class="li-sub">已完成订单</view>
-        </view>
-        <view class="li-arrow">›</view>
-      </view>
-      <view class="list-item" bindtap="openEditor">
-        <view class="li-icon li-icon-purple">👤</view>
-        <view class="li-body">
-          <view class="li-title">微信头像昵称</view>
-          <view class="li-sub">{{nickname ? nickname : '使用微信头像和昵称'}}</view>
         </view>
         <view class="li-arrow">›</view>
       </view>

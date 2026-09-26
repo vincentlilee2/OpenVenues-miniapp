@@ -23,6 +23,20 @@
 .user-name { font-size: 32rpx; font-weight: 600; }
 .user-phone { font-size: 24rpx; color: var(--muted); margin-top: 6rpx; }
 
+/* 顶部用户卡片右侧的「设置」（2026-09-26）：原来在「我的服务」里的「微信头像昵称」挪上来，
+   点开同一个编辑面板。flex:none 保证不会被长昵称挤走。 */
+.user-settings-btn {
+  flex: none;
+  margin-left: 12rpx;
+  padding: 8rpx 22rpx;
+  border-radius: 999rpx;
+  background: var(--primary);
+  color: #fff;
+  font-size: 24rpx;
+  line-height: 1.5;
+}
+.user-settings-hover { opacity: 0.75; }
+
 /* ===== 微信登录 ===== */
 .set-profile-hint {
   display: inline-block;
