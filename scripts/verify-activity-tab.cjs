@@ -79,7 +79,13 @@ const wait = () => new Promise((r) => setTimeout(r, 5));
     for (const f of ['activity.js', 'activity.wxml', 'activity.wxss', 'activity.json']) {
       ok(`存在 pages/activity/${f}`, exists(`pages/activity/${f}`));
     }
-    ok('导航栏标题是「活动」', JSON.parse(read('pages/activity/activity.json')).navigationBarTitleText === '活动');
+    ok('导航栏标题是「活动与课程」', JSON.parse(read('pages/activity/activity.json')).navigationBarTitleText === '活动与课程', JSON.parse(read('pages/activity/activity.json')).navigationBarTitleText);
+    // 顶部横幅已按用户要求去掉（2026-09-26）；tabBar 那一格仍叫「活动」（用户只要求改页面标题）
+    const actWxml = read('pages/activity/activity.wxml');
+    const actWxss = read('pages/activity/activity.wxss');
+    ok('★ 活动页没有横幅（hero）节点', !/class="hero"/.test(actWxml));
+    ok('★ 活动页 wxss 里 .hero 死样式已清', !/\.hero/.test(actWxss));
+    ok('段选「活动 / 课程」仍在（内容切换器，不是横幅）', /data-seg="promo"/.test(actWxml) && /data-seg="course"/.test(actWxml));
     // 自定义 tabBar（app.json 里 custom:true → 真正渲染的是组件）
     const tb = read('custom-tab-bar/index.wxml');
     ok('★ 自定义 tabBar 第二格也改成了活动', /data-path="\/pages\/activity\/activity"/.test(tb) && /<text>活动<\/text>/.test(tb));

@@ -1,9 +1,5 @@
 <view class="container">
-  <view class="hero">
-    <view class="hero-title">活动</view>
-    <view class="hero-sub">当前发布的活动与培训课程</view>
-  </view>
-
+  <!-- 顶部横幅已按用户要求去掉（2026-09-26）—— 直接进段选 -->
   <!-- 段选：活动 / 课程（与「畅打活动」「培训课程」两个后台栏目一一对应） -->
   <view class="seg">
     <view class="seg-item {{seg === 'promo' ? 'on' : ''}}" data-seg="promo" bindtap="switchSeg">🎯 活动</view>
