@@ -6,6 +6,8 @@
     "pages/promos/promos",
     "pages/activity/activity",
     "pages/courses/courses",
+    "pages/articles/articles",
+    "pages/article/article",
     "pages/promo-detail/promo-detail",
     "pages/order-list/order-list",
     "pages/order-detail/order-detail",

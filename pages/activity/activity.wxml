@@ -11,7 +11,9 @@
     {{seg === 'course' ? '暂无培训课程' : '暂无活动'}}
   </view>
 
-  <view wx:for="{{list}}" wx:key="id" class="card" bindtap="openDetail" data-id="{{item.id}}">
+  <!-- 活动/课程 卡（文章走下面那个变体） -->
+  <block wx:for="{{list}}" wx:key="id">
+  <view wx:if="{{item.kind !== 'article'}}" class="card" bindtap="openDetail" data-id="{{item.id}}" data-kind="{{item.kind}}">
     <view class="card-cover">
       <image wx:if="{{item.cover}}" src="{{item.cover}}" mode="aspectFill" class="cover-img"></image>
       <view wx:else class="cover-placeholder">
@@ -39,4 +41,23 @@
       <view class="when">🕐 {{item.timeText}}</view>
     </view>
   </view>
+
+  <!-- 场馆介绍（文章）卡：排在活动列表最后；无价格/无已报/无成团 —— 点进纯文章页 -->
+  <view wx:else class="card art-card" bindtap="openDetail" data-id="{{item.id}}" data-kind="article">
+    <view class="card-cover art-cover">
+      <image wx:if="{{item.cover}}" src="{{item.cover}}" mode="aspectFill" class="cover-img"></image>
+      <view wx:else class="cover-placeholder"><text class="art-ph">📖</text></view>
+      <view class="tag art-tag">场馆介绍</view>
+    </view>
+    <view class="card-body">
+      <view class="card-title">{{item.title}}</view>
+      <view wx:if="{{item.subtitle}}" class="art-sub">{{item.subtitle}}</view>
+      <view wx:if="{{item.excerpt}}" class="art-excerpt">{{item.excerpt}}…</view>
+      <view class="art-meta">
+        <text wx:if="{{item.publishText}}">🕐 {{item.publishText}}</text>
+        <text wx:if="{{item.venue_name}}" class="art-venue">📍 {{item.venue_name}}</text>
+      </view>
+    </view>
+  </view>
+  </block>
 </view>

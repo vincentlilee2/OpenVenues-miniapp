@@ -93,3 +93,18 @@
 .loc, .when { font-size: 24rpx; color: var(--muted); margin-top: 4rpx; }
 
 .empty { text-align: center; color: var(--muted); padding: 80rpx 0; }
+
+/* ── 场馆介绍（文章）卡（2026-09-26）：排在活动列表最后，视觉上区别于可报名活动 ── */
+.art-cover { height: 300rpx; }
+.art-ph { font-size: 72rpx; }
+.art-tag {
+  top: 20rpx;
+  left: 20rpx;
+  background: rgba(255, 255, 255, 0.92);
+  color: #3a7d44;
+  font-weight: 600;
+}
+.art-sub { font-size: 26rpx; color: var(--primary); margin-bottom: 8rpx; }
+.art-excerpt { font-size: 26rpx; color: var(--muted); line-height: 1.6; }
+.art-meta { display: flex; gap: 20rpx; font-size: 24rpx; color: var(--muted); margin-top: 12rpx; }
+.art-venue { color: var(--primary); }

@@ -12,15 +12,20 @@
 
     <!-- 场馆信息 -->
     <view class="card">
-      <!-- 名字行：右侧只有「⊕ 导航」（2026-09-25 用户要求**去掉分享按钮**）。
+      <!-- 名字行：右侧是「介绍…」（2026-09-26 用户要求：导航挪到地址行；分享按钮 09-25 已去掉）。
            ⚠️ 去掉内联分享按钮**不丢功能**：转发/分享到朋友圈仍在右上角「…」菜单里
            （onShareAppMessage + onShareTimeline + enableShareMenu 都保留着，见本页 js 顶部）。
            名字过长时**省略号截断**，绝不把右侧按钮挤走。 -->
       <view class="name-row">
         <view class="venue-name">{{venue.name}}</view>
+        <view class="intro-link" hover-class="nav-link-hover" bindtap="openIntro">介绍…</view>
+      </view>
+      <!-- 地址行：右侧是「⊕ 导航」（2026-09-26 挪过来）；地址**完整显示可折行**，不做省略号截断 -->
+      <view class="row row-addr">
+        <text class="label">📍 地址</text>
+        <text class="addr-text">{{venue.address || '地址待补充'}}</text>
         <view class="nav-link" hover-class="nav-link-hover" bindtap="openMap">⊕ 导航</view>
       </view>
-      <view class="row"><text class="label">📍 地址</text><text>{{venue.address || '地址待补充'}}</text></view>
       <view class="row" wx:if="{{venue.contact_phone}}">
         <text class="label">📞 电话</text>
         <text bindtap="callPhone">{{venue.contact_phone}}</text>

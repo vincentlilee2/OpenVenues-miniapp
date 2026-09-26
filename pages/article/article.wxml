@@ -1,0 +1,28 @@
+<!-- 文章详情（场馆介绍）—— 纯展示：封面背景 + 标题/副标题/发布时间 + 正文段落。
+     ⚠️ 刻意**没有**报名表单、「立即报名」按钮、价格、名额 —— 这是文章不是活动。 -->
+<view class="container">
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+
+  <block wx:elif="{{article}}">
+    <!-- 封面背景图（没有封面时用渐变底 + 标题占位） -->
+    <view class="hero">
+      <image wx:if="{{article.cover}}" src="{{article.cover}}" mode="aspectFill" class="hero-img"></image>
+      <view wx:else class="hero-ph"></view>
+      <view class="hero-mask"></view>
+      <view class="hero-text">
+        <view class="hero-title">{{article.title}}</view>
+        <view wx:if="{{article.subtitle}}" class="hero-sub">{{article.subtitle}}</view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="meta">
+        <text wx:if="{{publishText}}">🕐 {{publishText}}</text>
+        <text wx:if="{{article.venue_name}}" class="meta-venue">📍 {{article.venue_name}}</text>
+      </view>
+      <!-- 正文：一个换行 = 一个段落 -->
+      <view wx:for="{{paragraphs}}" wx:key="index" class="para">{{item}}</view>
+      <view wx:if="{{paragraphs.length === 0}}" class="empty">（暂无内容）</view>
+    </view>
+  </block>
+</view>

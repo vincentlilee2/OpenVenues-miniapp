@@ -1,0 +1,38 @@
+/* 场馆介绍列表（2026-09-26） */
+.hero {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  padding: 40rpx 32rpx 50rpx;
+  margin: 0 -24rpx 28rpx;
+  color: #fff;
+}
+.hero-title { font-size: 40rpx; font-weight: 600; margin-bottom: 8rpx; }
+.hero-sub { font-size: 26rpx; opacity: 0.85; }
+
+.art-card {
+  display: flex;
+  gap: 20rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06);
+}
+.art-cover { width: 220rpx; height: 150rpx; flex: none; border-radius: 12rpx; overflow: hidden; }
+.cover-img { width: 100%; height: 100%; }
+.cover-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+}
+.art-body { flex: 1; min-width: 0; }
+.art-title { font-size: 30rpx; font-weight: 600; margin-bottom: 6rpx; }
+.art-sub { font-size: 24rpx; color: var(--primary); margin-bottom: 6rpx; }
+.art-excerpt { font-size: 24rpx; color: var(--muted); line-height: 1.5; }
+.art-meta { display: flex; gap: 18rpx; font-size: 22rpx; color: var(--muted); margin-top: 10rpx; }
+.art-venue { color: var(--primary); }
+
+.empty { text-align: center; color: var(--muted); padding: 80rpx 0; }

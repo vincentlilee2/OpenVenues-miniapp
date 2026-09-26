@@ -18,16 +18,32 @@ const js = read('pages/venue-detail/venue-detail.js');
 const indexWxml = read('pages/index/index.wxml');
 const navUtil = read('utils/nav.js');
 
-console.log('--- ① 位置：在名字行右侧（分享已按用户要求去掉）---');
-const nameRow = (wxml.match(/<view class="name-row">([\s\S]*?)<\/view>\s*<view class="row"/) || [])[1] || '';
-ok('取到名字行区块', nameRow.length > 0);
-const iNav = nameRow.indexOf('class="nav-link"');
-ok('名字行里有「导航」', iNav >= 0);
+console.log('--- ① 位置（2026-09-26 用户要求挪位）：导航在「地址」行右侧；名字行右侧是「介绍…」---');
+// ⚠️ 别再用「从名字行吃到下一个 class="row" 为止」的老正则：地址行现在是 `class="row row-addr"`，
+//    老正则匹配不到它会**一路吃到后面真正的 `class="row"` 行**，把地址行里的导航当成名字行里的
+//    → 断言恒真 = **假绿**（2026-09-26 挪位后实测：老断言仍全过，实际位置已经错了）。改成按行切。
+const vdLines = wxml.split('\n');
+const iNameRow = vdLines.findIndex((l) => l.includes('class="name-row"'));
+const iAddrRow = vdLines.findIndex((l) => l.includes('class="row row-addr"'));
+const iAddrEnd = vdLines.findIndex((l, i) => i > iAddrRow && l.trim() === '</view>');
+const nameRow = vdLines.slice(iNameRow, iAddrRow).join('\n');
+const addrRow = vdLines.slice(iAddrRow, iAddrEnd + 1).join('\n');
+ok('取到名字行区块', iNameRow >= 0 && iAddrRow > iNameRow && nameRow.length > 0, `name=${iNameRow} addr=${iAddrRow}`);
+ok('取到地址行区块', iAddrRow >= 0 && iAddrEnd > iAddrRow && addrRow.length > 0, `addr=${iAddrRow} end=${iAddrEnd}`);
+// 名字行：名称 + 「介绍…」；**没有**导航、没有分享
+ok('★ 名字行右侧是「介绍…」（进该馆的介绍文章）', /class="intro-link"[^>]*bindtap="openIntro"/.test(nameRow) && /介绍…/.test(nameRow), nameRow.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 90));
+ok('★ 名字行里**没有**导航按钮了（已挪到地址行）', !/class="nav-link"|openMap/.test(nameRow), nameRow.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 90));
 // ★ 2026-09-25 用户要求「场馆详情页面的分享按钮 去掉」→ 名字行里必须**没有**分享按钮。
 //   （与 2026-09-24「放在分享右侧」的历史相反，以最新要求为准；转发仍在右上角「…」菜单）
 ok('★ 名字行里已无「分享」按钮（用户要求去掉）', !/share-link|open-type="share"/.test(nameRow), nameRow.trim().slice(0, 120));
-ok('导航文案是「⊕ 导航」（与首页卡片一致）', /class="nav-link"[^>]*>\s*⊕\s*导航\s*</.test(nameRow));
-ok('导航用 bindtap="openMap"', /class="nav-link"[^>]*bindtap="openMap"/.test(nameRow));
+// 地址行：导航落在这里，且地址必须**完整显示**
+ok('★ 地址行右侧有「⊕ 导航」（2026-09-26 挪过来）', /class="nav-link"[^>]*bindtap="openMap"/.test(addrRow), addrRow.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 90));
+ok('导航文案是「⊕ 导航」（与首页卡片一致）', /class="nav-link"[^>]*>\s*⊕\s*导航\s*</.test(addrRow));
+ok('导航用 bindtap="openMap"', /class="nav-link"[^>]*bindtap="openMap"/.test(addrRow));
+ok('地址有独立 class（addr-text，好给它单独的折行样式）', /class="addr-text"/.test(addrRow));
+const addrRule = (wxss.match(/\.addr-text\s*\{[\s\S]*?\}/) || [''])[0];
+ok('★ 地址不截断：.addr-text 没有 text-overflow / white-space: nowrap', !/text-overflow/.test(addrRule) && !/white-space/.test(addrRule), addrRule.replace(/\s+/g, ' ').slice(0, 90));
+ok('★ 地址可折行：word-break + flex:1（长地址换行显示全）', /word-break/.test(addrRule) && /flex:\s*1/.test(addrRule), addrRule.replace(/\s+/g, ' ').slice(0, 90));
 
 console.log('\n--- ② 不破坏既有约束：底部操作区仍恰好 3 个按钮，导航不进去 ---');
 // 底部操作区是 <view class="actions">（参考 verify-share.cjs 的取法，别用猜的 class 名）
@@ -36,7 +52,7 @@ const footerBtns = (actionsBlock.match(/<button/g) || []).length;
 ok('取到底部操作区', actionsBlock.length > 0);
 ok('底部操作区恰好 3 个 button', footerBtns === 3, '实际 ' + footerBtns);
 ok('底部操作区里没有「导航」', !/导航/.test(actionsBlock));
-ok('导航不在底部按钮行里（在名字行里）', nameRow.includes('nav-link') && !actionsBlock.includes('nav-link'));
+ok('导航不在底部按钮行里（在地址行里）', addrRow.includes('nav-link') && !actionsBlock.includes('nav-link'));
 ok('底部操作区仍是 约课/约场/畅打', ['约课', '约场', '畅打'].every((t) => actionsBlock.includes(t)), actionsBlock.replace(/\s+/g, ' ').trim().slice(0, 100));
 
 console.log('\n--- ③ 样式：与首页卡片的导航按钮同一套视觉 ---');

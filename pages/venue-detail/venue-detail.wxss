@@ -47,8 +47,9 @@
 /* 「分享」入口已按用户要求去掉（2026-09-25）—— 转发改走右上角「…」菜单，
    所以这里不再保留 .share-link / .share-link-hover 规则（死样式一并删掉）。 */
 
-/* 「⊕ 导航」：与首页场馆卡上的导航按钮**同一套视觉**（主色胶囊），坐在名字行右侧。
-   2026-09-25：分享按钮已按用户要求去掉，这一行现在只有「名字 + ⊕ 导航」。 */
+/* 「⊕ 导航」：与首页场馆卡上的导航按钮**同一套视觉**（主色胶囊）。
+   2026-09-25：分享按钮去掉 → 这一行只剩「名称 + 导航」；
+   2026-09-26：导航**挪到「地址」行的右侧**（用户要求），名字行右侧改成「介绍…」。 */
 .nav-link {
   flex: none;
   white-space: nowrap;
@@ -61,6 +62,18 @@
 }
 .nav-link-hover { opacity: 0.7; }
 
+/* 「介绍…」（2026-09-26）：名字行右侧 → 该场馆的介绍文章列表（纯文章，无报名） */
+.intro-link {
+  flex: none;
+  white-space: nowrap;
+  background: var(--primary);
+  color: #fff;
+  padding: 8rpx 20rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  line-height: 1.4;
+}
+
 .row {
   display: flex;
   justify-content: space-between;
@@ -70,6 +83,24 @@
 }
 .row .label { color: var(--muted); }
 .row:last-child { border-bottom: none; }
+
+/* 地址行（2026-09-26）：左标签 + **完整可折行**的地址 + 右侧导航按钮。
+   ⚠️ 地址**不能**用省略号截断（用户明确要求「地址信息要显示全，可以折行显示」），
+   所以这里给地址 flex:1 + min-width:0 + 允许换行（默认就换行，别设 nowrap/ellipsis）。 */
+.row-addr {
+  align-items: flex-start;
+  gap: 12rpx;
+}
+.row-addr .label { flex: none; }
+.addr-text {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  word-break: break-word;
+  line-height: 1.5;
+}
+/* 地址行的导航按钮要跟第一行文字对齐 */
+.row-addr .nav-link { margin-top: -2rpx; }
 
 .title { font-size: 32rpx; font-weight: 600; margin-bottom: 14rpx; }
 .court-list { display: flex; flex-direction: column; gap: 12rpx; }

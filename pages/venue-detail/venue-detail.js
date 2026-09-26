@@ -55,6 +55,13 @@ Page({
     wx.navigateTo({ url: `/pages/promos/promos?venue_id=${this._id}` });
   },
 
+  // 「介绍…」（2026-09-26）：进该场馆的**场馆介绍**文章列表（纯文章，点进去无报名）
+  //   带馆名 → 列表页标题显示「XX馆 · 介绍」
+  openIntro() {
+    const name = this.data.venue?.name ? `&venue_name=${encodeURIComponent(this.data.venue.name)}` : '';
+    wx.navigateTo({ url: `/pages/articles/articles?venue_id=${this._id}${name}` });
+  },
+
   callPhone() {
     if (this.data.venue?.contact_phone) {
       wx.makePhoneCall({ phoneNumber: this.data.venue.contact_phone });

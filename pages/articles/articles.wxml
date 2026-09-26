@@ -1,0 +1,26 @@
+<!-- 场馆介绍列表（2026-09-26）—— 纯文章列表，点进文章详情 -->
+<view class="container">
+  <view class="hero">
+    <view class="hero-title">场馆介绍</view>
+    <view class="hero-sub">{{venueName || '了解场馆与课程背后的事'}}</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+  <view wx:elif="{{empty}}" class="empty">这个场馆还没有介绍文章</view>
+
+  <view wx:for="{{list}}" wx:key="id" class="art-card" bindtap="openArticle" data-id="{{item.id}}">
+    <view class="art-cover">
+      <image wx:if="{{item.cover}}" src="{{item.cover}}" mode="aspectFill" class="cover-img"></image>
+      <view wx:else class="cover-placeholder"><text>📖</text></view>
+    </view>
+    <view class="art-body">
+      <view class="art-title">{{item.title}}</view>
+      <view wx:if="{{item.subtitle}}" class="art-sub">{{item.subtitle}}</view>
+      <view wx:if="{{item.excerpt}}" class="art-excerpt">{{item.excerpt}}…</view>
+      <view class="art-meta">
+        <text wx:if="{{item.publishText}}">🕐 {{item.publishText}}</text>
+        <text wx:if="{{item.venue_name}}" class="art-venue">📍 {{item.venue_name}}</text>
+      </view>
+    </view>
+  </view>
+</view>

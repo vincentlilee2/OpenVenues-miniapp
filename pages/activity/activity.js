@@ -39,12 +39,13 @@ Page({
   async loadAll() {
     this.setData({ loading: true });
     try {
-      // 两类都拉（数量都不大）；失败的那一类不影响另一类
-      const [promos, courses] = await Promise.all([
+      // 三类都拉（数量都不大）；失败的那一类不影响其他类
+      const [promos, courses, articles] = await Promise.all([
         api.listPromos('').catch(() => []),
         api.listCourses('').catch(() => []),
+        api.listArticles('').catch(() => []),
       ]);
-      this._raw = { promo: promos || [], course: courses || [] };
+      this._raw = { promo: promos || [], course: courses || [], article: articles || [] };
       this.render();
     } catch (e) {
       this.setData({ loading: false, list: [] });
@@ -55,12 +56,12 @@ Page({
   // 派生字段在这里算好（WXML 不能调方法），并按当前段位渲染
   render() {
     const kind = this.data.seg === 'course' ? 'course' : 'promo';
+    const isCourse = kind === 'course';
     const raw = (this._raw && this._raw[kind]) || [];
     // 周期活动/课程只留最近一期（与活动列表、课程列表同一套规则，别再各写一份）
     const folded = promoUtils.collapseRecurring(
       raw.filter((p) => Number(p.is_recurrence_instance) !== 0 || p.recurrence_kind !== 'weekly')
     );
-    const isCourse = kind === 'course';
     const list = folded.map((p) => {
       let cover = p.cover || '';
       if (cover && cover.startsWith('/')) cover = apiBase + cover;
@@ -73,6 +74,7 @@ Page({
       }
       return {
         ...p,
+        kind,
         cover: cover || (isCourse ? DEFAULT_COURSE_COVER : DEFAULT_PROMO_COVER),
         chips,
         expired: time.isPast(p.signup_deadline),
@@ -83,12 +85,30 @@ Page({
         metaSub: `${p.min_participants}人${isCourse ? '成班' : '成团'}`,
       };
     });
-    this.setData({ list, loading: false, empty: list.length === 0 });
+
+    // 场馆介绍（文章）只挂在「活动」段，且**排在活动列表最后**（用户 2026-09-26 要求）
+    let merged = list;
+    if (!isCourse) {
+      const arts = ((this._raw && this._raw.article) || []).map((a) => {
+        let cover = a.cover || '';
+        if (cover && cover.startsWith('/')) cover = apiBase + cover;
+        return {
+          ...a,
+          kind: 'article',
+          cover,
+          publishText: a.publish_at ? time.toLocalText(a.publish_at) : '',
+          excerpt: String(a.content || '').replace(/\s+/g, ' ').slice(0, 60),
+        };
+      });
+      merged = [...list, ...arts];
+    }
+    this.setData({ list: merged, loading: false, empty: merged.length === 0 });
   },
 
-  // 点卡片 → 活动/课程详情（同一个详情页，按 kind 适配文案）
+  // 点卡片：活动/课程 → 详情（可报名）；文章 → 文章页（纯展示，无报名）
   openDetail(e) {
-    const id = e.currentTarget.dataset.id;
+    const { id, kind } = e.currentTarget.dataset;
+    if (kind === 'article') return wx.navigateTo({ url: `/pages/article/article?id=${id}` });
     wx.navigateTo({ url: `/pages/promo-detail/promo-detail?id=${id}` });
   },
 });
