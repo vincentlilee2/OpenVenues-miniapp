@@ -13,7 +13,8 @@
       <view class="row"><text class="label">日期</text><text>{{order.booking_date}}</text></view>
       <view class="row"><text class="label">时段</text><text>{{order.start_time}} - {{order.end_time}}</text></view>
       <view class="row"><text class="label">时长</text><text>{{durationText}}</text></view>
-      <view class="row" wx:if="{{order.source === 'promo'}}"><text class="label">来源</text><text>🎯 畅打活动：{{promoTitle}}</text></view>
+      <!-- 来源（2026-09-26 用户要求）：不再显示「畅打活动：」前缀，直接显示服务名称 -->
+      <view class="row" wx:if="{{order.source === 'promo'}}"><text class="label">来源</text><text>🎯 {{promoTitle}}</text></view>
       <view class="row" wx:else><text class="label">来源</text><text>⏰ 散客预约</text></view>
     </view>
 

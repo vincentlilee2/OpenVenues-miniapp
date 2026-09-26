@@ -32,7 +32,7 @@ Page({
         statusText: STATUS_LABEL[o.status] || o.status,
         sourceText: o.source === 'promo' ? `🎯 ${(o.promo && o.promo.title) || '畅打活动'}` : '⏰ 散客预约',
         durationText: o.duration_hours > 1 ? `${o.duration_hours} 小时` : '1 小时',
-        promoTitle: (o.promo && o.promo.title) || '',
+        promoTitle: (o.promo && o.promo.title) || '畅打活动', // 2026-09-26：前缀去掉后，标题为空要有兜底，别只剩一个 🎯
         // 具体场地（不是只显示场馆名）；场馆级畅打显示「全部场地」
         courtText: courtTextOf(o),
         canCancel: ci.allowed,
