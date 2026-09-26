@@ -187,11 +187,11 @@ Page({
       } else {
         wx.showToast({ title: '报名成功！', icon: 'success' });
       }
-      // order-list 是 tabBar 页且 switchTab 不支持 query，用 storage 传参
+      // 订单页自 2026-09-26 起不是 tabBar 页 → 用 navigateTo 进；筛选条件仍走 storage 传参
       wx.setStorageSync('order_filter', 'all');
       wx.setStorageSync('order_filter_source', 'promo');
       setTimeout(() => {
-        wx.switchTab({ url: '/pages/order-list/order-list' });
+        wx.navigateTo({ url: '/pages/order-list/order-list' });
       }, 800);
     } catch (e) {
       wx.showModal({ title: '报名失败', content: e.error || '请稍后再试', showCancel: false });

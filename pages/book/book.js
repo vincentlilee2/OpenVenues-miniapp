@@ -283,7 +283,7 @@ Page({
       this.loadAvailability();
       wx.setStorageSync('order_filter', 'all');
       wx.setStorageSync('order_filter_source', 'hourly');
-      setTimeout(() => wx.switchTab({ url: '/pages/order-list/order-list' }), 800);
+      setTimeout(() => wx.navigateTo({ url: '/pages/order-list/order-list' }), 800);
     } else {
       wx.showModal({
         title: '部分失败',

@@ -4,6 +4,7 @@
     "pages/venue-detail/venue-detail",
     "pages/book/book",
     "pages/promos/promos",
+    "pages/activity/activity",
     "pages/courses/courses",
     "pages/promo-detail/promo-detail",
     "pages/order-list/order-list",
@@ -32,10 +33,10 @@
         "selectedIconPath": "static/tab-home-a.png"
       },
       {
-        "pagePath": "pages/order-list/order-list",
-        "text": "订单",
-        "iconPath": "static/tab-order.png",
-        "selectedIconPath": "static/tab-order-a.png"
+        "pagePath": "pages/activity/activity",
+        "text": "活动",
+        "iconPath": "static/tab-promo.png",
+        "selectedIconPath": "static/tab-promo-a.png"
       },
       {
         "pagePath": "pages/my/my",

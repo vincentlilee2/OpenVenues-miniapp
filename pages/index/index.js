@@ -8,8 +8,6 @@ Page({
   data: {
     venues: [],
     loading: true,
-    promoCount: 0,
-    promoSubText: '提前预约场地 · 畅打名额先到先得',
   },
 
   // 转发 / 分享到朋友圈（2026-09-24）：官方要求朋友圈需 onShareAppMessage + onShareTimeline 同时实现
@@ -60,31 +58,11 @@ Page({
       console.error('[listVenues fail]', e);
       wx.showToast({ title: msg, icon: 'none', duration: 3000 });
     }
-    this.loadPromoCount();
   },
 
   // 加载失败时点一下重试
   retryLoad() {
     this.load();
-  },
-
-  // banner 上显示进行中的畅打活动数（失败不影响首页）
-  async loadPromoCount() {
-    try {
-      const list = await api.listPromos('');
-      const n = (list || []).length;
-      this.setData({
-        promoCount: n,
-        promoSubText: n > 0 ? `提前预约场地 · 有 ${n} 个畅打活动进行中` : '提前预约场地 · 畅打名额先到先得',
-      });
-    } catch (e) {
-      this.setData({ promoCount: 0, promoSubText: '提前预约场地 · 畅打名额先到先得' });
-    }
-  },
-
-  // 点击 banner → 畅打活动列表
-  openPromos() {
-    wx.navigateTo({ url: '/pages/promos/promos' });
   },
 
   // 点封面上的 ♡/♥ → 服务端真收藏/取消（2026-09-25；此前只是弹个 toast 的占位）

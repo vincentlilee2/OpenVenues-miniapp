@@ -6,18 +6,6 @@
     <view class="city">📍 全部场馆 ▾</view>
   </view>
 
-  <!-- 横幅：点击进入畅打活动列表 -->
-  <view class="banner" bindtap="openPromos">
-    <view class="banner-main">
-      <view class="banner-title">在线预约 · 畅打活动</view>
-      <view class="banner-sub">{{promoSubText}}</view>
-    </view>
-    <view class="banner-cta">
-      <text class="banner-cta-text">活动列表</text>
-      <text class="banner-arrow">›</text>
-    </view>
-  </view>
-
   <!-- 加载/空 -->
   <view wx:if="{{loading}}" class="empty">加载中...</view>
   <view wx:elif="{{loadError}}" class="empty">

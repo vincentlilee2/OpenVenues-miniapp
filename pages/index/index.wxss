@@ -17,40 +17,7 @@
   border-radius: 999rpx;
 }
 
-.banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  color: #fff;
-  padding: 36rpx 32rpx;
-  border-radius: 20rpx;
-  margin-bottom: 28rpx;
-}
-.banner:active {
-  opacity: 0.9;
-}
-.banner-main { flex: 1; min-width: 0; }
-.banner-title {
-  font-size: 36rpx;
-  font-weight: 600;
-  margin-bottom: 8rpx;
-}
-.banner-sub {
-  font-size: 24rpx;
-  opacity: 0.85;
-}
-.banner-cta {
-  display: flex;
-  align-items: center;
-  margin-left: 16rpx;
-  padding: 10rpx 18rpx;
-  border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.22);
-  flex-shrink: 0;
-}
-.banner-cta-text { font-size: 24rpx; color: #fff; }
-.banner-arrow { font-size: 32rpx; color: #fff; margin-left: 6rpx; line-height: 1; }
+/* banner 样式已随「在线预约 · 畅打活动」横幅一起删除（2026-09-26 用户要求去掉） */
 
 .venue-card {
   background: #fff;

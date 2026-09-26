@@ -30,9 +30,10 @@ Page({
   },
 
   onShow() {
-    // 本页是 tabBar 页、常驻不销毁，onLoad 不会重跑；
     // 「预约/报名成功后跳到订单列表」是通过 storage 传参的，必须在这里读取，
     // 否则停留在上一次的状态筛选 tab 上，新订单看起来「没出现」。
+    // （本页 2026-09-26 起是普通页：每次 navigateTo 都会新建实例、onLoad 也会跑，
+    //   但 storage 传参这套保持不变 —— 改回 tab 页也不用动这层。）
     const filter = wx.getStorageSync('order_filter');
     if (filter) {
       wx.removeStorageSync('order_filter');
@@ -40,7 +41,6 @@ Page({
         this.setData({ activeStatus: filter });
       }
     }
-    this.syncTabBar();
     this.load();
     this.startPayTimer(); // 待支付倒计时（2026-09-24）
   },
@@ -101,12 +101,9 @@ Page({
     }
   },
 
-  // 每个 tab 页更新「自己那份」custom-tab-bar 实例（官方 API）
-  syncTabBar() {
-    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 1 });
-    }
-  },
+  // ⚠️ 本页自 2026-09-26 起**不再是 tabBar 页**（第二格「订单」改成了「活动」，入口挪到「我的 → 我的订单」）
+  //    → 不能再调 this.getTabBar()（非 tab 页返回 undefined）：原来的 syncTabBar 已删除。
+  //    也从 switchTab 改为 navigateTo 进本页（非 tab 页用 switchTab 会静默失败）。
 
   async load() {
     this.setData({ loading: true });

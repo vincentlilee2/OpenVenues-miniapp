@@ -1,0 +1,46 @@
+<view class="container">
+  <view class="hero">
+    <view class="hero-title">活动</view>
+    <view class="hero-sub">当前发布的活动与培训课程</view>
+  </view>
+
+  <!-- 段选：活动 / 课程（与「畅打活动」「培训课程」两个后台栏目一一对应） -->
+  <view class="seg">
+    <view class="seg-item {{seg === 'promo' ? 'on' : ''}}" data-seg="promo" bindtap="switchSeg">🎯 活动</view>
+    <view class="seg-item {{seg === 'course' ? 'on' : ''}}" data-seg="course" bindtap="switchSeg">🎓 课程</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+  <view wx:elif="{{empty}}" class="empty">
+    {{seg === 'course' ? '暂无培训课程' : '暂无活动'}}
+  </view>
+
+  <view wx:for="{{list}}" wx:key="id" class="card" bindtap="openDetail" data-id="{{item.id}}">
+    <view class="card-cover">
+      <image wx:if="{{item.cover}}" src="{{item.cover}}" mode="aspectFill" class="cover-img"></image>
+      <view wx:else class="cover-placeholder">
+        <view class="cp-line1">{{seg === 'course' ? '培训课程' : '畅打活动'}}</view>
+        <view class="cp-line2">{{item.start_time}} - {{item.end_time}}</view>
+      </view>
+      <view wx:if="{{item.expired}}" class="tag expired">已截止</view>
+      <view wx:else class="tag price">¥{{item.price_per_person}}<text class="per">/人</text></view>
+      <view wx:if="{{item.recurrenceTag}}" class="tag recurrence">🔁 {{item.recurrenceTag}}</view>
+    </view>
+
+    <view class="card-body">
+      <view class="card-title">{{item.title}}</view>
+
+      <!-- 课程专属：教练 / 课时（活动为空数组，不渲染） -->
+      <view wx:if="{{item.chips.length}}" class="chips">
+        <text wx:for="{{item.chips}}" wx:for-item="chip" wx:key="*this" class="chip">{{chip}}</text>
+      </view>
+
+      <view class="meta">
+        <text class="meta-people">👥 已报 {{item.signed_up}}/{{item.max_capacity}}人</text>
+        <text class="meta-sub">{{item.metaSub}}</text>
+      </view>
+      <view class="loc">📍 {{item.venueText}}</view>
+      <view class="when">🕐 {{item.timeText}}</view>
+    </view>
+  </view>
+</view>

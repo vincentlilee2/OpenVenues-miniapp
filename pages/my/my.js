@@ -162,7 +162,8 @@ Page({
   goOrders(e) {
     const status = e.currentTarget.dataset.status || 'all';
     if (status !== 'all') wx.setStorageSync('order_filter', status);
-    wx.switchTab({ url: '/pages/order-list/order-list' });
+    // 订单页自 2026-09-26 起不是 tabBar 页 → 必须用 navigateTo（switchTab 会静默失败）
+    wx.navigateTo({ url: '/pages/order-list/order-list' });
   },
 
   // 活动页不是 tabBar 页 → 必须用 navigateTo

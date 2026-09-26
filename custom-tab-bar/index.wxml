@@ -10,11 +10,11 @@
 
   <view class="tab-item"
         style="color:{{selected === 1 ? '#fde68a' : 'rgba(255,255,255,0.95)'}};font-weight:{{selected === 1 ? '700' : '600'}};"
-        data-idx="1" data-path="/pages/order-list/order-list"
+        data-idx="1" data-path="/pages/activity/activity"
         bindtap="switchTab">
-    <image src="{{selected === 1 ? '/static/tab-order-a.png' : '/static/tab-order.png'}}"
+    <image src="{{selected === 1 ? '/static/tab-promo-a.png' : '/static/tab-promo.png'}}"
            style="width:56rpx;height:56rpx;filter:brightness(0) invert(1) {{selected === 1 ? 'sepia(1) saturate(8) hue-rotate(-10deg)' : ''}};opacity:{{selected === 1 ? '1' : '0.9'}};margin-bottom:6rpx;"></image>
-    <text>订单</text>
+    <text>活动</text>
   </view>
 
   <view class="tab-item"
