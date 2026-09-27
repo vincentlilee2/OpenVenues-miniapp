@@ -4,6 +4,7 @@ const time = require('../../utils/time.js');
 const promoUtils = require('../../utils/promos.js');
 const contact = require('../../utils/contact.js');
 const pay = require('../../utils/pay.js');
+const cardPay = require('../../utils/cardPay.js'); // 会员卡余额支付（2026-09-26）
 const share = require('../../utils/share.js');
 
 // 默认海报：畅打用 default.jpg，**课程用 course-default.jpg**（2026-09-26 用户提供）
@@ -168,21 +169,34 @@ Page({
       // 支付（2026-09-24）：报名费下单即付（未开通支付 → need_pay 为 false，行为与历史一致）
       const data = (created && created.data) || {};
       if (data.need_pay) {
-        const r = await pay.handleAfterCreate({ id: data.order_id, need_pay: true, total_price: data.total_price }, 'promo');
-        if (r && r.paid) wx.showToast({ title: '报名成功，已支付', icon: 'success' });
-        else if (r && r.pending) {
-          await new Promise((resolve) =>
-            wx.showModal({
-              title: '支付结果确认中',
-              content: '微信已受理，入账可能需几秒。请稍后在「我的订单」查看；若未支付成功，15 分钟内可重新支付。',
-              showCancel: false,
-              success: resolve,
-            })
-          );
-        } else if (!r || !r.defered) {
-          wx.showToast({ title: '报名成功，待支付', icon: 'none' });
+        // ===== 会员卡余额支付（2026-09-26 需求 ③）：先问是否用卡，不用/没卡再走微信 =====
+        //   服务类型按活动类型分：课程 kind='course' → 'course'；畅打 → 'promo'
+        const promoNow = this.data.promo || {};
+        const service = promoNow.kind === 'course' ? 'course' : 'promo';
+        const cp = await cardPay.payOne({
+          order: { id: data.order_id, total_price: data.total_price },
+          venueId: promoNow.venue_id,
+          service,
+        });
+        if (cp.paid) {
+          wx.showToast({ title: '报名成功，已用会员卡支付', icon: 'success' });
         } else {
-          wx.showToast({ title: '报名成功，可稍后支付', icon: 'none' });
+          const r = await pay.handleAfterCreate({ id: data.order_id, need_pay: true, total_price: data.total_price }, 'promo');
+          if (r && r.paid) wx.showToast({ title: '报名成功，已支付', icon: 'success' });
+          else if (r && r.pending) {
+            await new Promise((resolve) =>
+              wx.showModal({
+                title: '支付结果确认中',
+                content: '微信已受理，入账可能需几秒。请稍后在「我的订单」查看；若未支付成功，15 分钟内可重新支付。',
+                showCancel: false,
+                success: resolve,
+              })
+            );
+          } else if (!r || !r.defered) {
+            wx.showToast({ title: '报名成功，待支付', icon: 'none' });
+          } else {
+            wx.showToast({ title: '报名成功，可稍后支付', icon: 'none' });
+          }
         }
       } else {
         wx.showToast({ title: '报名成功！', icon: 'success' });

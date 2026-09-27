@@ -67,7 +67,11 @@ console.log('\n--- ② 订单列表：sourceText 是「🎯 服务名称」/「�
   ok('★ 列表里没有「畅打活动：」前缀', !/畅打活动：/.test(noComment));
   ok('散客 → 「⏰ 散客预约」', /'⏰ 散客预约'/.test(noComment));
   // 派生表达式就在 load() 的 map 里（没抽成函数），所以这里直接钉住表达式本身
-  ok('★ 活动/课程 → 「🎯 标题」并带兜底', /sourceText:\s*o\.source === 'promo' \? `🎯 \$\{o\.promo_title \|\| '畅打活动'\}` : '⏰ 散客预约'/.test(noComment), (noComment.match(/sourceText:.*/) || [''])[0].trim());
+  // 2026-09-26 追加：source 变成三分支（card / promo / hourly）—— 断言跟着写法更新，
+  // 但**行为要求不变**：活动/课程仍是「🎯 标题（带兜底）」，散客仍是「⏰ 散客预约」。
+  ok('★ 活动/课程 → 「🎯 标题」并带兜底', /source === 'promo' \? `🎯 \$\{o\.promo_title \|\| '畅打活动'\}`/.test(noComment), (noComment.match(/sourceText:.*/) || [''])[0].trim());
+  ok('★ 办卡充值订单 → 「💳 办卡充值：卡名」并带兜底', /source === 'card' \? `💳 办卡充值：\$\{o\.card_title \|\| '会员卡'\}`/.test(noComment), (noComment.match(/source === 'card'[^,]*/) || [''])[0]);
+  ok('散客仍是「⏰ 散客预约」', /: '⏰ 散客预约'/.test(noComment));
   ok('列表模板会把 sourceText 渲染出来', /\{\{item\.sourceText\}\}/.test(read('pages/order-list/order-list.wxml')));
 }
 

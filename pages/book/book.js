@@ -4,6 +4,7 @@ const api = require('../../api/index.js');
 const session = require('../../utils/session.js');
 const contact = require('../../utils/contact.js');
 const pay = require('../../utils/pay.js');
+const cardPay = require('../../utils/cardPay.js'); // 会员卡余额支付（2026-09-26）
 const grid = require('./grid.js');
 const merge = require('./merge.js');
 
@@ -246,11 +247,29 @@ Page({
       //   下单即付：先按总金额确认一次，再逐单调起收银台（一单一付，微信侧一单一交易）
       //   未开通支付的门店 need_pay 为 false → 走原来的"下单成功"提示，行为与历史一致
       if (needPay.length) {
-        const sum = needPay.reduce((s, o) => s + Number(o.total_price || 0), 0).toFixed(2);
+        // ===== 会员卡余额支付（2026-09-26，用户需求 ③）=====
+        //   先问是否用会员卡余额（服务端按「该场馆 + 订场」匹配可用卡）；不用或没卡 → 交回下面的微信支付流程
+        const cp = await cardPay.payAll({ orders: needPay, venueId: this._venueId, service: 'court' });
+        if (cp.paidIds.length) {
+          wx.showToast({
+            title: `已用会员卡支付 ${cp.paidIds.length} 单` + (cp.balanceAfter === undefined ? '' : `，卡余额 ¥${cp.balanceAfter}`),
+            icon: 'success',
+          });
+        }
+        const rest = needPay.filter((o) => !cp.paidIds.includes(o.id));
+        if (!rest.length) {
+          this.setData({ selectedKeys: {}, selectedCount: 0, totalPrice: 0 });
+          this.loadAvailability();
+          wx.setStorageSync('order_filter', 'all');
+          wx.setStorageSync('order_filter_source', 'hourly');
+          setTimeout(() => wx.navigateTo({ url: '/pages/order-list/order-list' }), 800);
+          return;
+        }
+        const sum = rest.reduce((s, o) => s + Number(o.total_price || 0), 0).toFixed(2);
         const goPay = await new Promise((resolve) =>
           wx.showModal({
             title: '预约成功，请完成支付',
-            content: `${needPay.length} 单合计 ¥${sum}。请在 15 分钟内完成支付 —— 超时订单自动关闭并释放场地。`,
+            content: `${rest.length} 单合计 ¥${sum}。请在 15 分钟内完成支付 —— 超时订单自动关闭并释放场地。`,
             confirmText: '立即支付',
             cancelText: '稍后支付',
             success: (r) => resolve(r.confirm),
@@ -259,7 +278,7 @@ Page({
         if (goPay) {
           let paidCount = 0;
           let pendingCount = 0;
-          for (const o of needPay) {
+          for (const o of rest) {
             const r = await pay.payOrder(o.id, { silent: true });
             if (r.paid) paidCount++;
             else if (r.pending) pendingCount++;

@@ -36,7 +36,12 @@ function rawRequest(opts, retried) {
         if (res.statusCode >= 200 && res.statusCode < 300 && body.ok) {
           resolve(body.data);
         } else {
-          reject({ status: res.statusCode, error: body.error || `HTTP ${res.statusCode}` });
+          // ⚠️ 2026-09-26 修：原来只带 {status, error} → **服务端的业务错误码全被丢掉**，
+          //   前端拿不到 code（如会员卡余额支付的 402 insufficient / 支付未开通的 PAY_DISABLED），
+          //   只能凭文案猜分支（实测：余额不足被当成普通失败）。
+          //   现在把响应体原样带上（ok/error/code/balance/need…），status/error 保持兼容。
+          const extra = body && typeof body === 'object' ? body : {};
+          reject(Object.assign({ status: res.statusCode, error: body && body.error ? body.error : `HTTP ${res.statusCode}` }, extra));
         }
       },
       fail(err) {

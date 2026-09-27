@@ -202,6 +202,81 @@ console.log('\n--- 8) 支付文案（card 分支）---');
   ok('充值文案正确（不是「预约成功」）', /充值订单已创建，需要支付/.test(pay) && /充值金额/.test(pay));
 }
 
+console.log('\n--- 9) 会员卡余额支付（阶段 3：约场 / 报名 / 订单页）---');
+{
+  // 共用出口
+  const cp = read('utils/cardPay.js');
+  ok('utils/cardPay.js 存在', /const cards = \(await api\.usableCards/.test(cp) === false && /api\.usableCards\(/.test(cp));
+  ok('用服务端算可用卡（venue + service）', /api\.usableCards\(opts\.venueId, opts\.service\)/.test(cp));
+  ok('用卡支付调 payOrderWithCard', /api\.payOrderWithCard\(o\.id, card\.id\)/.test(cp));
+  ok('余额不足（402 insufficient）有专门分支', /code === 'insufficient'/.test(cp) && /会员卡余额不足/.test(cp));
+  ok('没卡时引导去办卡充值（带 from=order）', /还没有会员卡/.test(cp) && /\/pages\/cards\/cards\?from=order/.test(cp));
+  ok('用户选「直接支付」→ 返回 skipped 交回原流程', /reason: 'declined'/.test(cp));
+  ok('多张卡时让用户选（actionSheet）', /showActionSheet/.test(cp));
+
+  // 两处接线
+  const book = read('pages/book/book.js');
+  ok('约场页引入 cardPay', /require\('\.\.\/\.\.\/utils\/cardPay\.js'\)/.test(book));
+  ok('约场页下单后先试卡支付（service=court）', /cardPay\.payAll\(\{ orders: needPay, venueId: this\._venueId, service: 'court' \}\)/.test(book));
+  ok('★ 没用卡的单交回微信支付（不重复扣）', /const rest = needPay\.filter\(\(o\) => !cp\.paidIds\.includes\(o\.id\)\)/.test(book));
+  ok('卡支付成功直接收尾（不再弹微信确认）', /if \(!rest\.length\) \{/.test(book));
+
+  const pd = read('pages/promo-detail/promo-detail.js');
+  ok('报名页引入 cardPay', /require\('\.\.\/\.\.\/utils\/cardPay\.js'\)/.test(pd));
+  ok('报名页按活动类型选服务（课程=course / 畅打=promo）', /kind === 'course' \? 'course' : 'promo'/.test(pd));
+  ok('报名页卡支付成功后不再走微信', /cp\.paid[\s\S]{0,120}已用会员卡支付/.test(pd));
+
+  // 订单页 card 分支（用户需求 ⑩）
+  const olj = read('pages/order-list/order-list.js');
+  const odw = read('pages/order-detail/order-detail.wxml');
+  ok('订单列表：source=card 显示办卡充值 + 卡名', /source === 'card' \? `💳 办卡充值：\$\{o\.card_title/.test(olj));
+  ok('订单列表：卡单时间显示为「日期 · 充值」', /o\.source === 'card' \? `\$\{o\.booking_date\} · 充值`/.test(olj));
+  ok('订单列表 wxml：卡单走会员卡充值行', /item\.source === 'card'[\s\S]{0,60}会员卡充值/.test(read('pages/order-list/order-list.wxml')));
+  ok('订单列表 wxml：卡单不显示时长', /wx:if="\{\{item\.source !== 'card'\}\}"/.test(read('pages/order-list/order-list.wxml')));
+  ok('订单详情：card 分支（类型/会员卡/下单日期，无场馆场地时段）', /order\.source === 'card'[\s\S]{0,200}办卡充值[\s\S]{0,200}会员卡[\s\S]{0,120}下单日期/.test(odw));
+  ok('订单详情：来源三分支（card / promo / 散客预约）', /order\.source === 'card'[\s\S]{0,200}wx:elif="\{\{order\.source === 'promo'\}\}"/.test(odw));
+
+  // 真调 cardPay 三条分支
+  const cpMod = require(path.join(ROOT, 'utils/cardPay.js'));
+  // ① 没卡 → 引导去办卡（选「去办卡充值」）
+  handlers.navs.length = 0;
+  handlers.modals.length = 0;
+  let asked = [];
+  handlers.request = (o) => { asked.push(o.url); o.success(json([])); };
+  global.wx.showModal = (o) => { handlers.modals.push(o); if (o.success) o.success({ confirm: true }); };
+  let r1 = await cpMod.payOne({ order: { id: 11, total_price: 100 }, venueId: 3, service: 'court' });
+  ok('没卡 → 弹「还没有会员卡」', handlers.modals.some((m) => /还没有会员卡/.test(m.title)), JSON.stringify(handlers.modals.map((m) => m.title)));
+  ok('没卡 → 跳办卡充值（from=order）', handlers.navs.includes('/pages/cards/cards?from=order'), handlers.navs.join(','));
+  ok('没卡 → 返回 skipped（不阻塞原支付流程）', r1.paid === false && /no-card/.test(r1.reason || ''), JSON.stringify(r1));
+
+  // ② 有卡 → 用户确认 → 扣款成功
+  handlers.navs.length = 0; handlers.modals.length = 0;
+  handlers.request = (o) => {
+    if (/usable-cards/.test(o.url)) return o.success(json([{ id: 5, name: '畅打尊享卡', balance: 1905, discount: 0.95 }]));
+    if (/pay-with-card/.test(o.url)) return o.success(json({ paid: 95, balance_after: 1810 }));
+    o.success(json({}));
+  };
+  const r2 = await cpMod.payOne({ order: { id: 12, total_price: 100 }, venueId: 3, service: 'court' });
+  ok('有卡 → 弹「用会员卡余额支付？」', handlers.modals.some((m) => /用会员卡余额支付/.test(m.title)), JSON.stringify(handlers.modals.map((m) => m.title)));
+  ok('有卡 → 扣款成功并回报余额', r2.paid === true && r2.balanceAfter === 1810, JSON.stringify(r2));
+
+  // ③ 余额不足 → 提示充值或直接支付
+  handlers.navs.length = 0; handlers.modals.length = 0;
+  handlers.request = (o) => {
+    if (/usable-cards/.test(o.url)) return o.success(json([{ id: 5, name: '畅打尊享卡', balance: 50, discount: 0.95 }]));
+    if (/pay-with-card/.test(o.url)) {
+      // ⚠️ HTTP 402 是「有响应」的错误 → wx.request 走 success（带 statusCode），不是 fail。
+      //    我第一版写成 o.fail(...) → 断言拿到的是「用卡支付失败」而不是余额不足。
+      return o.success({ statusCode: 402, data: { ok: false, error: '会员卡余额不足，请充值或直接支付', code: 'insufficient', balance: 50, need: 95 } });
+    }
+    o.success(json({}));
+  };
+  const r3 = await cpMod.payOne({ order: { id: 13, total_price: 100 }, venueId: 3, service: 'court' });
+  ok('余额不足 → 弹「会员卡余额不足」', handlers.modals.some((m) => /会员卡余额不足/.test(m.title)), JSON.stringify(handlers.modals.map((m) => m.title)));
+  ok('余额不足文案给两个出口（充值 / 直接支付）', handlers.modals.some((m) => /充值/.test(m.content) && /直接支付/.test(m.content)), handlers.modals.map((m) => m.content).join(' | ').slice(0, 160));
+  ok('余额不足 → 未支付（交回微信）', r3.paid === false && r3.reason === 'insufficient', JSON.stringify(r3));
+}
+
 console.log(`\n办卡充值（阶段 2 小程序页面）：${pass} 过 / ${fail} 失败`);
 if (fail) process.exit(1);
 })();

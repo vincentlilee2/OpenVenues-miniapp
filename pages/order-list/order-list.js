@@ -120,8 +120,8 @@ Page({
         return {
           ...o,
           statusText: STATUS_LABEL[o.status] || o.status,
-          sourceText: o.source === 'promo' ? `🎯 ${o.promo_title || '畅打活动'}` : '⏰ 散客预约',
-          timeText: `${o.booking_date} · ${o.start_time}-${o.end_time}`,
+          sourceText: o.source === 'card' ? `💳 办卡充值：${o.card_title || '会员卡'}` : o.source === 'promo' ? `🎯 ${o.promo_title || '畅打活动'}` : '⏰ 散客预约',
+          timeText: o.source === 'card' ? `${o.booking_date} · 充值` : `${o.booking_date} · ${o.start_time}-${o.end_time}`,
           durationText: o.duration_hours > 1 ? `${o.duration_hours} 小时` : '1 小时',
           cancelable: ci.allowed,
           // 只在「进行中的订单被规则挡住」时给原因，已完成/已取消的不啰嗦

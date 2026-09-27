@@ -13,8 +13,9 @@
       <text class="badge badge-{{item.status}}">{{item.statusText}}</text>
     </view>
     <view class="order-body">
-      <view class="venue-name">{{item.venue_name}}<text class="court-name" wx:if="{{item.court_name}}"> · {{item.court_name}}</text></view>
-      <view class="order-time">📅 {{item.timeText}}<text class="order-duration">（{{item.durationText}}）</text></view>
+      <view class="venue-name" wx:if="{{item.source === 'card'}}">💳 会员卡充值<text class="court-name"> · {{item.card_title || '会员卡'}}</text></view>
+      <view class="venue-name" wx:else>{{item.venue_name}}<text class="court-name" wx:if="{{item.court_name}}"> · {{item.court_name}}</text></view>
+      <view class="order-time">📅 {{item.timeText}}<text class="order-duration" wx:if="{{item.source !== 'card'}}">（{{item.durationText}}）</text></view>
       <view class="order-source">{{item.sourceText}}</view>
       <view wx:if="{{item.needPay}}" class="pay-hint">⏳ 待支付 {{item.remainText}}（超时自动取消）</view>
       <view wx:elif="{{item.payText}}" class="pay-done">{{item.payText}}</view>

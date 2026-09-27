@@ -7,14 +7,23 @@
     </view>
 
     <view class="card">
-      <view class="row"><text class="label">场馆</text><text>{{order.venue_name}}</text></view>
-      <view class="row"><text class="label">场地</text><text>{{courtText}}</text></view>
-      <view class="row"><text class="label">地址</text><text>{{order.venue_address || '地址待补充'}}</text></view>
-      <view class="row"><text class="label">日期</text><text>{{order.booking_date}}</text></view>
-      <view class="row"><text class="label">时段</text><text>{{order.start_time}} - {{order.end_time}}</text></view>
-      <view class="row"><text class="label">时长</text><text>{{durationText}}</text></view>
+      <!-- 办卡充值订单（2026-09-26）：没有场馆/场地/时段，只显示卡信息 -->
+      <block wx:if="{{order.source === 'card'}}">
+        <view class="row"><text class="label">类型</text><text>💳 办卡充值</text></view>
+        <view class="row"><text class="label">会员卡</text><text>{{order.card_title || '会员卡'}}</text></view>
+        <view class="row"><text class="label">下单日期</text><text>{{order.booking_date}}</text></view>
+      </block>
+      <block wx:else>
+        <view class="row"><text class="label">场馆</text><text>{{order.venue_name}}</text></view>
+        <view class="row"><text class="label">场地</text><text>{{courtText}}</text></view>
+        <view class="row"><text class="label">地址</text><text>{{order.venue_address || '地址待补充'}}</text></view>
+        <view class="row"><text class="label">日期</text><text>{{order.booking_date}}</text></view>
+        <view class="row"><text class="label">时段</text><text>{{order.start_time}} - {{order.end_time}}</text></view>
+        <view class="row"><text class="label">时长</text><text>{{durationText}}</text></view>
+      </block>
       <!-- 来源（2026-09-26 用户要求）：不再显示「畅打活动：」前缀，直接显示服务名称 -->
-      <view class="row" wx:if="{{order.source === 'promo'}}"><text class="label">来源</text><text>🎯 {{promoTitle}}</text></view>
+      <view class="row" wx:if="{{order.source === 'card'}}"><text class="label">来源</text><text>💳 {{order.card_title || '会员卡'}}</text></view>
+      <view class="row" wx:elif="{{order.source === 'promo'}}"><text class="label">来源</text><text>🎯 {{promoTitle}}</text></view>
       <view class="row" wx:else><text class="label">来源</text><text>⏰ 散客预约</text></view>
     </view>
 
