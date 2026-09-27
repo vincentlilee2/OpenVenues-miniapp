@@ -97,4 +97,26 @@ function collapseRecurring(list, todayStr) {
   );
 }
 
-module.exports = { collapseRecurring, recurrenceTagOf, mondayOf, sundayOf, toDateStr, WEEKDAY_CN_FULL };
+/**
+ * 该场馆有没有「还能报名的畅打」——决定场馆详情页要不要显示「畅打」按钮
+ *   （2026-09-27 用户要求：「如果该馆没有对应发布的畅打活动时，则下面不要显示 畅打 按钮」）
+ *
+ * 口径与畅打列表页保持一致，否则会出现「有按钮、点进去空列表」的尴尬：
+ *   ① 先滤掉「每周模版」（列表页不展示模版；模版的 signup_deadline 是占位 1900-01-01）
+ *   ② 再折叠周期（同一周活动只留最近一期）
+ *   ③ 至少有一期**未过报名截止**才算“有活动”
+ *   ④ 只管畅打：课程走「约课」按钮，别用课程把畅打按钮点亮
+ */
+function hasJoinable(list) {
+  const time = require('./time.js');
+  const shown = collapseRecurring(
+    (list || []).filter(
+      (p) =>
+        (!p.kind || p.kind === 'promo') &&
+        (Number(p.is_recurrence_instance) !== 0 || p.recurrence_kind !== 'weekly')
+    )
+  );
+  return shown.some((p) => p.signup_deadline && !time.isPast(p.signup_deadline));
+}
+
+module.exports = { collapseRecurring, recurrenceTagOf, mondayOf, sundayOf, toDateStr, hasJoinable, WEEKDAY_CN_FULL };
