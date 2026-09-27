@@ -1,0 +1,50 @@
+/* 我的会员卡 · 详情（2026-09-26）—— 卡面样式在 app.wxss 的 .mcard */
+.mcard { margin-bottom: 28rpx; }
+
+.info-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 6rpx 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06);
+}
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20rpx;
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid var(--border);
+  font-size: 26rpx;
+}
+.info-row:last-child { border-bottom: none; }
+.info-row .k { color: var(--muted); flex: none; }
+.info-row .v { color: var(--text); text-align: right; }
+
+.block-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0,0,0,0.06);
+}
+.block-title { font-size: 28rpx; font-weight: 600; margin-bottom: 8rpx; }
+.block-text { font-size: 26rpx; color: var(--text); line-height: 1.75; white-space: pre-wrap; }
+
+.tx-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--border);
+}
+.tx-item:last-child { border-bottom: none; }
+.tx-main { flex: 1; min-width: 0; }
+.tx-type { font-size: 27rpx; font-weight: 500; }
+.tx-note { font-size: 24rpx; color: var(--muted); margin-top: 6rpx; word-break: break-all; }
+.tx-time { font-size: 22rpx; color: var(--muted); margin-top: 6rpx; }
+.tx-amount { flex: none; font-size: 28rpx; font-weight: 600; color: var(--text); }
+.tx-amount.in { color: #16a34a; }
+
+.tip { font-size: 23rpx; color: var(--muted); line-height: 1.7; padding: 4rpx 8rpx 40rpx; }

@@ -12,8 +12,12 @@
     "pages/order-list/order-list",
     "pages/order-detail/order-detail",
     "pages/my/my",
-    "pages/favorites/favorites"
-  ],
+    "pages/favorites/favorites",
+    "pages/cards/cards",
+    "pages/card-detail/card-detail",
+    "pages/my-cards/my-cards",
+    "pages/my-card-detail/my-card-detail"
+    ],
   "window": {
     "backgroundTextStyle": "dark",
     "navigationBarBackgroundColor": "#3a7d44",

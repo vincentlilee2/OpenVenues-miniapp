@@ -1,0 +1,46 @@
+<!-- 会员卡详情 + 立即充值（2026-09-26） -->
+<view class="container">
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+
+  <block wx:elif="{{card}}">
+    <view class="mcard detail-card">
+      <view class="mcard-glow"></view>
+      <view class="mcard-top">
+        <view>
+          <view class="mcard-name">{{card.name}}</view>
+          <view wx:if="{{card.subtitle}}" class="mcard-sub">{{card.subtitle}}</view>
+        </view>
+        <view class="mcard-chip">{{card.kind_text}}</view>
+      </view>
+      <view class="mcard-amount">¥{{card.price}}<text class="unit">充值金额</text></view>
+      <view class="mcard-foot">
+        <text class="tag">{{card.discount_text}}</text>
+        <text class="tag">{{card.validity_text}}</text>
+        <text class="tag">{{card.services_text}}</text>
+      </view>
+    </view>
+
+    <view class="info-card">
+      <view class="info-row"><text class="k">适用场馆</text><text class="v">{{card.venue_name}}</text></view>
+      <view class="info-row"><text class="k">适用服务</text><text class="v">{{card.services_text}}</text></view>
+      <view class="info-row"><text class="k">折扣</text><text class="v">使用卡余额支付时按 {{card.discount_text}} 计价</text></view>
+      <view class="info-row"><text class="k">有效期</text><text class="v">{{card.validity_text}}</text></view>
+    </view>
+
+    <view wx:if="{{card.terms}}" class="block-card">
+      <view class="block-title">使用条款</view>
+      <view class="block-text">{{card.terms}}</view>
+    </view>
+    <view wx:if="{{card.notes}}" class="block-card">
+      <view class="block-title">其他说明</view>
+      <view class="block-text">{{card.notes}}</view>
+    </view>
+
+    <view class="actions">
+      <button class="btn-primary" hover-class="btn-hover" bindtap="onRecharge" disabled="{{submitting}}">
+        {{submitting ? '处理中...' : '立即充值 ¥' + card.price}}
+      </button>
+      <view class="link" bindtap="goMyCards">查看我的会员卡 ›</view>
+    </view>
+  </block>
+</view>

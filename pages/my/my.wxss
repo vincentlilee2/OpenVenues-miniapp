@@ -205,6 +205,7 @@
 .li-icon-green { background: var(--primary); }
 .li-icon-orange { background: #f59e0b; }
 .li-icon-purple { background: #8b5cf6; font-style: italic; font-weight: 600; }
+.li-icon-gold { background: var(--gold); }
 
 .li-body { flex: 1; }
 .li-title { font-size: 28rpx; font-weight: 500; }

@@ -48,4 +48,20 @@ module.exports = {
   payConfig: () => request({ url: '/api/pay/config', auth: false }),
   payOrder: (id) => request({ url: `/api/orders/${id}/pay`, method: 'POST' }),
   payStatus: (id, sync) => request({ url: `/api/pay/status/${id}` + (sync ? '?sync=1' : '') }),
+
+  // ===== 会员卡 / 办卡充值（2026-09-26）=====
+  //   listCards/getCard：顾客端「办卡充值」列表与详情（只返回已上架）
+  //   rechargeCard：立即充值 → 建充值订单；未配置支付时服务端直接发卡（need_pay=false）
+  //   myCards：我持有的卡；myCardDetail：单卡详情（余额 / 消费列表 / 服务说明）
+  //   usableCards：这笔订单哪些卡能用（下单页据此决定是否显示「会员卡余额支付」）
+  //   payOrderWithCard：用卡余额支付订单（服务端按卡折扣扣款，幂等）
+  listCards: () => request({ url: '/api/cards', auth: false }),
+  getCard: (id) => request({ url: `/api/cards/${id}`, auth: false }),
+  rechargeCard: (id) => request({ url: `/api/cards/${id}/recharge`, method: 'POST' }),
+  myCards: () => request({ url: '/api/my/cards' }),
+  myCardDetail: (id) => request({ url: `/api/my/cards/${id}` }),
+  usableCards: (venueId, service) =>
+    request({ url: `/api/my/usable-cards?venue_id=${venueId || ''}&service=${service || ''}` }),
+  payOrderWithCard: (orderId, cardId) =>
+    request({ url: `/api/orders/${orderId}/pay-with-card`, method: 'POST', data: { card_id: cardId } }),
 };

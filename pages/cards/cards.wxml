@@ -1,0 +1,32 @@
+<!-- 办卡充值（2026-09-26）—— 已上架会员卡列表（卡面样式在 app.wxss 的 .mcard） -->
+<view class="container">
+  <view class="hero">
+    <view class="hero-title">办卡充值</view>
+    <view class="hero-sub">充得多 · 用得更省 · 余额支付自动打折</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+  <view wx:elif="{{empty}}" class="empty">暂无在售会员卡，敬请期待</view>
+
+  <view wx:for="{{list}}" wx:key="id" class="card-wrap">
+    <view class="mcard" bindtap="openCard" data-id="{{item.id}}">
+      <view class="mcard-glow"></view>
+      <view class="mcard-top">
+        <view>
+          <view class="mcard-name">{{item.name}}</view>
+          <view wx:if="{{item.subtitle}}" class="mcard-sub">{{item.subtitle}}</view>
+        </view>
+        <view class="mcard-chip">{{item.kind_text}}</view>
+      </view>
+      <view class="mcard-amount">¥{{item.price}}<text class="unit">充值金额</text></view>
+      <view class="mcard-foot">
+        <text class="tag">{{item.discount_text}}</text>
+        <text class="tag">{{item.validity_text}}</text>
+        <text class="tag">{{item.services_text}}</text>
+      </view>
+    </view>
+    <view class="card-note">适用：{{item.venue_name}} · 点卡片查看详情并充值</view>
+  </view>
+
+  <view class="my-entry" bindtap="goMyCards">我的会员卡 ›</view>
+</view>

@@ -1,0 +1,33 @@
+<!-- 我的会员卡（2026-09-26）—— 名称 / 小标题 / 当前余额，点「查看」进详情 -->
+<view class="container">
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+
+  <view wx:elif="{{empty}}" class="empty">
+    <view>还没有会员卡</view>
+    <button class="btn-primary go-buy" hover-class="btn-hover" bindtap="goBuy">去办卡充值</button>
+  </view>
+
+  <block wx:else>
+    <view wx:for="{{list}}" wx:key="id" class="card-wrap">
+      <view class="mcard {{item.off ? 'mcard-off' : ''}}" bindtap="openCard" data-id="{{item.id}}">
+        <view class="mcard-glow"></view>
+        <view class="mcard-top">
+          <view>
+            <view class="mcard-name">{{item.name}}</view>
+            <view wx:if="{{item.subtitle}}" class="mcard-sub">{{item.subtitle}}</view>
+          </view>
+          <view class="mcard-chip">{{item.statusText}}</view>
+        </view>
+        <view class="mcard-amount">¥{{item.balance}}<text class="unit">当前余额</text></view>
+        <view class="mcard-foot">
+          <text class="tag">卡号 {{item.card_no}}</text>
+          <text class="tag">{{item.venue_name}}</text>
+        </view>
+      </view>
+      <view class="card-bar">
+        <text class="bar-sub">{{item.services_text}}{{item.expires_at ? '' : ' · 永久有效'}}</text>
+        <view class="bar-btn" catchtap="openCard" data-id="{{item.id}}">查看 ›</view>
+      </view>
+    </view>
+  </block>
+</view>

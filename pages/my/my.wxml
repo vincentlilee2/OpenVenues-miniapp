@@ -73,13 +73,21 @@
         </view>
         <view class="li-arrow">›</view>
       </view>
-      <!-- 办卡充值（2026-09-26 新增）：入口先落位，**内容占位**（点一下先给提示，
-           以后接会员卡/储值充值页时，把 my.js 的 openCardRecharge 改成 navigateTo 即可） -->
+      <!-- 我的会员卡（2026-09-26）：我充值购买的卡；「查看」进详情看余额/消费列表/服务说明 -->
+      <view class="list-item" bindtap="goMyCards">
+        <view class="li-icon li-icon-gold">🎫</view>
+        <view class="li-body">
+          <view class="li-title">我的会员卡</view>
+          <view class="li-sub">余额、消费记录与服务说明</view>
+        </view>
+        <view class="li-arrow">›</view>
+      </view>
+      <!-- 办卡充值（2026-09-26 接真页）：已上架会员卡列表 → 卡详情 → 立即充值 -->
       <view class="list-item" bindtap="openCardRecharge">
         <view class="li-icon li-icon-green">💳</view>
         <view class="li-body">
           <view class="li-title">办卡充值</view>
-          <view class="li-sub">会员卡 / 储值充值（功能开发中）</view>
+          <view class="li-sub">充得多用得更省，余额支付自动打折</view>
         </view>
         <view class="li-arrow">›</view>
       </view>

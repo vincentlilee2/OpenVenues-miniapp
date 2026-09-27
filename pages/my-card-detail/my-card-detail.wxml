@@ -1,0 +1,57 @@
+<!-- 我的会员卡 · 详情（2026-09-26）—— 余额 / 消费列表 / 服务说明 -->
+<view class="container">
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+
+  <block wx:elif="{{card}}">
+    <view class="mcard {{card.expired ? 'mcard-off' : ''}}">
+      <view class="mcard-glow"></view>
+      <view class="mcard-top">
+        <view>
+          <view class="mcard-name">{{card.name}}</view>
+          <view wx:if="{{card.subtitle}}" class="mcard-sub">{{card.subtitle}}</view>
+        </view>
+        <view class="mcard-chip">{{card.expired ? '已过期' : '会员卡'}}</view>
+      </view>
+      <view class="mcard-amount">¥{{card.balance}}<text class="unit">当前余额</text></view>
+      <view class="mcard-foot">
+        <text class="tag">累计充值 ¥{{card.total}}</text>
+        <text class="tag">已消费 ¥{{card.consumed}}</text>
+      </view>
+    </view>
+
+    <view class="info-card">
+      <view class="info-row"><text class="k">卡号</text><text class="v">{{card.card_no}}</text></view>
+      <view class="info-row"><text class="k">适用场馆</text><text class="v">{{card.venue_name}}</text></view>
+      <view class="info-row"><text class="k">适用服务</text><text class="v">{{card.services_text}}</text></view>
+      <view class="info-row"><text class="k">折扣</text><text class="v">{{card.discountText}}</text></view>
+      <view class="info-row"><text class="k">开卡时间</text><text class="v">{{card.activatedText}}</text></view>
+      <view class="info-row"><text class="k">有效期</text><text class="v">{{card.expiresText}}</text></view>
+    </view>
+
+    <view class="block-card">
+      <view class="block-title">消费列表</view>
+      <view wx:if="{{empty}}" class="empty">还没有充值/消费记录</view>
+      <view wx:else class="tx-list">
+        <view wx:for="{{txs}}" wx:key="id" class="tx-item">
+          <view class="tx-main">
+            <view class="tx-type">{{item.typeText}}</view>
+            <view class="tx-note">{{item.note}}{{item.detailText ? ' · ' + item.detailText : ''}}</view>
+            <view class="tx-time">{{item.timeText}}</view>
+          </view>
+          <view class="tx-amount {{item.inMoney ? 'in' : ''}}">{{item.amountText}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{card.terms}}" class="block-card">
+      <view class="block-title">服务说明 · 使用条款</view>
+      <view class="block-text">{{card.terms}}</view>
+    </view>
+    <view wx:if="{{card.notes}}" class="block-card">
+      <view class="block-title">其他说明</view>
+      <view class="block-text">{{card.notes}}</view>
+    </view>
+
+    <view class="tip">用会员卡余额支付约场 / 约课 / 活动报名时，按上面的折扣自动计价。</view>
+  </block>
+</view>

@@ -177,10 +177,14 @@ Page({
   },
 
   // 办卡充值（2026-09-26 新增入口，**内容占位**）
-  //   TODO(会员卡/储值)：做好页面后把这里换成
-  //   wx.navigateTo({ url: '/pages/card/card' }) —— 其余不用动
+  // 办卡充值（2026-09-26 接真页）：已上架会员卡列表 → 点卡进详情 → 立即充值
   openCardRecharge() {
-    wx.showToast({ title: '办卡充值功能开发中，敬请期待', icon: 'none' });
+    wx.navigateTo({ url: '/pages/cards/cards' });
+  },
+
+  // 我的会员卡（2026-09-26）：我充值购买的卡（名称/小标题/当前余额）→ 查看余额、消费列表、服务说明
+  goMyCards() {
+    wx.navigateTo({ url: '/pages/my-cards/my-cards' });
   },
 
   // 我的收藏（2026-09-25）：也不是 tabBar 页 → navigateTo

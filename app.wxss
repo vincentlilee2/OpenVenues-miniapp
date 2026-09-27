@@ -107,3 +107,22 @@ page {
 .badge-completed { background: #dbeafe; color: #1e40af; }
 .badge-refunded { background: #ede9fe; color: #6b21a8; }
 .badge-no_show { background: #f3e8ff; color: #6b21a8; }
+
+/* ===== 会员卡卡面（办卡充值，2026-09-26）=====
+   4 个页面共用（cards / card-detail / my-cards / my-card-detail），改一处全站生效。
+   视觉方案 A：品牌深绿渐变 + 金色金额 + 金边（先按 3 版预览里的 A 落地，用户改选只动这段） */
+.mcard { position:relative; border-radius:24rpx; padding:34rpx 38rpx; color:#fff; overflow:hidden;
+  background:linear-gradient(135deg,#2d6235 0%,#3a7d44 52%,#4ea25a 100%); border:2rpx solid #c9a961;
+  box-shadow:0 10rpx 28rpx rgba(45,98,53,.26); }
+.mcard .mcard-glow { position:absolute; right:-80rpx; top:-110rpx; width:360rpx; height:360rpx; border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, rgba(201,169,97,.55), rgba(201,169,97,0) 70%); }
+.mcard .mcard-top { position:relative; display:flex; justify-content:space-between; align-items:flex-start; }
+.mcard .mcard-name { font-size:38rpx; font-weight:700; letter-spacing:1rpx; }
+.mcard .mcard-sub { font-size:24rpx; opacity:.85; margin-top:8rpx; }
+.mcard .mcard-chip { font-size:22rpx; padding:4rpx 16rpx; border-radius:999rpx; background:rgba(255,255,255,.18);
+  border:1rpx solid rgba(255,255,255,.28); white-space:nowrap; }
+.mcard .mcard-amount { position:relative; margin-top:42rpx; font-size:60rpx; font-weight:700; color:#f0d68c; }
+.mcard .mcard-amount .unit { font-size:26rpx; margin-left:10rpx; color:#fff; opacity:.85; font-weight:400; }
+.mcard .mcard-foot { position:relative; display:flex; gap:14rpx; flex-wrap:wrap; margin-top:24rpx; }
+.mcard .mcard-foot .tag { font-size:22rpx; padding:4rpx 14rpx; border-radius:10rpx; background:rgba(255,255,255,.14); }
+.mcard.mcard-off { filter:grayscale(.65); opacity:.72; }

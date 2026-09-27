@@ -70,17 +70,19 @@ async function payOrder(orderId, opts = {}) {
 }
 
 /**
- * 下单/报名后统一走这里：需要支付就确认 + 调起，不需要就返回 { skipped: true }
+ * 下单/报名/充值后统一走这里：需要支付就确认 + 调起，不需要就返回 { skipped: true }
  * @param {object} created 下单接口返回的 data（含 id / need_pay / total_price）
- * @param {'booking'|'promo'} kind
+ * @param {'booking'|'promo'|'card'} kind
  */
 async function handleAfterCreate(created, kind = 'booking') {
   if (!created || !created.need_pay) return { skipped: true };
-  const title = kind === 'promo' ? '报名成功，需要支付' : '预约成功，需要支付';
+  const title = kind === 'promo' ? '报名成功，需要支付' : kind === 'card' ? '充值订单已创建，需要支付' : '预约成功，需要支付';
   const content =
     kind === 'promo'
       ? `报名费 ¥${created.total_price}。请在 15 分钟内完成支付，超时名额自动释放。`
-      : `场地费 ¥${created.total_price}。请在 15 分钟内完成支付，超时自动关闭并释放场地。`;
+      : kind === 'card'
+        ? `充值金额 ¥${created.total_price}。请在 15 分钟内完成支付，支付成功后卡额度立即到账；超时订单自动关闭。`
+        : `场地费 ¥${created.total_price}。请在 15 分钟内完成支付，超时自动关闭并释放场地。`;
   const go = await new Promise((resolve) => {
     wx.showModal({
       title,
