@@ -167,7 +167,9 @@ Page({
       contact.persistContact(api, { name: form.booker_name, phone: form.booker_phone });
 
       // 支付（2026-09-24）：报名费下单即付（未开通支付 → need_pay 为 false，行为与历史一致）
-      const data = (created && created.data) || {};
+      // ⚠️ 同 book.js：request.js 已解包 → 再读 .data 会让 need_pay 永远为空，
+      //    报名后直接跳走、从不进收银台（2026-09-27 修）
+      const data = created || {};
       if (data.need_pay) {
         // ===== 会员卡余额支付（2026-09-26 需求 ③）：先问是否用卡，不用/没卡再走微信 =====
         //   服务类型按活动类型分：课程 kind='course' → 'course'；畅打 → 'promo'

@@ -231,7 +231,10 @@ Page({
           contact_phone: contactPhone,
         });
         okCount++;
-        const d = (created && created.data) || {};
+        // ⚠️ api/request.js 已把 {ok,data} 解包成 data 本体 —— 这里再读 .data 会永远得到 {}，
+        //    于是 need_pay 永远为空 → **支付那一段整段不执行**，下单后直接跳到"我的订单"，
+        //    用户看到的就是"还得再点一次去支付"（2026-09-27 手机端实测就是这个现象）。
+        const d = created || {};
         if (d.need_pay) needPay.push({ id: d.id, total_price: d.total_price });
       } catch (e) {
         failMsg = e.error || '下单失败';
