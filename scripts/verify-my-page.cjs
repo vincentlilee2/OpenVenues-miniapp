@@ -66,7 +66,7 @@ console.log('--- ① 快捷入口：「我的订单」→「培训课程」---')
   ok('取到快捷入口区块', shortcuts.length > 0);
   ok('★ 有「培训课程」入口', /class="sc-label">培训课程</.test(shortcuts) && /bindtap="goCourses"/.test(shortcuts), shortcuts.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 100));
   ok('★ 快捷入口里已无「我的订单」', !/我的订单/.test(shortcuts));
-  ok('快捷入口仍是 3 项（畅打活动 / 我的收藏 未动）', /畅打活动/.test(shortcuts) && /我的收藏/.test(shortcuts));
+  ok('快捷入口仍是 3 项（活动报名 / 我的收藏 未动）', /活动报名/.test(shortcuts) && /我的收藏/.test(shortcuts));
   ok('★ js 有 goCourses 且跳课程列表页', /goCourses\(\)[\s\S]{0,160}wx\.navigateTo\(\{ url: '\/pages\/courses\/courses' \}\)/.test(js), (js.match(/goCourses\(\)[\s\S]{0,90}/) || [''])[0].replace(/\n\s*/g, ' '));
   if (page && typeof page.goCourses === 'function') {
     calls.navs.length = 0;

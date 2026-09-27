@@ -51,7 +51,7 @@
     </view>
     <view class="sc" bindtap="goPromos">
       <view class="sc-icon">🎯</view>
-      <view class="sc-label">畅打活动</view>
+      <view class="sc-label">活动报名</view>
     </view>
     <view class="sc" bindtap="goFavorites">
       <view class="sc-icon">♥</view>
