@@ -59,8 +59,8 @@
     <view class="actions">
       <button class="btn-warn" hover-class="btn-hover" bindtap="onBookLesson">约课</button>
       <button class="btn-outline btn-action" hover-class="btn-hover" bindtap="onBookVenue">约场</button>
-      <!-- 该馆没有可报名的畅打时隐藏（2026-09-27 用户要求），否则点进去是空列表 -->
-        <button wx:if="{{hasPromo}}" class="btn-primary btn-action" hover-class="btn-hover" bindtap="onPromoList">畅打</button>
+      <!-- 2026-09-27 用户最终决定：不管该馆有没有发布活动，**都显示**这个按钮；文案从「畅打」改成「活动」 -->
+      <button class="btn-primary btn-action" hover-class="btn-hover" bindtap="onPromoList">活动</button>
     </view>
   </block>
 </view>
