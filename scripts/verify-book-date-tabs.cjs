@@ -44,7 +44,8 @@ const tabCss = block('.date-tab');
 const SCREEN = 750; // 设计稿屏宽（rpx）
 const w = Number((tabCss.match(/width:\s*(\d+)rpx/) || [])[1]);
 const hm = Number((tabCss.match(/margin:\s*0\s+(\d+)rpx/) || [])[1]);
-const pad = Number((tabsCss.match(/padding:\s*\d+rpx\s+(\d+)rpx/) || [])[1]);
+const pv = ((tabsCss.match(/padding:\s*([^;]+)/) || [])[1] || '0').trim().split(/\s+/).map((x) => parseFloat(x) || 0);
+const pad = pv.length > 1 ? pv[1] : pv[0]; // 水平方向内边距（padding: 10rpx 0 → 0）
 const need = 7 * (w + hm * 2) + pad * 2;
 
 // ---------- 核心算术：7 格必须塞得进一屏 ----------
