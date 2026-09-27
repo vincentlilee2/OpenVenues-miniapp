@@ -210,3 +210,29 @@
   color: var(--muted);
   line-height: 1.5;
 }
+
+/* ★ 2026-09-27：课表模式下已过期的课程/活动方格 —— 要看得见，但灰色不可点 */
+.gc-promo-expired {
+  background: #f2f3f5;
+  border-color: #dcdfe6;
+  opacity: 0.75;
+}
+.gc-promo-expired .gp-name,
+.gc-promo-expired .gp-signed,
+.gc-promo-expired .gp-price {
+  color: #9aa0a6;
+}
+.gp-expired {
+  background: #eceff1;
+  color: #8c9096;
+}
+.lg-expired {
+  background: #f2f3f5;
+  border: 1rpx solid #dcdfe6;
+}
+/* 课表模式的提示（隐藏联系人/立即预定后，告诉用户去哪儿报名） */
+.hint-schedule {
+  margin-top: 24rpx;
+  color: #3a7d44;
+  font-weight: 600;
+}

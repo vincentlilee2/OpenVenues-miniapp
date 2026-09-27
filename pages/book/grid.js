@@ -56,6 +56,8 @@ function buildRows(allSlots, courts, selectedSet, geoOpt) {
         pricePerPerson: s.promo.price_per_person,
         minParticipants: s.promo.min_participants,
         promoId: s.promo.id,
+        // ★ 2026-09-27：过期课程也要画（灰色「已过期」），服务端在课表模式下会下发
+        expired: !!s.promo.expired,
       });
     }
   }
@@ -129,6 +131,8 @@ function buildRows(allSlots, courts, selectedSet, geoOpt) {
       remaining: Math.max(0, Number(p.maxCap) - Number(p.signed)),
       cid: p.cid,
       col,
+      // ★ 2026-09-27：已过期的课程/活动 → 灰色、标「已过期」、点击不进报名
+      expired: !!p.expired,
       startHour: p.startHour,
       endHour: p.endHour,
       label: p.startHour + ':00-' + p.endHour + ':00',

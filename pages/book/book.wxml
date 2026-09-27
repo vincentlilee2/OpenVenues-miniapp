@@ -10,6 +10,9 @@
 
   <view wx:if="{{loading}}" class="empty">加载中...</view>
 
+  <!-- 课表模式：当天没有课程时给个明确空态（否则整页像坏了） -->
+  <view wx:if="{{scheduleMode && !loading && !promos.length}}" class="empty">当天暂无课程</view>
+
   <!-- 节假日价格提示 -->
   <view wx:if="{{holidayPrice}}" class="holiday-tip">
     <text class="holiday-tip-icon">🎉</text>
@@ -41,14 +44,16 @@
         </block>
 
         <!-- 畅打浮层：在自己的场地列内，纵向跨整段小时 -->
-        <view wx:for="{{promos}}" wx:key="pid" class="gc-promo"
+        <view wx:for="{{promos}}" wx:key="pid" class="gc-promo {{item.expired ? 'gc-promo-expired' : ''}}"
               style="left:{{item.left}}rpx; width:{{item.width}}rpx; top:{{item.top}}rpx; height:{{item.height}}rpx;"
-              bindtap="onPromoTap" data-promo-id="{{item.promoId}}" data-full="{{item.full}}">
+              bindtap="onPromoTap" data-promo-id="{{item.promoId}}" data-full="{{item.full}}" data-expired="{{item.expired}}">
           <view class="gp-name">{{item.name}}</view>
           <view class="gp-signed">{{item.signed}}/{{item.maxCap}}人</view>
           <view class="gp-price">{{item.priceLabel}}</view>
-          <view class="gp-cta" wx:if="{{item.minParticipants > 1}}">≥{{item.minParticipants}}人成团</view>
-          <view class="gp-cta" wx:if="{{item.full}}" style="background:#fff1f0;color:#cf1322">已满</view>
+          <!-- ★ 2026-09-27：过期课程标示（灰色不可点）；过期优先于「已满」显示 -->
+          <view class="gp-cta gp-expired" wx:if="{{item.expired}}">已过期</view>
+          <view class="gp-cta" wx:if="{{!item.expired && item.minParticipants > 1}}">≥{{item.minParticipants}}人成团</view>
+          <view class="gp-cta" wx:if="{{!item.expired && item.full}}" style="background:#fff1f0;color:#cf1322">已满</view>
         </view>
 
       </view>
@@ -63,13 +68,17 @@
     <view class="lg lg-selected"></view><text>已选择</text>
     <view class="lg lg-mine"></view><text>我的预定</text>
     <view class="lg lg-promo"></view><text>活动</text>
+    <view class="lg lg-expired"></view><text>已过期</text>
   </view>
 
-  <view class="hint">最多选 {{maxCourts}} 个场地（{{selectedCount}}/{{maxCourts}}）</view>
+  <view class="hint" wx:if="{{!scheduleMode}}">最多选 {{maxCourts}} 个场地（{{selectedCount}}/{{maxCourts}}）</view>
+
+  <!-- ★ 2026-09-27：课表模式（培训教室只排课、不租场）→ 隐藏联系人/立即预定，改这句提示 -->
+  <view class="hint hint-schedule" wx:if="{{scheduleMode}}">点击 课程时段进行报名</view>
 
   <!-- 联系人：自动填入登录用户的昵称 / 手机号，可修改。
        场馆凭这里的姓名+电话与你联系，也是订单里记录的报名人。 -->
-  <view class="card contact-card">
+  <view class="card contact-card" wx:if="{{!scheduleMode}}">
     <view class="contact-title">联系人</view>
     <view class="form-row">
       <text class="form-label">姓名</text>
@@ -84,7 +93,7 @@
     <view class="contact-tip">已自动填入你的微信昵称与手机号（手机号未授权时请手动填写一次，之后会自动记住）</view>
   </view>
 
-  <button class="btn-primary book-btn" bindtap="onBook" disabled="{{selectedCount === 0}}">
+  <button class="btn-primary book-btn" wx:if="{{!scheduleMode}}" bindtap="onBook" disabled="{{selectedCount === 0}}">
     立即预定
   </button>
 </view>

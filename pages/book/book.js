@@ -12,6 +12,8 @@ const WD_LABEL = ['周日', '周一', '周二', '周三', '周四', '周五', '�
 
 Page({
   data: {
+    // 课表模式（培训教室类场馆）：隐藏联系人/立即预定，改提示点击课程方格报名（防首屏闪烁）
+    scheduleMode: false,
     venueId: null,
     venueName: '',
     activeDate: '',
@@ -109,9 +111,12 @@ Page({
     try {
       const allSlots = [];
       let hasOverride = false;
+      // ★ 2026-09-27：课表模式（该馆没有任何有价格格子）→ 隐藏联系人/立即预定，改提示点击课程方格报名
+      let scheduleMode = false;
       for (const c of courts) {
         const r = await api.courtAvailability(c.id, activeDate, uid);
         if (r.hasOverride) hasOverride = true;
+        if (r.schedule_mode) scheduleMode = true;
         for (const s of r.slots || []) allSlots.push({ ...s, court_id: c.id });
       }
       const selectedSet = new Set(Object.keys(this.data.selectedKeys || {}));
@@ -122,6 +127,7 @@ Page({
         promos: built.promos,
         geo: built.geo,
         holidayPrice: hasOverride, // 当天命中了节假日价格
+        scheduleMode,
         loading: false,
       });
     } catch (e) {
@@ -166,7 +172,12 @@ Page({
 
   // 点击畅打块 → 活动详情
   onPromoTap(e) {
-    const { promoId, full } = e.currentTarget.dataset;
+    const { promoId, full, expired } = e.currentTarget.dataset;
+    // ★ 2026-09-27 用户要求：过期的课程时段方格**要显示出来**（灰色「已过期」），但不可点击
+    if (expired) {
+      wx.showToast({ title: '该课程已过期', icon: 'none' });
+      return;
+    }
     // ★ 2026-09-27：未满 → 照常进报名（同一时段其他用户仍可报名）；已满 → 明确告知，不给空点
     if (full) {
       wx.showToast({ title: '该时段已满，无法报名', icon: 'none' });
