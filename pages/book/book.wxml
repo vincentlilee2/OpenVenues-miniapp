@@ -84,6 +84,6 @@
   </view>
 
   <button class="btn-primary book-btn" bindtap="onBook" disabled="{{selectedCount === 0}}">
-    立即预约
+    立即预定
   </button>
 </view>

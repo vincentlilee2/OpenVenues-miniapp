@@ -134,6 +134,26 @@ console.log('\n--- 3) 支付状态机（结果以服务端为准）---');
   ok('★ 约场单笔：不再先弹合计确认（直接进收银台）', /let goPay = true;/.test(bookJs) && /if \(rest\.length > 1\)/.test(bookJs));
   ok('约场多笔：仍给一句合计说明（且可稍后支付）', /将逐单支付/.test(bookJs) && /稍后支付/.test(bookJs));
 
+  // 用户 2026-09-27：「立即预约改为立即预定」「支付确定后直接转到我的订单（该订单状态成功状态）」
+  const bookWxml = read('pages/book/book.wxml');
+  ok('★ 按钮文案 = 立即预定', /立即预定/.test(bookWxml) && !/立即预约/.test(bookWxml), (bookWxml.match(/立即[预][预约定]*/) || [''])[0]);
+  {
+    // 支付那一段必须在「跳我的订单」之前 —— 否则就是"没付就先跳走"（用户抱怨的正是这个观感）
+    const payAt = bookJs.indexOf('await pay.payOrder(o.id');
+    // 注意：文件里有两处跳订单页 —— ① 全部用卡支付完的分支（也在支付之后 ✓）② 收银台流程末尾。
+    // 取**最后一处**比对，才是在验"收银台付完才跳"。
+    const navAt = bookJs.lastIndexOf("wx.navigateTo({ url: '/pages/order-list/order-list' })");
+    ok('★ 先支付、后跳我的订单（顺序正确）', payAt > 0 && navAt > payAt, `pay@${payAt} nav@${navAt}`);
+    ok('★ 跳转带上订单筛选（我的订单按服务来源分组）', /order_filter_source', 'hourly'/.test(bookJs));
+  }
+  {
+    const promoJs2 = read('pages/promo-detail/promo-detail.js');
+    const payAt = promoJs2.indexOf('pay.handleAfterCreate(');
+    const navAt = promoJs2.indexOf("wx.navigateTo({ url: '/pages/order-list/order-list' })");
+    ok('★ 报名/约课：也是先支付后跳我的订单', payAt > 0 && navAt > payAt, `pay@${payAt} nav@${navAt}`);
+    ok('★ 报名页跳转带 source=promo（畅打/约课）', /order_filter_source', 'promo'/.test(promoJs2));
+  }
+
   const promoJs = read('pages/promo-detail/promo-detail.js');
   ok('畅打报名后：走支付', /pay\.handleAfterCreate\(/.test(promoJs));
 
