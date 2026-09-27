@@ -43,4 +43,25 @@
       <view class="link" bindtap="goMyCards">查看我的会员卡 ›</view>
     </view>
   </block>
+
+  <!-- 模拟微信支付弹窗（2026-09-27 用户要求）：未配置商户号时，先确认再建单 -->
+  <view wx:if="{{showMockPay}}" class="pay-mask" catchtouchmove="noop">
+    <view class="pay-sheet">
+      <view class="pay-head">
+        <text class="pay-title">微信支付</text>
+        <text class="pay-close" bindtap="onCancelMockPay">✕</text>
+      </view>
+      <view class="pay-amount">¥{{card.price}}</view>
+      <view class="pay-for">{{card.name}}</view>
+      <view class="pay-tip">
+        <text class="pay-tip-strong">⚠ 商户号信息未开通</text>
+        <text>当前为「模拟支付」，不会真实扣款；确认后将生成充值订单并立即把额度充进会员卡。</text>
+        <text class="pay-tip-note">管理员在后台「💳 支付参数」填好商户号并同步后，这里会自动切换为真实微信支付。</text>
+      </view>
+      <button class="pay-btn" hover-class="pay-btn-hover" bindtap="onConfirmMockPay" disabled="{{submitting}}">
+        {{submitting ? '处理中...' : '确认支付'}}
+      </button>
+      <view class="pay-cancel" bindtap="onCancelMockPay">取消</view>
+    </view>
+  </view>
 </view>

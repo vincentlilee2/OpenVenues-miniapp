@@ -138,26 +138,76 @@ console.log('\n--- 5) 办卡充值列表页（真调 load + openCard）---');
   ok('带 from=order 时把来源传下去（充值后返回继续下单）', handlers.navs.includes('/pages/card-detail/card-detail?id=9&from=order'), handlers.navs.join(','));
 }
 
-console.log('\n--- 6) 卡详情 + 立即充值 ---');
+console.log('\n--- 6) 卡详情 + 立即充值（含模拟支付确认）---');
 {
   const src = read('pages/card-detail/card-detail.wxml');
   ok('有卡面 + 立即充值按钮', src.includes('class="mcard detail-card"') && /立即充值/.test(src));
   ok('展示使用条款与其他说明', /使用条款/.test(src) && /其他说明/.test(src));
+  // 2026-09-27 用户要求：点立即充值先弹「模拟微信支付」弹窗（标注商户号未开通），确认后才建单
+  ok('★ WXML 有模拟支付弹窗（底部面板 + 遮罩）', /class="pay-mask"/.test(src) && /class="pay-sheet"/.test(src));
+  ok('★ 弹窗标注「商户号信息未开通」', /商户号信息未开通/.test(src));
+  ok('★ 弹窗写明「模拟支付 / 不会真实扣款」', /模拟支付/.test(src) && /不会真实扣款/.test(src));
+  ok('弹窗有金额、卡名、确认支付、取消', /pay-amount/.test(src) && /onConfirmMockPay/.test(src) && /onCancelMockPay/.test(src));
+  ok('弹窗样式用微信绿确认按钮（贴近收银台观感）', /#07c160/.test(read('pages/card-detail/card-detail.wxss')));
+
   const js = read('pages/card-detail/card-detail.js');
   ok('调 rechargeCard', /api\.rechargeCard\(/.test(js));
+  ok('★ 先探测 payConfig 再决定是否弹模拟窗', /api\.payConfig\(\)/.test(js) && /if \(!payEnabled\) \{[\s\S]{0,120}showMockPay: true/.test(js));
+  ok('★ 探测失败按未开通处理（不会误扣）', /payEnabled = false; \/\/ 探测失败/.test(js));
   ok('★ 走统一支付出口 pay.handleAfterCreate(..., \'card\')', /handleAfterCreate\([\s\S]{0,200}'card'/.test(js));
   ok('支付成功/取消/确认中 三种分支都处理', /res\.paid/.test(js) && /res\.cancelled/.test(js) && /res\.pending/.test(js));
   ok('from=order 时提示返回继续', /返回上一步继续用会员卡支付/.test(js));
 
-  // 未配置支付：服务端直接发卡 → 前端弹「充值成功」
+  // ① 未配置商户号：点立即充值 → 只弹窗，**不建单**
+  let calls = [];
   handlers.modals.length = 0;
   handlers.toasts.length = 0;
-  handlers.request = (o) => o.success(json({ order_id: 3, order_no: 'V001', need_pay: false, card: { id: 1, card_no: 'VC1', balance: 2000 } }));
+  handlers.request = (o) => {
+    calls.push(o.url);
+    if (/\/api\/pay\/config/.test(o.url)) return o.success(json({ enabled: false }));
+    if (/recharge/.test(o.url)) return o.success(json({ order_id: 3, order_no: 'V001', need_pay: false, card: { id: 1, card_no: 'VC1', balance: 2000 } }));
+    o.success(json({}));
+  };
   const p = loadPage('pages/card-detail/card-detail.js');
-  const i = inst(p, { card: { name: '畅打尊享卡', price: 2000 } });
+  const i = inst(p, { card: { id: 7, name: '畅打尊享卡', price: 2000 } });
   try { await i.onRecharge(); } catch (e) { console.log('     [页面抛错] ' + e.message); }
+  ok('★ 点立即充值 → 弹出模拟支付弹窗', i.data.showMockPay === true, JSON.stringify(i.data.showMockPay));
+  ok('★ 确认前**没有**建单（用户明确要求：确认后再生成订单）', !calls.some((u) => /recharge/.test(u)), calls.join(','));
+
+  // ② 点「确认支付」→ 这时才建单 + 发卡成功
+  handlers.modals.length = 0;
+  try { await i.onConfirmMockPay(); } catch (e) { console.log('     [页面抛错] ' + e.message); }
+  await new Promise((r) => setTimeout(r, 10));
+  ok('★ 确认后才建单', calls.some((u) => /recharge/.test(u)), calls.join(','));
+  ok('弹窗已收起', i.data.showMockPay === false);
   ok('测试直通：弹出「充值成功」', handlers.modals.some((m) => /充值成功/.test(m.title)), 'modals=' + JSON.stringify(handlers.modals.map((m) => m.title)) + ' toasts=' + JSON.stringify(handlers.toasts));
-  ok('提示里带上到账金额', handlers.modals.some((m) => /2000/.test(m.content)), handlers.modals.map((m) => m.content).join(' | ') + ' toasts=' + JSON.stringify(handlers.toasts));
+  ok('提示里带上到账金额', handlers.modals.some((m) => /2000/.test(m.content)), handlers.modals.map((m) => m.content).join(' | '));
+
+  // ③ 点「取消」→ 什么都不发生（不建单）
+  calls = [];
+  handlers.modals.length = 0;
+  handlers.toasts.length = 0;
+  const i2 = inst(p, { card: { id: 7, name: '畅打尊享卡', price: 2000 } });
+  await i2.onRecharge();
+  i2.onCancelMockPay();
+  ok('★ 取消后不建单', !calls.some((u) => /recharge/.test(u)), calls.join(','));
+  ok('取消给出提示', handlers.toasts.some((t) => /已取消/.test(t)), JSON.stringify(handlers.toasts));
+  ok('取消后弹窗收起', i2.data.showMockPay === false);
+
+  // ④ 已配置商户号 → 不弹模拟窗，直接走真收银台
+  calls = [];
+  handlers.modals.length = 0;
+  handlers.request = (o) => {
+    calls.push(o.url);
+    if (/\/api\/pay\/config/.test(o.url)) return o.success(json({ enabled: true }));
+    if (/recharge/.test(o.url)) return o.success(json({ order_id: 9, order_no: 'V009', need_pay: true, total_price: 2000 }));
+    if (/\/api\/orders\/9\/pay/.test(o.url)) return o.success(json({ pay_params: null }));
+    o.success(json({}));
+  };
+  const i3 = inst(p, { card: { id: 7, name: '畅打尊享卡', price: 2000 } });
+  await i3.onRecharge();
+  ok('★ 已开通支付 → 不弹模拟窗', !i3.data.showMockPay, String(i3.data.showMockPay));
+  ok('已开通支付 → 直接建单走真支付', calls.some((u) => /recharge/.test(u)), calls.join(','));
 }
 
 console.log('\n--- 7) 我的会员卡 + 卡详情（余额/消费列表/服务说明）---');

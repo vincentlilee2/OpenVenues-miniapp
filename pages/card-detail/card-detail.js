@@ -1,13 +1,18 @@
-// 会员卡详情 + 立即充值（2026-09-26）
-//   入口：办卡充值列表点卡片（可带 from=order：充值成功后返回原页继续下单）
-//   充值两条路径（服务端决定）：
-//     · 未配置商户号 → need_pay=false，服务端已直接发卡（用户明确要求的"测试通过"）
-//     · 已配置 → need_pay=true，走 utils/pay.js 的收银台 + 服务端入账确认
+// 会员卡详情 + 立即充值（2026-09-26；2026-09-27 按用户要求加「模拟支付」确认）
+//
+// 用户 2026-09-27 要求：
+//   「当前点击立即充值后没有交互直接生成会员卡订单了。改成点击立即充值按钮后弹出一个模拟微信支付的弹窗，
+//     但标注为开通商户号信息，当前模拟支付。之后确认后再生成订单。」
+//
+// ⇒ 两条路径：
+//   · **未配置商户号**（payConfig.enabled=false）→ 先弹**模拟微信支付**弹窗（标注"商户号未开通，当前为模拟支付，
+//     不会真实扣款"）→ 用户点「确认支付」**才**建单发卡；点「取消」什么都不发生（不建单）。
+//   · **已配置商户号** → 直接建单 → 走 utils/pay.js 的真收银台（wx.requestPayment）→ 回调入账才发卡。
 const api = require('../../api/index.js');
 const pay = require('../../utils/pay.js');
 
 Page({
-  data: { card: null, loading: true, submitting: false },
+  data: { card: null, loading: true, submitting: false, showMockPay: false },
 
   onLoad(opt) {
     this._id = opt.id;
@@ -27,7 +32,42 @@ Page({
     }
   },
 
+  /**
+   * 点「立即充值」：
+   *   未开通在线支付 → **先弹模拟支付弹窗**，确认后才建单（这一版就是用户要的交互）
+   *   已开通 → 直接建单走真收银台
+   */
   async onRecharge() {
+    if (this.data.submitting) return;
+    const card = this.data.card || {};
+    if (!card.id) return;
+    let payEnabled = false;
+    try {
+      const pc = await api.payConfig();
+      payEnabled = !!(pc && pc.enabled);
+    } catch (e) {
+      payEnabled = false; // 探测失败按未开通处理（更保守：多一次确认，不会误扣）
+    }
+    if (!payEnabled) {
+      this.setData({ showMockPay: true });
+      return; // 注意：此时**还没有建单**（用户要求「确认后再生成订单」）
+    }
+    this.doRecharge();
+  },
+
+  onCancelMockPay() {
+    this.setData({ showMockPay: false });
+    wx.showToast({ title: '已取消，未生成订单', icon: 'none' });
+  },
+
+  /** 模拟支付里点「确认支付」→ 现在才真正建单 */
+  onConfirmMockPay() {
+    this.setData({ showMockPay: false });
+    this.doRecharge();
+  },
+
+  /** 真正建单 + 发卡（未配置支付时服务端测试直通：订单已支付 + 立刻发卡） */
+  async doRecharge() {
     if (this.data.submitting) return;
     const card = this.data.card || {};
     this.setData({ submitting: true });
@@ -47,7 +87,6 @@ Page({
         wx.showToast({ title: (res && res.error) || '支付未完成', icon: 'none' });
         return;
       }
-      // 未配置支付：服务端已发卡
       this.afterSuccess(card, `充值成功，卡额度 ¥${(r && r.card && r.card.balance) || card.price} 已到账`);
     } catch (e) {
       wx.showToast({ title: (e && e.message) || '充值失败，请稍后再试', icon: 'none' });
@@ -77,4 +116,6 @@ Page({
   goMyCards() {
     wx.navigateTo({ url: '/pages/my-cards/my-cards' });
   },
+
+  noop() {},
 });

@@ -33,3 +33,55 @@
 
 .actions { margin: 34rpx 0 40rpx; }
 .link { text-align: center; color: var(--primary); font-size: 26rpx; padding: 26rpx 0 0; }
+
+/* ===== 模拟微信支付弹窗（2026-09-27）=====
+   形态对齐微信收银台：底部白色圆角面板 + 金额大字 + 微信绿确认按钮。
+   未配置商户号时用它先确认再建单；配好后自动走真 wx.requestPayment。 */
+.pay-mask {
+  position: fixed;
+  left: 0; right: 0; top: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 999;
+  display: flex;
+  align-items: flex-end;
+}
+.pay-sheet {
+  width: 100%;
+  background: #fff;
+  border-radius: 28rpx 28rpx 0 0;
+  padding: 34rpx 40rpx calc(30rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+.pay-head { display: flex; justify-content: space-between; align-items: center; }
+.pay-title { font-size: 30rpx; font-weight: 600; color: #1f2937; }
+.pay-close { font-size: 32rpx; color: #9ca3af; padding: 0 8rpx; }
+.pay-amount { text-align: center; font-size: 64rpx; font-weight: 700; margin: 26rpx 0 6rpx; color: #1f2937; }
+.pay-for { text-align: center; font-size: 26rpx; color: #6b7280; margin-bottom: 26rpx; }
+.pay-tip {
+  background: #fff7ed;
+  border: 1rpx solid #fed7aa;
+  border-radius: 16rpx;
+  padding: 20rpx 22rpx;
+  font-size: 24rpx;
+  color: #9a3412;
+  line-height: 1.65;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+.pay-tip-strong { font-size: 26rpx; font-weight: 600; }
+.pay-tip-note { color: #b45309; font-size: 22rpx; }
+.pay-btn {
+  margin-top: 30rpx;
+  background: #07c160; /* 微信绿 */
+  color: #fff;
+  font-size: 32rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 14rpx;
+  border: none;
+}
+.pay-btn::after { border: none; }
+.pay-btn-hover { opacity: 0.85; }
+.pay-btn[disabled] { background: #9ee6b8; color: #fff; }
+.pay-cancel { text-align: center; font-size: 28rpx; color: #6b7280; padding: 26rpx 0 6rpx; }
