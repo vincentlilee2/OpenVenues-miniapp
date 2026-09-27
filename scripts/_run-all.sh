@@ -5,7 +5,10 @@ P=0; F=0; BAD=""
 for f in scripts/verify-*.cjs; do
   n=$(basename "$f" .cjs)
   out=$(node "$f" 2>&1)
-  if echo "$out" | grep -q "✗"; then F=$((F+1)); BAD="$BAD $n"; else P=$((P+1)); fi
+  rc=$?
+  # ⚠️ 2026-09-27：同时看**退出码** —— 套件中途崩溃时不会打印 ✗ 行，
+  #    只 grep ✗ 会把它算成「绿」（假绿；实测踩到过：verify-activity-tab）
+  if [ "$rc" -ne 0 ] || echo "$out" | grep -q "✗"; then F=$((F+1)); BAD="$BAD $n"; else P=$((P+1)); fi
 done
 echo "小程序全套：$P 套全绿 / $F 套有红：$BAD"
 for n in $BAD; do
