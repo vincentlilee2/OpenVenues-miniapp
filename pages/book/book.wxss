@@ -1,18 +1,19 @@
 .date-tabs {
   /* ★ 2026-09-27 用户要求：7 天日期必须一屏可见（原来每格写死 130rpx + 左右各 8rpx = 146rpx，
-     7 格共 1022rpx，而设计稿屏宽只有 750rpx → 只看得见 5 天，后面的被推到屏外，
-     用户不知道能滑就永远看不到）。
-     方案 B（用户选定）：**紧凑定宽** —— 每格 96rpx + 左右各 3rpx = 102rpx，
-     7 格共 714rpx ≤ 750rpx，正好一屏放下；同时保留 scroll-x，
-     万一将来格子变多或遇到极窄屏，仍然能滑，不会硬挤。 */
-  display: flex;
+     7 格共 1022rpx，而设计稿屏宽只有 750rpx → 只看得见 5 天，后面的被推到屏外）。
+     方案 B（用户选定）：紧凑**定宽** —— 每格 96rpx + 左右各 3rpx = 102rpx，
+     7 格共 714rpx ≤ 750rpx，正好一屏放下；scroll-x 保留作兜底。
+     横排用「容器 nowrap + 子元素 inline-block」——真机验证过的排法。
+     ⚠️ 千万别在这儿写 display:flex：小程序 scroll-view 内部自带包裹层，外层 flex
+     作用不到子元素，日期格会竖着排成一列（2026-09-27 实测截图踩过这个坑）。 */
+  white-space: nowrap;
   background: #fff;
-  padding: 10rpx 4rpx;
+  padding: 10rpx 0;
   margin: 0 -24rpx 8rpx;
   border-bottom: 1rpx solid var(--border);
 }
 .date-tab {
-  flex: none;
+  display: inline-block; /* 与容器 nowrap 配对才横排（真机验证过的写法） */
   width: 96rpx;
   text-align: center;
   padding: 8rpx 0;
