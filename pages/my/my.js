@@ -176,13 +176,8 @@ Page({
     wx.navigateTo({ url: '/pages/courses/courses' });
   },
 
-  // 办卡充值（2026-09-26 新增入口，**内容占位**）
-  // 办卡充值（2026-09-26 接真页）：已上架会员卡列表 → 点卡进详情 → 立即充值
-  openCardRecharge() {
-    wx.navigateTo({ url: '/pages/cards/cards' });
-  },
-
-  // 我的会员卡（2026-09-26）：我充值购买的卡（名称/小标题/当前余额）→ 查看余额、消费列表、服务说明
+  // 我的会员卡（2026-09-26；2026-09-27 与「办卡充值」合并为一个入口）：
+  //   页面里上段=可开通的卡（「我要开通」），下段=我持有的卡 → 查看余额、消费列表、服务说明
   goMyCards() {
     wx.navigateTo({ url: '/pages/my-cards/my-cards' });
   },

@@ -157,30 +157,26 @@ console.log('\n--- ⑥ 关于：版本号 1.1.0 + 简介文案 ---');
   ok('样式 .about-desc 改为 li-sub 修饰（有 margin-top、无边框）', /margin-top:\s*6rpx/.test(aboutRule) && !/border-bottom/.test(aboutRule), aboutRule.replace(/\s+/g, ' ').slice(0, 80));
 }
 
-console.log('\n--- ⑦ 我的服务：我的会员卡 + 办卡充值（2026-09-26 接真页面）---');
+console.log('\n--- ⑦ 我的服务：会员卡一个入口（2026-09-27 与「办卡充值」合并）---');
 {
   const service = wxml.slice(wxml.indexOf('<view class="section-title">我的服务</view>'), wxml.indexOf('<view class="section-title">关于</view>'));
-  ok('★「我的服务」里有「办卡充值」条目', /li-title">办卡充值</.test(service), (service.match(/li-title">[^<]*/g) || []).join(' / '));
-  ok('★ 位置在「我的订单」下面（用户要求）', service.indexOf('我的订单') < service.indexOf('办卡充值') && service.indexOf('我的订单') >= 0, `订单@${service.indexOf('我的订单')} 办卡@${service.indexOf('办卡充值')}`);
-  // ⚠️ 2026-09-26 需求 ④：在「我的订单」下面再加「我的会员卡」，顺序 = 我的订单 → 我的会员卡 → 办卡充值 → 意见反馈
+  // 用户 2026-09-27：「将 我的 中的 我的会员卡 与 办卡充值 栏目合并：我的会员卡」
+  ok('★「我的服务」里已无「办卡充值」条目（已合并）', !/li-title">办卡充值</.test(service), (service.match(/li-title">[^<]*/g) || []).join(' / '));
   ok('★ 有「我的会员卡」条目', /li-title">我的会员卡</.test(service), (service.match(/li-title">[^<]*/g) || []).join(' / '));
-  ok('★ 三者顺序：我的订单 → 我的会员卡 → 办卡充值', service.indexOf('我的订单') < service.indexOf('我的会员卡') && service.indexOf('我的会员卡') < service.indexOf('办卡充值'));
+  ok('★ 位置在「我的订单」下面（用户要求）', service.indexOf('我的订单') < service.indexOf('我的会员卡') && service.indexOf('我的订单') >= 0, `订单@${service.indexOf('我的订单')} 卡@${service.indexOf('我的会员卡')}`);
+  ok('★ 我的服务只剩 3 个条目（订单 / 会员卡 / 意见反馈）', ((service.match(/li-title">/g) || []).length === 3), (service.match(/li-title">[^<]*/g) || []).join(' / '));
   ok('我的会员卡 走 goMyCards', /class="list-item" bindtap="goMyCards"/.test(service) && /goMyCards\(\)\s*\{[\s\S]{0,120}\/pages\/my-cards\/my-cards/.test(js));
-  ok('带图标与说明副标题', /li-icon[^>]*>💳</.test(service) && /li-sub">充得多用得更省/.test(service));
-  ok('点它走 openCardRecharge', /class="list-item" bindtap="openCardRecharge"/.test(service));
-  // 占位已接真页：navigateTo 到 /pages/cards/cards，且**不许**再有「开发中」字样（防复发——用户点名过占位要接真页）
-  ok('js 的 openCardRecharge 现在跳真页面', /openCardRecharge\(\)\s*\{[\s\S]{0,140}navigateTo\(\{\s*url:\s*'\/pages\/cards\/cards'/.test(js), (js.match(/openCardRecharge\(\)[\s\S]{0,120}/) || [''])[0].replace(/\n\s*/g, ' '));
+  ok('带图标与说明副标题（开通 + 余额/消费）', /li-icon[^>]*>🎫</.test(service) && /li-sub">开通会员卡/.test(service));
   ok('★ 不再有「功能开发中」占位文案（防复发）', !/功能开发中/.test(js) && !/功能开发中/.test(wxml));
-  if (page && typeof page.openCardRecharge === 'function') {
+  if (page && typeof page.goMyCards === 'function') {
     calls.navs.length = 0;
     const toasts = [];
     const origToast = global.wx.showToast;
     global.wx.showToast = (o) => toasts.push(o);
-    page.openCardRecharge.call({ data: {}, setData() {} });
     page.goMyCards.call({ data: {}, setData() {} });
     global.wx.showToast = origToast;
-    ok('★ 真调 openCardRecharge() → 跳 /pages/cards/cards（不再是 toast 占位）', calls.navs.includes('/pages/cards/cards') && toasts.length === 0, JSON.stringify(calls.navs) + ' toasts=' + JSON.stringify(toasts));
-    ok('★ 真调 goMyCards() → 跳 /pages/my-cards/my-cards', calls.navs.includes('/pages/my-cards/my-cards'), JSON.stringify(calls.navs));
+    ok('★ 真调 goMyCards() → 跳 /pages/my-cards/my-cards', calls.navs.includes('/pages/my-cards/my-cards') && toasts.length === 0, JSON.stringify(calls.navs) + ' toasts=' + JSON.stringify(toasts));
+    ok('★ 旧的 openCardRecharge 处理函数已删除（防复发）', typeof page.openCardRecharge !== 'function');
   } else {
     console.log('     ⚠ 没拿到 page 对象 → 动态断言跳过（静态断言已覆盖）');
   }

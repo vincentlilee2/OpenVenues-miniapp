@@ -52,14 +52,15 @@ const json = (data) => ({ statusCode: 200, data: { ok: true, data } });
 
 console.log('\n--- 1) 页面文件与注册 ---');
 {
-  for (const p of ['cards/cards', 'card-detail/card-detail', 'my-cards/my-cards', 'my-card-detail/my-card-detail']) {
+  // 2026-09-27：pages/cards（办卡充值列表）已并入 pages/my-cards，页面数 17 → 16
+  for (const p of ['card-detail/card-detail', 'my-cards/my-cards', 'my-card-detail/my-card-detail']) {
     ok(`pages/${p} 四个文件齐全`, ['.js', '.wxml', '.wxss', '.json'].every((ext) => exists(`pages/${p}${ext}`)));
   }
   const app = JSON.parse(read('app.json'));
-  for (const p of ['pages/cards/cards', 'pages/card-detail/card-detail', 'pages/my-cards/my-cards', 'pages/my-card-detail/my-card-detail']) {
+  for (const p of ['pages/card-detail/card-detail', 'pages/my-cards/my-cards', 'pages/my-card-detail/my-card-detail']) {
     ok(`app.json 注册 ${p}`, app.pages.includes(p));
   }
-  ok('页面数 17（原 13 + 4）', app.pages.length === 17, app.pages.length);
+  ok('页面数 16（原 17 − 合并掉的 cards 页）', app.pages.length === 16, app.pages.length);
 }
 
 console.log('\n--- 2) 卡面样式（app.wxss 共用，用户选定的方案 A）---');
@@ -72,26 +73,25 @@ console.log('\n--- 2) 卡面样式（app.wxss 共用，用户选定的方案 A�
   ok('过期态降饱和', /\.mcard\.mcard-off/.test(css));
 }
 
-console.log('\n--- 3) 「我的」入口（我的订单 → 我的会员卡 → 办卡充值 → 意见反馈）---');
+console.log('\n--- 3) 「我的」入口（合并为一个「我的会员卡」）---');
 {
   const wxml = read('pages/my/my.wxml');
   const i1 = wxml.indexOf('我的订单');
   const i2 = wxml.indexOf('我的会员卡');
-  const i3 = wxml.indexOf('办卡充值');
   const i4 = wxml.indexOf('意见反馈');
-  ok('顺序：我的订单 在 我的会员卡 之前', i1 > 0 && i2 > i1, `${i1}/${i2}`);
-  ok('我的会员卡 在 办卡充值 之前', i2 < i3, `${i2}/${i3}`);
-  ok('办卡充值 在 意见反馈 之前', i3 < i4, `${i3}/${i4}`);
+  ok('顺序：我的订单 → 我的会员卡 → 意见反馈', i1 > 0 && i2 > i1 && i4 > i2, `${i1}/${i2}/${i4}`);
+  ok('★ 「办卡充值」行已消失（防复发：只留一个入口）', !/li-title">办卡充值/.test(wxml) && !/openCardRecharge/.test(wxml), (wxml.match(/办卡充值/) || [''])[0]);
+  ok('★ 会员卡入口只有 1 个（不重复）', (wxml.match(/li-title">我的会员卡/g) || []).length === 1, (wxml.match(/li-title">我的会员卡/g) || []).length);
   ok('我的会员卡绑定 goMyCards', /bindtap="goMyCards"/.test(wxml));
   ok('★ 旧的「功能开发中」占位已消失（防复发）', !/功能开发中/.test(wxml) && !/功能开发中/.test(read('pages/my/my.js')));
-  ok('办卡充值副标题已换成真实文案', /充得多用得更省/.test(wxml));
+  ok('副标题已改成真实文案（开通 + 余额/消费）', /开通会员卡/.test(wxml) && /余额与消费记录/.test(wxml));
+  ok('★ 旧 openCardRecharge 处理函数已删除', !/openCardRecharge/.test(read('pages/my/my.js')));
 
   const my = loadPage('pages/my/my.js');
   const mi = inst(my);
+  handlers.navs.length = 0;
   mi.goMyCards();
-  mi.openCardRecharge();
-  ok('goMyCards → /pages/my-cards/my-cards', handlers.navs.includes('/pages/my-cards/my-cards'), handlers.navs.join(','));
-  ok('★ openCardRecharge 现在真的跳页（不再是 toast 占位）', handlers.navs.includes('/pages/cards/cards'), handlers.navs.join(','));
+  ok('goMyCards → /pages/my-cards/my-cards（唯一会员卡入口）', handlers.navs.includes('/pages/my-cards/my-cards'), handlers.navs.join(','));
 }
 
 console.log('\n--- 4) api/index.js 接口接线 ---');
@@ -110,32 +110,75 @@ console.log('\n--- 4) api/index.js 接口接线 ---');
 }
 
 (async () => {
-console.log('\n--- 5) 办卡充值列表页（真调 load + openCard）---');
+console.log('\n--- 5) 合并页「我的会员卡」：上段可开通 + 下段我的卡（真调 load）---');
 {
-  const src = read('pages/cards/cards.wxml');
-  ok('用共用卡面 .mcard', src.includes('class="mcard"'));
-  ok('显示名称/小标题/金额', src.includes('mcard-name') && src.includes('mcard-sub') && src.includes('mcard-amount'));
-  ok('底部标签含折扣 / 有效期 / 服务', ['item.discount_text', 'item.validity_text', 'item.services_text'].every((k) => src.includes(k)));
-  ok('空态文案', /暂无在售会员卡/.test(src));
-  ok('有「我的会员卡」入口', /goMyCards/.test(src));
+  const src = read('pages/my-cards/my-cards.wxml');
+  ok('两段结构：可开通的会员卡 / 我的会员卡', src.includes('可开通的会员卡') && src.includes('我的会员卡'));
+  ok('★ 可开通的卡右侧是「我要开通」', /buy-cta">我要开通/.test(src), (src.match(/buy-cta[^>]*>[^<]*/) || [''])[0]);
+  ok('★ 「我要开通」是金黄字体（#c9a227）', /\.buy-cta\s*\{[\s\S]{0,260}color:\s*#c9a227/.test(read('pages/my-cards/my-cards.wxss')));
+  ok('下段仍是共用卡面 .mcard + 查看', src.includes('mcard-name') && /查看 ›/.test(src));
+  ok('★ 旧「办卡充值」列表页已删除', !exists('pages/cards/cards.wxml') && !exists('pages/cards/cards.js'));
+  ok('★ app.json 不再注册该页', !read('app.json').includes('pages/cards/cards'));
+  ok('cardPay 的"没卡"引导指向合并页', /\/pages\/my-cards\/my-cards\?from=order/.test(read('utils/cardPay.js')));
 
-  handlers.request = (o) => o.success(json([
-    { id: 7, name: '畅打尊享卡', subtitle: '全馆通用', kind_text: '充值卡', price: 5000, discount_text: '9.5 折', validity_text: '有效期：开卡后 1 年', services_text: '订场、活动报名', venue_name: '全部场馆' },
-  ]));
-  const p = loadPage('pages/cards/cards.js');
+  const TPLS = [
+    { id: 1, name: 'A卡', subtitle: '', price: 1000, discount_text: '无折扣', validity_text: '', services_text: '' },
+    { id: 2, name: 'B卡', subtitle: '全馆通用', price: 2000, discount_text: '9 折', validity_text: '有效期：开卡后 1 年', services_text: '订场' },
+    { id: 3, name: 'C卡', subtitle: '', price: 5000, discount_text: '8.5 折', validity_text: '', services_text: '' },
+  ];
+  const serveTpls = (myCards) => {
+    handlers.request = (o) => {
+      if (/\/api\/cards$/.test(o.url)) return o.success(json(TPLS));
+      if (/\/api\/my\/cards$/.test(o.url)) return o.success(json(myCards));
+      return o.success(json({}));
+    };
+  };
+  const sleep = () => new Promise((r) => setTimeout(r, 20));
+  const p = loadPage('pages/my-cards/my-cards.js');
+
+  // 我持有模板 2 的有效卡 → 上段应只剩 1、3
+  serveTpls([{ id: 21, template_id: 2, name: 'B卡', status: 'active', expired: false, balance: 1900, card_no: 'VC2' }]);
+  handlers.navs.length = 0;
   const i = inst(p);
   i.onLoad({});
-  await new Promise((r) => setTimeout(r, 10));
-  ok('load() 拉到卡列表', i.data.list.length === 1 && i.data.list[0].name === '畅打尊享卡', JSON.stringify(i.data.list));
-  ok('empty=false', i.data.empty === false);
-  i.openCard({ currentTarget: { dataset: { id: 7 } } });
-  ok('点卡 → /pages/card-detail/card-detail?id=7', handlers.navs.includes('/pages/card-detail/card-detail?id=7'), handlers.navs.join(','));
+  await sleep();
+  ok('★ 上段只列"尚未开通"的卡（已开通的模板被排除）', i.data.available.map((x) => x.id).join(',') === '1,3', i.data.available.map((x) => x.id).join(','));
+  ok('下段是我的卡', i.data.mine.length === 1 && String(i.data.mine[0].template_id) === '2');
+  ok('有效卡状态文案 = 正常', i.data.mine[0].statusText === '正常' && i.data.mine[0].off === false);
+  ok('没卡时不显示"还没有开通"提示', i.data.mine.length === 1);
 
-  handlers.navs.length = 0;
+  // 取消充值订单 → 卡作废 → 该模板回到上段（能再开通一次）
+  serveTpls([{ id: 21, template_id: 2, name: 'B卡', status: 'voided', expired: false, balance: 0, card_no: 'VC2' }]);
   const i2 = inst(p);
-  i2.onLoad({ from: 'order' });
-  i2.openCard({ currentTarget: { dataset: { id: 9 } } });
-  ok('带 from=order 时把来源传下去（充值后返回继续下单）', handlers.navs.includes('/pages/card-detail/card-detail?id=9&from=order'), handlers.navs.join(','));
+  i2.onLoad({});
+  await sleep();
+  ok('★ 卡作废后该模板重新出现在上段（可再开通）', i2.data.available.map((x) => x.id).join(',') === '1,2,3', i2.data.available.map((x) => x.id).join(','));
+  ok('作废卡在下段标「已作废」', i2.data.mine[0].statusText === '已作废' && i2.data.mine[0].off === true);
+
+  // 已过期的卡也放回上段（续费/重开）
+  serveTpls([{ id: 21, template_id: 2, name: 'B卡', status: 'active', expired: true, balance: 100, card_no: 'VC2' }]);
+  const i2b = inst(p);
+  i2b.onLoad({});
+  await sleep();
+  ok('★ 过期卡对应的模板也回到上段', i2b.data.available.map((x) => x.id).join(',') === '1,2,3', i2b.data.available.map((x) => x.id).join(','));
+
+  // 跳转：我要开通 → 卡详情（带 from 透传）；下段点卡 → 卡详情页
+  i.buyCard({ currentTarget: { dataset: { id: 3 } } });
+  ok('「我要开通」→ /pages/card-detail/card-detail?id=3', handlers.navs.includes('/pages/card-detail/card-detail?id=3'), handlers.navs.join(','));
+  handlers.navs.length = 0;
+  const i3 = inst(p);
+  i3.onLoad({ from: 'order' });
+  i3.buyCard({ currentTarget: { dataset: { id: 5 } } });
+  ok('from=order 透传下去（充值后回原页继续下单）', handlers.navs.includes('/pages/card-detail/card-detail?id=5&from=order'), handlers.navs.join(','));
+  i.openCard({ currentTarget: { dataset: { id: 21 } } });
+  ok('下段点卡 → /pages/my-card-detail/my-card-detail?id=21', handlers.navs.includes('/pages/my-card-detail/my-card-detail?id=21'), handlers.navs.join(','));
+
+  // 充值成功返回（onShow）→ 重新拉取，卡从上面"挪到"下面
+  serveTpls([{ id: 21, template_id: 2, name: 'B卡', status: 'active', expired: false, balance: 2000, card_no: 'VC2' }]);
+  const i4 = inst(p, { available: [], mine: [], loading: false });
+  i4.onShow();
+  await sleep();
+  ok('★ onShow 重新拉取（充值返回后卡自动挪到下段）', i4.data.available.map((x) => x.id).join(',') === '1,3' && i4.data.mine.length === 1, i4.data.available.map((x) => x.id).join(','));
 }
 
 console.log('\n--- 6) 卡详情 + 立即充值（含模拟支付确认）---');
@@ -216,7 +259,9 @@ console.log('\n--- 7) 我的会员卡 + 卡详情（余额/消费列表/服务�
   ok('显示当前余额', mySrc.includes('当前余额'));
   ok('显示卡号与场馆', mySrc.includes('item.card_no') && mySrc.includes('item.venue_name'));
   ok('有「查看 ›」', /查看/.test(mySrc));
-  ok('空态给「去办卡充值」出口', /还没有会员卡/.test(mySrc) && /去办卡充值/.test(mySrc));
+  // 2026-09-27 合并后：空态不再是「还没有会员卡 + 去办卡充值按钮」，改成两段式提示
+  ok('★ 下段空态指向「我要开通」（不再是去办卡充值按钮）', /还没有开通会员卡/.test(mySrc) && /我要开通/.test(mySrc));
+  ok('★ 全空时给中性空态（没有可开通的卡）', /暂时没有会员卡/.test(mySrc));
 
   const detSrc = read('pages/my-card-detail/my-card-detail.wxml');
   ok('详情显示余额/累计充值/已消费', detSrc.includes('当前余额') && detSrc.includes('累计充值') && detSrc.includes('已消费'));
@@ -260,7 +305,7 @@ console.log('\n--- 9) 会员卡余额支付（阶段 3：约场 / 报名 / 订�
   ok('用服务端算可用卡（venue + service）', /api\.usableCards\(opts\.venueId, opts\.service\)/.test(cp));
   ok('用卡支付调 payOrderWithCard', /api\.payOrderWithCard\(o\.id, card\.id\)/.test(cp));
   ok('余额不足（402 insufficient）有专门分支', /code === 'insufficient'/.test(cp) && /会员卡余额不足/.test(cp));
-  ok('没卡时引导去办卡充值（带 from=order）', /还没有会员卡/.test(cp) && /\/pages\/cards\/cards\?from=order/.test(cp));
+  ok('没卡时引导去合并页（带 from=order）', /还没有会员卡/.test(cp) && /\/pages\/my-cards\/my-cards\?from=order/.test(cp));
   ok('用户选「直接支付」→ 返回 skipped 交回原流程', /reason: 'declined'/.test(cp));
   ok('多张卡时让用户选（actionSheet）', /showActionSheet/.test(cp));
 
@@ -296,7 +341,7 @@ console.log('\n--- 9) 会员卡余额支付（阶段 3：约场 / 报名 / 订�
   global.wx.showModal = (o) => { handlers.modals.push(o); if (o.success) o.success({ confirm: true }); };
   let r1 = await cpMod.payOne({ order: { id: 11, total_price: 100 }, venueId: 3, service: 'court' });
   ok('没卡 → 弹「还没有会员卡」', handlers.modals.some((m) => /还没有会员卡/.test(m.title)), JSON.stringify(handlers.modals.map((m) => m.title)));
-  ok('没卡 → 跳办卡充值（from=order）', handlers.navs.includes('/pages/cards/cards?from=order'), handlers.navs.join(','));
+  ok('没卡 → 跳合并页（from=order）', handlers.navs.includes('/pages/my-cards/my-cards?from=order'), handlers.navs.join(','));
   ok('没卡 → 返回 skipped（不阻塞原支付流程）', r1.paid === false && /no-card/.test(r1.reason || ''), JSON.stringify(r1));
 
   // ② 有卡 → 用户确认 → 扣款成功

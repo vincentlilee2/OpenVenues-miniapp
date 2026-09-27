@@ -40,7 +40,7 @@ const pickCard = (cards) =>
 
 /** 去办卡充值（from=order → 充值成功后返回本页继续） */
 function gotoBuyCard() {
-  wx.navigateTo({ url: '/pages/cards/cards?from=order' });
+  wx.navigateTo({ url: '/pages/my-cards/my-cards?from=order' });
 }
 
 /**

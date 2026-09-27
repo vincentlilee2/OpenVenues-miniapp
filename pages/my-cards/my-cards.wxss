@@ -1,13 +1,53 @@
-/* 我的会员卡（2026-09-26）—— 卡面样式在 app.wxss 的 .mcard */
+/* 我的会员卡（2026-09-26；2026-09-27 与「办卡充值」合并为两段）—— 卡面样式在 app.wxss 的 .mcard */
 .card-wrap { margin-bottom: 34rpx; }
 
+/* ===== 分段标题 ===== */
+.sec-title {
+  font-size: 28rpx; font-weight: 700; color: var(--text, #1f2937);
+  margin: 12rpx 0 20rpx; padding-left: 18rpx; position: relative;
+}
+.sec-title::before {
+  content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 8rpx; height: 28rpx; border-radius: 4rpx; background: var(--primary, #3a7d44);
+}
+
+/* ===== 上段：可开通的卡（右侧金黄「我要开通」）===== */
+.buy-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #fff; border-radius: 20rpx; padding: 26rpx 26rpx;
+  margin-bottom: 20rpx; box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+.buy-row-hover { background: #f7faf7; }
+.buy-info { flex: 1; min-width: 0; padding-right: 20rpx; }
+.buy-name { font-size: 32rpx; font-weight: 700; color: var(--text, #1f2937); }
+.buy-sub { font-size: 24rpx; color: var(--muted, #6b7280); margin-top: 6rpx; }
+.buy-meta { font-size: 25rpx; color: var(--muted, #6b7280); margin-top: 12rpx; }
+.buy-price { font-size: 30rpx; font-weight: 700; color: var(--primary, #3a7d44); margin-right: 8rpx; }
+.buy-dot { margin: 0 8rpx; opacity: .6; }
+
+/* 金黄「我要开通」—— 用户 2026-09-27 明确要求"明显的金黄字体" */
+.buy-cta {
+  flex: none; display: flex; align-items: center;
+  font-size: 30rpx; font-weight: 700; letter-spacing: 1rpx;
+  color: #c9a227;
+  background: rgba(201, 169, 97, 0.14);
+  border: 1rpx solid rgba(201, 169, 97, 0.55);
+  border-radius: 999rpx; padding: 12rpx 24rpx;
+}
+.buy-arrow { margin-left: 6rpx; font-size: 30rpx; }
+
+/* 下段为空时的提示 */
+.mine-empty {
+  font-size: 26rpx; color: var(--muted, #6b7280); text-align: center;
+  padding: 26rpx 0 10rpx;
+}
+
+/* ===== 下段：我的会员卡 ===== */
 .card-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16rpx 10rpx 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14rpx 6rpx 0;
 }
 .bar-sub { font-size: 24rpx; color: var(--muted); flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .bar-btn { flex: none; font-size: 26rpx; color: var(--primary); padding: 6rpx 4rpx 6rpx 20rpx; }
 
-.go-buy { margin-top: 30rpx; width: 320rpx; }
+.empty-sub { font-size: 24rpx; color: var(--muted, #9ca3af); margin-top: 14rpx; }

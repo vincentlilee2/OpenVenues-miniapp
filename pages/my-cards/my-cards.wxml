@@ -1,33 +1,59 @@
-<!-- 我的会员卡（2026-09-26）—— 名称 / 小标题 / 当前余额，点「查看」进详情 -->
+<!-- 我的会员卡（2026-09-26；2026-09-27 与「办卡充值」合并为两段）
+     上段：当前正在发行、我**尚未开通**的卡 —— 右侧金黄「我要开通」→ 卡详情（立即充值）
+     下段：我的会员卡（充值成功后就只出现在这里） -->
 <view class="container">
   <view wx:if="{{loading}}" class="empty">加载中...</view>
 
-  <view wx:elif="{{empty}}" class="empty">
-    <view>还没有会员卡</view>
-    <button class="btn-primary go-buy" hover-class="btn-hover" bindtap="goBuy">去办卡充值</button>
+  <view wx:elif="{{emptyAll}}" class="empty">
+    <view>暂时没有会员卡</view>
+    <view class="empty-sub">管理员发布会员卡后会显示在这里</view>
   </view>
 
   <block wx:else>
-    <view wx:for="{{list}}" wx:key="id" class="card-wrap">
-      <view class="mcard {{item.off ? 'mcard-off' : ''}}" bindtap="openCard" data-id="{{item.id}}">
-        <view class="mcard-glow"></view>
-        <view class="mcard-top">
-          <view>
-            <view class="mcard-name">{{item.name}}</view>
-            <view wx:if="{{item.subtitle}}" class="mcard-sub">{{item.subtitle}}</view>
+    <!-- ===== 上段：可开通 ===== -->
+    <block wx:if="{{available.length}}">
+      <view class="sec-title">可开通的会员卡</view>
+      <view wx:for="{{available}}" wx:key="id" class="buy-row" hover-class="buy-row-hover"
+            bindtap="buyCard" data-id="{{item.id}}">
+        <view class="buy-info">
+          <view class="buy-name">{{item.name}}</view>
+          <view wx:if="{{item.subtitle}}" class="buy-sub">{{item.subtitle}}</view>
+          <view class="buy-meta">
+            <text class="buy-price">¥{{item.price}}</text>
+            <text class="buy-dot">·</text>{{item.discount_text}}<text wx:if="{{item.validity_text}}"><text class="buy-dot">·</text>{{item.validity_text}}</text>
           </view>
-          <view class="mcard-chip">{{item.statusText}}</view>
         </view>
-        <view class="mcard-amount">¥{{item.balance}}<text class="unit">当前余额</text></view>
-        <view class="mcard-foot">
-          <text class="tag">卡号 {{item.card_no}}</text>
-          <text class="tag">{{item.venue_name}}</text>
+        <view class="buy-cta">我要开通<text class="buy-arrow">›</text></view>
+      </view>
+    </block>
+
+    <!-- ===== 下段：我的会员卡 ===== -->
+    <block wx:if="{{mine.length}}">
+      <view class="sec-title">我的会员卡</view>
+      <view wx:for="{{mine}}" wx:key="id" class="card-wrap">
+        <view class="mcard {{item.off ? 'mcard-off' : ''}}" bindtap="openCard" data-id="{{item.id}}">
+          <view class="mcard-glow"></view>
+          <view class="mcard-top">
+            <view>
+              <view class="mcard-name">{{item.name}}</view>
+              <view wx:if="{{item.subtitle}}" class="mcard-sub">{{item.subtitle}}</view>
+            </view>
+            <view class="mcard-chip">{{item.statusText}}</view>
+          </view>
+          <view class="mcard-amount">¥{{item.balance}}<text class="unit">当前余额</text></view>
+          <view class="mcard-foot">
+            <text class="tag">卡号 {{item.card_no}}</text>
+            <text class="tag">{{item.venue_name}}</text>
+          </view>
+        </view>
+        <view class="card-bar">
+          <text class="bar-sub">{{item.services_text}}{{item.expires_at ? '' : ' · 永久有效'}}</text>
+          <view class="bar-btn" catchtap="openCard" data-id="{{item.id}}">查看 ›</view>
         </view>
       </view>
-      <view class="card-bar">
-        <text class="bar-sub">{{item.services_text}}{{item.expires_at ? '' : ' · 永久有效'}}</text>
-        <view class="bar-btn" catchtap="openCard" data-id="{{item.id}}">查看 ›</view>
-      </view>
-    </view>
+    </block>
+
+    <!-- 有可开通的卡、但一张都还没开通时的提示（替代原来的"去办卡充值"按钮） -->
+    <view wx:if="{{!mine.length && available.length}}" class="mine-empty">还没有开通会员卡，点上面的「我要开通」即可</view>
   </block>
 </view>
