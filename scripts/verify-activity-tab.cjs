@@ -82,6 +82,7 @@ const wait = () => new Promise((r) => setTimeout(r, 5));
     ok('导航栏标题是「活动与课程」', JSON.parse(read('pages/activity/activity.json')).navigationBarTitleText === '活动与课程', JSON.parse(read('pages/activity/activity.json')).navigationBarTitleText);
     // 顶部横幅已按用户要求去掉（2026-09-26）；tabBar 那一格仍叫「活动」（用户只要求改页面标题）
     const actWxml = read('pages/activity/activity.wxml');
+    const actJs = read('pages/activity/activity.js');
     const actWxss = read('pages/activity/activity.wxss');
     ok('★ 活动页没有横幅（hero）节点', !/class="hero"/.test(actWxml));
     ok('★ 活动页 wxss 里 .hero 死样式已清', !/\.hero/.test(actWxss));
