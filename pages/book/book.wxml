@@ -1,6 +1,7 @@
 <view class="container">
   <!-- 日期 Tab (今天起 7 天) -->
-  <!-- 7 格 flex 等分，一屏刚好放下（scroll-x 保留只为极端窄屏兜底，正常不会滑） -->
+  <!-- 紧凑定宽：每格 96rpx+3rpx 外边距 → 7 格 714rpx，一屏刚好放下；
+       scroll-x 保留作兜底（格子变多或极窄屏时仍可滑），正常不需要滑 -->
   <scroll-view class="date-tabs" scroll-x="true" enhanced="true" show-scrollbar="{{false}}">
     <view wx:for="{{dateTabs}}" wx:key="date" class="date-tab {{item.date === activeDate ? 'active' : ''}}"
           bindtap="onDateTap" data-date="{{item.date}}">

@@ -1,7 +1,10 @@
 .date-tabs {
-  /* ★ 2026-09-27 用户要求：7 天日期必须一屏可见（原来每格 146rpx × 7 = 1022rpx，
-     750rpx 的屏只看得见 5 天，后面的被推到屏外，用户不知道能滑就看不到）→
-     改成 flex 等分：每格 flex:1，7 格正好铺满，不给滑也不会有半截。 */
+  /* ★ 2026-09-27 用户要求：7 天日期必须一屏可见（原来每格写死 130rpx + 左右各 8rpx = 146rpx，
+     7 格共 1022rpx，而设计稿屏宽只有 750rpx → 只看得见 5 天，后面的被推到屏外，
+     用户不知道能滑就永远看不到）。
+     方案 B（用户选定）：**紧凑定宽** —— 每格 96rpx + 左右各 3rpx = 102rpx，
+     7 格共 714rpx ≤ 750rpx，正好一屏放下；同时保留 scroll-x，
+     万一将来格子变多或遇到极窄屏，仍然能滑，不会硬挤。 */
   display: flex;
   background: #fff;
   padding: 10rpx 4rpx;
@@ -9,12 +12,12 @@
   border-bottom: 1rpx solid var(--border);
 }
 .date-tab {
-  flex: 1;
-  min-width: 0;
+  flex: none;
+  width: 96rpx;
   text-align: center;
   padding: 8rpx 0;
   border-radius: 10rpx;
-  margin: 0 2rpx;
+  margin: 0 3rpx;
   color: var(--muted);
   font-size: 24rpx;
 }
