@@ -25,7 +25,7 @@ global.wx = {
   setStorageSync: () => {},
   removeStorageSync: () => {},
   navigateTo: (o) => handlers.navs.push(o.url),
-  navigateBack: () => handlers.navs.push('BACK'),
+  navigateBack: (o) => handlers.navs.push('BACK:' + ((o && o.delta) || 1)),
   redirectTo: (o) => handlers.navs.push('REDIRECT:' + o.url),
   switchTab: (o) => handlers.navs.push('SWITCH:' + o.url),
   showToast: (o) => handlers.toasts.push(o.title),
@@ -199,7 +199,10 @@ console.log('\n--- 6) 卡详情 + 立即充值（含模拟支付确认）---');
   ok('★ 探测失败按未开通处理（不会误扣）', /payEnabled = false; \/\/ 探测失败/.test(js));
   ok('★ 走统一支付出口 pay.handleAfterCreate(..., \'card\')', /handleAfterCreate\([\s\S]{0,200}'card'/.test(js));
   ok('支付成功/取消/确认中 三种分支都处理', /res\.paid/.test(js) && /res\.cancelled/.test(js) && /res\.pending/.test(js));
-  ok('from=order 时提示返回继续', /返回上一步继续用会员卡支付/.test(js));
+  // from=order：退两页回下单页继续付款（栈 = 下单页 → 我的会员卡 → 卡详情）；
+  // delta 超出栈时 fail 兜底回「我的会员卡」（2026-09-27 改成自动返回，不再用模态框）
+  ok('★ from=order 时自动退两页回下单页', /backToOrder\) wx\.navigateBack\(\{ delta: 2/.test(js) && /充值成功，返回继续支付/.test(js));
+  ok('★ 返回失败时兜底 redirect 到我的会员卡', /const fail = \(\) => wx\.redirectTo\(\{ url: '\/pages\/my-cards\/my-cards' \}\)/.test(js));
 
   // ① 未配置商户号：点立即充值 → 只弹窗，**不建单**
   let calls = [];
@@ -223,8 +226,12 @@ console.log('\n--- 6) 卡详情 + 立即充值（含模拟支付确认）---');
   await new Promise((r) => setTimeout(r, 10));
   ok('★ 确认后才建单', calls.some((u) => /recharge/.test(u)), calls.join(','));
   ok('弹窗已收起', i.data.showMockPay === false);
-  ok('测试直通：弹出「充值成功」', handlers.modals.some((m) => /充值成功/.test(m.title)), 'modals=' + JSON.stringify(handlers.modals.map((m) => m.title)) + ' toasts=' + JSON.stringify(handlers.toasts));
-  ok('提示里带上到账金额', handlers.modals.some((m) => /2000/.test(m.content)), handlers.modals.map((m) => m.content).join(' | '));
+  ok('测试直通：提示「充值成功」', handlers.toasts.some((t) => /充值成功/.test(t)), 'toasts=' + JSON.stringify(handlers.toasts));
+  // 用户 2026-09-27：『点击了立即充值并在弹窗中确定后，要返回我的会员卡页面，不要还停留在充值页面』
+  ok('★ 不再弹"充值成功"模态框（模态框可能把人留在充值页）', !handlers.modals.some((m) => /充值成功/.test(m.title)), JSON.stringify(handlers.modals.map((m) => m.title)));
+  ok('★ 确认后**不点任何按钮**也会自动返回（还没到点就还没返回）', !handlers.navs.some((n) => /BACK/.test(n)), handlers.navs.join(','));
+  await new Promise((r) => setTimeout(r, 1000));
+  ok('★ 自动返回上一页 = 我的会员卡（delta=1）', handlers.navs.includes('BACK:1'), handlers.navs.join(','));
 
   // ③ 点「取消」→ 什么都不发生（不建单）
   calls = [];

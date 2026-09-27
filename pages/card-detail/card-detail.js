@@ -95,22 +95,28 @@ Page({
     }
   },
 
+  /**
+   * 充值成功后**不要停在充值页**（用户 2026-09-27 明确要求）：
+   *   · 普通入口（我的会员卡 → 我要开通 → 卡详情）：返回上一页 = 「我的会员卡」，
+   *     该页 onShow 会重新拉取 → 刚开通的卡自动出现在下段列表里（上面那份"可开通"里消失）。
+   *   · from=order（下单时没卡被引导过来充值）：上一步是「我的会员卡」、再上一步才是下单页，
+   *     所以退两页回下单页继续付款（delta 超出栈时 fail 兜底回「我的会员卡」）。
+   *   用 toast 而不是模态框：模态框要用户点一下、点「知道了」还可能留在原地。
+   */
   afterSuccess(card, msg) {
     const backToOrder = this._from === 'order';
-    wx.showModal({
-      title: '充值成功',
-      content: backToOrder ? `${msg}。返回上一步继续用会员卡支付。` : `${msg}。可在「我的会员卡」查看余额与消费记录。`,
-      confirmText: backToOrder ? '返回继续' : '查看我的卡',
-      cancelText: '知道了',
-      success: (res) => {
-        if (res.confirm) {
-          if (backToOrder) wx.navigateBack({ delta: 1 });
-          else wx.redirectTo({ url: '/pages/my-cards/my-cards' });
-        } else {
-          wx.navigateBack({ delta: 1 });
-        }
-      },
+    // 「支付结果确认中」是异步回调还没到的情形，提示要如实（别报"成功"）
+    const pending = /确认中/.test(msg || '');
+    wx.showToast({
+      title: pending ? '支付确认中，稍后在会员卡查看' : backToOrder ? '充值成功，返回继续支付' : '充值成功',
+      icon: pending ? 'none' : 'success',
+      duration: 1200,
     });
+    setTimeout(() => {
+      const fail = () => wx.redirectTo({ url: '/pages/my-cards/my-cards' });
+      if (backToOrder) wx.navigateBack({ delta: 2, fail });
+      else wx.navigateBack({ delta: 1, fail });
+    }, 900);
   },
 
   goMyCards() {
