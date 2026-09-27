@@ -49,7 +49,7 @@ const pad = pv.length > 1 ? pv[1] : pv[0]; // 水平方向内边距（padding: 1
 const need = 7 * (w + hm * 2) + pad * 2;
 
 // ---------- 核心算术：7 格必须塞得进一屏 ----------
-ok('★★ 每格定宽（紧凑，不再写死 130rpx）', w > 0 && w < 130, w + 'rpx');
+ok('★★ 每格定宽（放大字号后仍紧凑，不回到 130rpx）', w > 0 && w <= 110, w + 'rpx');
 ok('★★ 每格左右外边距 ≤ 4rpx', hm >= 0 && hm <= 4, hm + 'rpx');
 ok('★★ 7 格总宽（含外边距与容器内边距）≤ 750rpx → 一屏放下',
   Number.isFinite(need) && need <= SCREEN, need + 'rpx / 屏宽 ' + SCREEN + 'rpx');
@@ -69,8 +69,8 @@ ok('★★ scroll-x 兜底仍在（格子变多/极窄屏仍能滑）',
   const wk = (wxss.match(/\.date-week \{[^}]*font-size:\s*(\d+)rpx/) || [])[1];
   const dy = (wxss.match(/\.date-day \{[^}]*font-size:\s*(\d+)rpx/) || [])[1];
   const pd = Number((tabCss.match(/padding:\s*(\d+)rpx/) || [])[1]);
-  ok('★ 星期字号 ≤ 22rpx', Number(wk) <= 22, wk + 'rpx');
-  ok('★ 日期数字字号 ≤ 30rpx', Number(dy) <= 30, dy + 'rpx');
+  ok('★ 星期字号在 22~26rpx（放大后）', Number(wk) >= 22 && Number(wk) <= 26, wk + 'rpx');
+  ok('★ 日期数字字号在 30~38rpx（放大后）', Number(dy) >= 30 && Number(dy) <= 38, dy + 'rpx');
   ok('★ 格子上下内边距 ≤ 10rpx', pd <= 10, pd + 'rpx');
 }
 

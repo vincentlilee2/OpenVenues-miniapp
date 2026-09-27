@@ -14,20 +14,20 @@
 }
 .date-tab {
   display: inline-block; /* 与容器 nowrap 配对才横排（真机验证过的写法） */
-  width: 96rpx;
+  width: 100rpx;         /* 紧凑：7 格 742rpx ≤ 750rpx，仍一屏放下 */
   text-align: center;
-  padding: 8rpx 0;
-  border-radius: 10rpx;
+  padding: 10rpx 0;
+  border-radius: 12rpx;
   margin: 0 3rpx;
   color: var(--muted);
-  font-size: 24rpx;
+  font-size: 26rpx;
 }
 .date-tab.active {
   background: var(--primary);
   color: #fff;
 }
-.date-week { font-size: 20rpx; line-height: 1.15; opacity: 0.85; }
-.date-day { font-size: 30rpx; font-weight: 600; margin-top: 0; line-height: 1.2; }
+.date-week { font-size: 24rpx; line-height: 1.2; opacity: 0.85; }
+.date-day { font-size: 36rpx; font-weight: 700; margin-top: 2rpx; line-height: 1.15; }
 
 /* 节假日价格提示条 */
 .holiday-tip {
