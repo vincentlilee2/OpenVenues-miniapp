@@ -113,12 +113,13 @@ console.log('\n--- 3) 支付状态机（结果以服务端为准）---');
   r = await pay.handleAfterCreate({ id: 7, need_pay: false, total_price: 50 });
   ok('未开通支付的订单 → 直接跳过（行为与历史一致）', r.skipped === true && wxCalls.modal.length === 0);
 
-  // 需要支付 + 用户在确认框点「立即支付」
+  // 用户 2026-09-27：提交后**直接**拉起收银台，不再先弹「预约成功，请完成支付」二次确认
+  wxCalls.modal.length = 0;
   fakeState.payOrderReply = { pay_params: PAY_PARAMS };
   fakeState.statusReplies = [{ paid: true }];
   r = await pay.handleAfterCreate({ id: 8, need_pay: true, total_price: 50 }, 'booking');
-  ok('需要支付 → 先弹确认（含 15 分钟说明）', wxCalls.modal.some((m) => /15 分钟/.test(m.content || '')), JSON.stringify(wxCalls.modal).slice(0, 120));
-  ok('确认后完成支付', r.paid === true);
+  ok('★ 不再有「预约成功/报名成功，需要支付」二次确认（点提交即进收银台）', !wxCalls.modal.some((m) => /需要支付|立即支付/.test((m.title || '') + (m.content || ''))), JSON.stringify(wxCalls.modal.map((m) => m.title)));
+  ok('直接完成支付', r.paid === true);
 
   console.log('\n--- 5) api 层有支付三件套 ---');
   const apiSrc = read('api/index.js');
@@ -130,7 +131,8 @@ console.log('\n--- 3) 支付状态机（结果以服务端为准）---');
   const bookJs = read('pages/book/book.js');
   ok('约场下单后：收集 need_pay 订单', /needPay\.push/.test(bookJs) && /d\.need_pay/.test(bookJs));
   ok('约场下单后：逐单调起支付', /pay\.payOrder\(/.test(bookJs));
-  ok('约场：稍后支付也能走（不阻断下单）', /稍后支付/.test(bookJs));
+  ok('★ 约场单笔：不再先弹合计确认（直接进收银台）', /let goPay = true;/.test(bookJs) && /if \(rest\.length > 1\)/.test(bookJs));
+  ok('约场多笔：仍给一句合计说明（且可稍后支付）', /将逐单支付/.test(bookJs) && /稍后支付/.test(bookJs));
 
   const promoJs = read('pages/promo-detail/promo-detail.js');
   ok('畅打报名后：走支付', /pay\.handleAfterCreate\(/.test(promoJs));

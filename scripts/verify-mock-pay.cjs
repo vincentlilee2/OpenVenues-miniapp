@@ -123,6 +123,33 @@ console.log('\n--- 6) 支付入口三处都会自动获得模拟能力（走同�
   ok('约课复用报名页（kind=course 走同一分支）', /course/.test(read('pages/promo-detail/promo-detail.js')) || /promo-detail/.test(read('pages/course-detail/course-detail.js') || ''));
 }
 
+console.log('\n--- 7) 用户要求：提交后**直接**弹收银台（不再先弹二次确认，也不用到我的订单再点一次）---');
+{
+  let confirmCalls = 0;
+  handlers.request = (o) => {
+    if (/mock-confirm/.test(o.url)) { confirmCalls++; return o.success({ statusCode: 200, data: json({ paid: true, mock: true, amount_yuan: '60.00' }) }); }
+    if (/\/pay$/.test(o.url)) return o.success({ statusCode: 200, data: json({ mock: true, order_id: 88, amount_yuan: '60.00' }) });
+    return o.success({ statusCode: 200, data: json({}) });
+  };
+  handlers.modals.length = 0;
+  const r = await pay.handleAfterCreate({ id: 88, need_pay: true, total_price: 60 }, 'booking');
+  const titles = handlers.modals.map((m) => m.title);
+  ok('★ 没有「预约成功，请完成支付」这类二次确认', !handlers.modals.some((m) => /需要支付|请完成支付|立即支付/.test((m.title || '') + (m.content || ''))), JSON.stringify(titles));
+  ok('★ 提交后直接弹出的就是模拟收银台', handlers.modals.length === 1 && /微信支付（模拟）/.test(handlers.modals[0].title), JSON.stringify(titles));
+  ok('★ 一单即一付（确认后已入账）', confirmCalls === 1 && r.paid === true, `confirm=${confirmCalls} paid=${r.paid}`);
+}
+
+console.log('\n--- 8) 约场页面：单笔直付、多笔才先给合计说明 ---');
+{
+  const book = read('pages/book/book.js');
+  ok('★ 单笔不弹合计确认（goPay 默认 true）', /let goPay = true;/.test(book) && /if \(rest\.length > 1\)/.test(book));
+  ok('多笔合计说明写了"逐单支付"', /将逐单支付/.test(book));
+  ok('★ 提交后仍走 pay.payOrder（收银台入口不变）', /await pay\.payOrder\(o\.id/.test(book));
+  ok('订单仍是"待支付 + 15 分钟锁"（不想现在付可退出，之后在我的订单里付）', /15 分钟/.test(book) && /我的订单/.test(book));
+  const promo = read('pages/promo-detail/promo-detail.js');
+  ok('★ 报名/约课同样直达收银台（走 handleAfterCreate）', /pay\.handleAfterCreate\(/.test(promo));
+}
+
 console.log(`\n模拟支付模式（小程序端）：${pass} 过 / ${fail} 失败`);
 if (fail) process.exit(1);
 })();

@@ -265,16 +265,22 @@ Page({
           setTimeout(() => wx.navigateTo({ url: '/pages/order-list/order-list' }), 800);
           return;
         }
-        const sum = rest.reduce((s, o) => s + Number(o.total_price || 0), 0).toFixed(2);
-        const goPay = await new Promise((resolve) =>
-          wx.showModal({
-            title: '预约成功，请完成支付',
-            content: `${rest.length} 单合计 ¥${sum}。请在 15 分钟内完成支付 —— 超时订单自动关闭并释放场地。`,
-            confirmText: '立即支付',
-            cancelText: '稍后支付',
-            success: (r) => resolve(r.confirm),
-          })
-        );
+        // 用户 2026-09-27：「点击 立即预约 就要弹出 模拟收银台，而不是到我的订单中再点击一次在线支付」
+        //   ⇒ 单笔（最常见）：**直接拉起收银台**，不再先弹「预约成功，请完成支付」。
+        //     一次约多个时段才先给一句合计说明（要逐单拉起收银台，金额看不全容易懵）。
+        let goPay = true;
+        if (rest.length > 1) {
+          const sum = rest.reduce((s, o) => s + Number(o.total_price || 0), 0).toFixed(2);
+          goPay = await new Promise((resolve) =>
+            wx.showModal({
+              title: `预约成功，将逐单支付 ${rest.length} 笔`,
+              content: `合计 ¥${sum}。每笔会单独拉起一次收银台；15 分钟内未付的订单自动关闭并释放场地。`,
+              confirmText: '开始支付',
+              cancelText: '稍后支付',
+              success: (r) => resolve(r.confirm),
+            })
+          );
+        }
         if (goPay) {
           let paidCount = 0;
           let pendingCount = 0;

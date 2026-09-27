@@ -300,8 +300,10 @@ console.log('\n--- 7) 我的会员卡 + 卡详情（余额/消费列表/服务�
 console.log('\n--- 8) 支付文案（card 分支）---');
 {
   const pay = read('utils/pay.js');
-  ok('handleAfterCreate 支持 card', /kind === 'card'/.test(pay));
-  ok('充值文案正确（不是「预约成功」）', /充值订单已创建，需要支付/.test(pay) && /充值金额/.test(pay));
+  ok('handleAfterCreate 支持 card（真支付路径仍走它）', /kind = 'card'/.test(pay) || /'card'/.test(pay));
+  // 2026-09-27：通用二次确认框已去掉（提交后直接进收银台）→
+  // 充值那句"专属文案"现在在卡详情自己的模拟支付弹窗里，断言改到这里
+  ok('★ 充值文案在卡详情弹窗里（模拟支付 + 不真实扣款）', /模拟支付/.test(read('pages/card-detail/card-detail.wxml')) && /不会真实扣款/.test(read('pages/card-detail/card-detail.wxml')));
 }
 
 console.log('\n--- 9) 会员卡余额支付（阶段 3：约场 / 报名 / 订单页）---');

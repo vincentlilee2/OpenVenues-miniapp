@@ -112,23 +112,10 @@ async function mockSettle(orderId, info = {}) {
  */
 async function handleAfterCreate(created, kind = 'booking') {
   if (!created || !created.need_pay) return { skipped: true };
-  const title = kind === 'promo' ? '报名成功，需要支付' : kind === 'card' ? '充值订单已创建，需要支付' : '预约成功，需要支付';
-  const content =
-    kind === 'promo'
-      ? `报名费 ¥${created.total_price}。请在 15 分钟内完成支付，超时名额自动释放。`
-      : kind === 'card'
-        ? `充值金额 ¥${created.total_price}。请在 15 分钟内完成支付，支付成功后卡额度立即到账；超时订单自动关闭。`
-        : `场地费 ¥${created.total_price}。请在 15 分钟内完成支付，超时自动关闭并释放场地。`;
-  const go = await new Promise((resolve) => {
-    wx.showModal({
-      title,
-      content,
-      confirmText: '立即支付',
-      cancelText: '稍后支付',
-      success: (res) => resolve(res.confirm),
-    });
-  });
-  if (!go) return { skipped: true, defered: true };
+  // 用户 2026-09-27：「约场页面中 点击 立即预约 就要弹出 模拟收银台，而不是到 我的订单 中再点击一次在线支付」
+  //   ⇒ **不再先弹「预约成功/报名成功，需要支付」的二次确认**（以前点「稍后支付」就落到我的订单，白跑一趟），
+  //     提交后直接拉起收银台 —— 收银台本身就会显示金额，金额确认这一步没有丢。
+  //     订单仍是「待支付 + 15 分钟锁」：真不想现在付，退出即可，之后在「我的订单」里还能付。
   return payOrder(created.id);
 }
 
