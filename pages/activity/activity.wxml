@@ -2,8 +2,9 @@
   <!-- 顶部横幅已按用户要求去掉（2026-09-26）—— 直接进段选 -->
   <!-- 段选：活动 / 课程（与「畅打活动」「培训课程」两个后台栏目一一对应） -->
   <view class="seg">
-    <view class="seg-item {{seg === 'promo' ? 'on' : ''}}" data-seg="promo" bindtap="switchSeg">🎯 活动</view>
+    <!-- 2026-09-27 用户要求：课程放左侧、活动放右侧，且**默认显示课程**（见 activity.js 的 seg 初值） -->
     <view class="seg-item {{seg === 'course' ? 'on' : ''}}" data-seg="course" bindtap="switchSeg">🎓 课程</view>
+    <view class="seg-item {{seg === 'promo' ? 'on' : ''}}" data-seg="promo" bindtap="switchSeg">🎯 活动</view>
   </view>
 
   <view wx:if="{{loading}}" class="empty">加载中...</view>

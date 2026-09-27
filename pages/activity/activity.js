@@ -14,7 +14,8 @@ const DEFAULT_PROMO_COVER = `${apiBase}/static/promos/default.jpg`;
 const DEFAULT_COURSE_COVER = `${apiBase}/static/promos/course-default.jpg`;
 
 Page({
-  data: { seg: 'promo', list: [], loading: true },
+  // 段选默认 = 课程（2026-09-27 用户要求：「将 课程放到左侧，活动在右侧，并默认显示 课程」）
+  data: { seg: 'course', list: [], loading: true },
 
   onLoad() {
     this.loadAll();

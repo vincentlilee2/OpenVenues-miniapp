@@ -86,6 +86,14 @@ const wait = () => new Promise((r) => setTimeout(r, 5));
     ok('★ 活动页没有横幅（hero）节点', !/class="hero"/.test(actWxml));
     ok('★ 活动页 wxss 里 .hero 死样式已清', !/\.hero/.test(actWxss));
     ok('段选「活动 / 课程」仍在（内容切换器，不是横幅）', /data-seg="promo"/.test(actWxml) && /data-seg="course"/.test(actWxml));
+    // ★ 2026-09-27 用户要求：「将 课程放到左侧，活动 在右侧，并默认显示 课程」
+    ok(
+      '★★ 段选顺序：课程在左、活动在右',
+      actWxml.indexOf('data-seg="course"') > 0 && actWxml.indexOf('data-seg="course"') < actWxml.indexOf('data-seg="promo"'),
+      `course@${actWxml.indexOf('data-seg="course"')} promo@${actWxml.indexOf('data-seg="promo"')}`
+    );
+    ok('★★ 默认显示「课程」（seg 初值 = course）', /data:\s*\{\s*seg:\s*'course'/.test(actJs), (actJs.match(/data:\s*\{[^}]*seg:[^,}]*/) || [''])[0]);
+    ok('★ 两个段的 data-seg 与 bindtap 都没丢', /data-seg="course"[^>]*bindtap="switchSeg"/.test(actWxml) && /data-seg="promo"[^>]*bindtap="switchSeg"/.test(actWxml));
     // 周期标签位置（2026-09-26 用户要求）：右下角，别再用左上（会压住默认课程图顶部的广告文字）
     const recRule = (actWxss.match(/\.tag\.recurrence\s*\{[\s\S]*?\}/) || [''])[0];
     ok('★ 周期标签在右下角（bottom + right）', /bottom:\s*20rpx/.test(recRule) && /right:\s*20rpx/.test(recRule), recRule.replace(/\s+/g, ' ').slice(0, 110));
