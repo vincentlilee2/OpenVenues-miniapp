@@ -1,26 +1,29 @@
 .date-tabs {
-  white-space: nowrap;
+  /* ★ 2026-09-27 用户要求：7 天日期必须一屏可见（原来每格 146rpx × 7 = 1022rpx，
+     750rpx 的屏只看得见 5 天，后面的被推到屏外，用户不知道能滑就看不到）→
+     改成 flex 等分：每格 flex:1，7 格正好铺满，不给滑也不会有半截。 */
+  display: flex;
   background: #fff;
-  padding: 14rpx 0;
+  padding: 10rpx 4rpx;
   margin: 0 -24rpx 8rpx;
   border-bottom: 1rpx solid var(--border);
 }
 .date-tab {
-  display: inline-block;
-  width: 130rpx;
+  flex: 1;
+  min-width: 0;
   text-align: center;
-  padding: 12rpx 0;
-  border-radius: 12rpx;
-  margin: 0 8rpx;
+  padding: 8rpx 0;
+  border-radius: 10rpx;
+  margin: 0 2rpx;
   color: var(--muted);
-  font-size: 26rpx;
+  font-size: 24rpx;
 }
 .date-tab.active {
   background: var(--primary);
   color: #fff;
 }
-.date-week { font-size: 24rpx; opacity: 0.8; }
-.date-day { font-size: 32rpx; font-weight: 600; margin-top: 4rpx; }
+.date-week { font-size: 20rpx; line-height: 1.15; opacity: 0.85; }
+.date-day { font-size: 30rpx; font-weight: 600; margin-top: 0; line-height: 1.2; }
 
 /* 节假日价格提示条 */
 .holiday-tip {

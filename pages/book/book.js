@@ -48,7 +48,8 @@ Page({
       const d = new Date(now.getTime() + i * 86400e3);
       tabs.push({
         date: d.toISOString().slice(0, 10),
-        weekdayLabel: WD_LABEL[d.getDay()] + (i === 0 ? ' 今天' : ''),
+        // ★ 2026-09-27：日期格改成等分后每格只有约 100rpx，「周日 今天」放不下 → 今天那格直接写「今天」
+        weekdayLabel: i === 0 ? '今天' : WD_LABEL[d.getDay()],
         day: String(d.getDate()),
       });
     }
