@@ -41,8 +41,14 @@ async function payOrder(orderId, opts = {}) {
     if (e && e.code === 'PAY_DISABLED') return { paid: false, error: '本店尚未开通在线支付' };
     return { paid: false, error: (e && (e.error || e.errMsg)) || '发起支付失败' };
   }
-  const d = (r && r.data) || {};
+  // ⚠️ api/request.js **已经把 {ok,data} 解包成了 data 本体** —— 这里再套一层 .data 会永远拿到
+  //    undefined（2026-09-27 实测：配了商户号后真支付也走成「服务端未返回支付参数」——整条真支付链路
+  //    因为这段一直没被真跑过而带病上线）。同类坑在本仓出现过三次，见 skill。
+  const d = r || {};
   if (d.already_paid) return { paid: true };
+  // 模拟支付模式（2026-09-27）：服务端没配商户号但开了模拟模式 → 弹"模拟收银台"，
+  // 确认后调 mock-confirm 入账（服务端复用真实回调的入账逻辑，只是不真扣钱）。
+  if (d.mock) return mockSettle(orderId, d);
   if (!d.pay_params) return { paid: false, error: '服务端未返回支付参数' };
 
   try {
@@ -57,7 +63,7 @@ async function payOrder(orderId, opts = {}) {
   for (let i = 0; i < 6; i++) {
     try {
       const s = await api.payStatus(orderId, i >= 3);
-      if (s && s.data && s.data.paid) return { paid: true, data: s.data };
+      if (s && s.paid) return { paid: true, data: s }; // 同样是已解包的响应（见上面 payOrder 的注释）
     } catch (e) {
       // 忽略：继续重试
     }
@@ -67,6 +73,36 @@ async function payOrder(orderId, opts = {}) {
     wx.showToast({ title: '支付结果确认中，请稍后在订单里查看', icon: 'none', duration: 2600 });
   }
   return { paid: false, pending: true };
+}
+
+/**
+ * 模拟收银台（2026-09-27 起启用；仅在服务端「模拟支付模式」开启且未配置商户号时才会走到）
+ * 形态照微信收银台做，但**必须写明这是模拟支付**，避免误以为真扣了钱。
+ * @param {number} orderId
+ * @param {object} [info] 服务端返回的金额信息（amount_yuan）
+ * @returns {Promise<{paid:boolean, cancelled?:boolean, mock?:boolean, error?:string}>}
+ */
+async function mockSettle(orderId, info = {}) {
+  const amount = info.amount_yuan != null ? `¥${info.amount_yuan}` : '';
+  const okGo = await new Promise((resolve) => {
+    wx.showModal({
+      title: '微信支付（模拟）',
+      content: `${amount ? `支付金额 ${amount}\n\n` : ''}⚠️ 商户号未开通 —— 当前为「模拟支付」，不会真实扣款。\n确认后订单立即生效（相当于已付款）。`,
+      confirmText: '确认支付',
+      cancelText: '取消',
+      confirmColor: '#07c160',
+      success: (res) => resolve(!!res.confirm),
+      fail: () => resolve(false),
+    });
+  });
+  if (!okGo) return { paid: false, cancelled: true, mock: true };
+  try {
+    const r = await api.mockConfirmOrder(orderId);
+    const dd = r || {}; // 已解包
+    return { paid: true, mock: true, data: dd };
+  } catch (e) {
+    return { paid: false, mock: true, error: (e && (e.error || e.message)) || '模拟支付失败' };
+  }
 }
 
 /**
@@ -116,4 +152,4 @@ function payBadgeText(order) {
   return '';
 }
 
-module.exports = { payOrder, handleAfterCreate, remainText, payBadgeText, requestPayment };
+module.exports = { payOrder, handleAfterCreate, remainText, payBadgeText, requestPayment, mockSettle };

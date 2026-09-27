@@ -42,12 +42,18 @@ Page({
     const card = this.data.card || {};
     if (!card.id) return;
     let payEnabled = false;
+    let mockActive = false;
     try {
       const pc = await api.payConfig();
       payEnabled = !!(pc && pc.enabled);
+      // 模拟支付模式（2026-09-27）：没商户号但后台开了模拟模式 → 下单会返回 need_pay，
+      // 这里的模拟弹窗**本身就是那一次确认**，确认后直接调模拟入账（不再弹第二个收银台）。
+      mockActive = !!(pc && pc.mock_active);
     } catch (e) {
       payEnabled = false; // 探测失败按未开通处理（更保守：多一次确认，不会误扣）
+      mockActive = false;
     }
+    this._mockActive = mockActive;
     if (!payEnabled) {
       this.setData({ showMockPay: true });
       return; // 注意：此时**还没有建单**（用户要求「确认后再生成订单」）
@@ -74,6 +80,13 @@ Page({
     try {
       const r = await api.rechargeCard(this._id);
       if (r && r.need_pay) {
+        // 模拟支付模式：上面那个模拟弹窗已经确认过了 → 直接入账，别再弹第二个窗
+        if (this._mockActive) {
+          const m = await pay.mockSettle(r.order_id, { amount_yuan: card.price });
+          if (m && m.paid) return this.afterSuccess(card, '充值成功，卡额度已到账（模拟支付）');
+          wx.showToast({ title: (m && m.error) || '已取消支付', icon: 'none' });
+          return;
+        }
         const res = await pay.handleAfterCreate(
           { id: r.order_id, need_pay: true, total_price: card.price },
           'card'

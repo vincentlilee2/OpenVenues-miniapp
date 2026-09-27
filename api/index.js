@@ -48,6 +48,8 @@ module.exports = {
   payConfig: () => request({ url: '/api/pay/config', auth: false }),
   payOrder: (id) => request({ url: `/api/orders/${id}/pay`, method: 'POST' }),
   payStatus: (id, sync) => request({ url: `/api/pay/status/${id}` + (sync ? '?sync=1' : '') }),
+  // 模拟支付确认（2026-09-27）：仅在服务端开了「模拟支付模式」且未配商户号时可用，否则会被拒
+  mockConfirmOrder: (id) => request({ url: `/api/orders/${id}/pay/mock-confirm`, method: 'POST' }),
 
   // ===== 会员卡 / 办卡充值（2026-09-26）=====
   //   listCards/getCard：顾客端「办卡充值」列表与详情（只返回已上架）

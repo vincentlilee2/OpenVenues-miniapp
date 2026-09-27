@@ -36,8 +36,11 @@ global.wx = {
 };
 
 // ---- 假 api（注入 require 缓存，pay.js 会拿到它）----
+// ⚠️ 桩返回的必须是**解包后**的 data 本体：真实 api/request.js 成功时 resolve(body.data)。
+//    2026-09-27 实测：这里原来返回整包 {ok,data}，把 pay.js 里"又读一层 .data"的真 bug 一起掩盖了
+//    （配了商户号后真支付会走成「服务端未返回支付参数」）。改了桩，就是为了让错模型无处藏身。
 let fakeState = { payOrderReply: null, payOrderThrows: null, statusReplies: [] };
-const statusQueue = () => (fakeState.statusReplies.length ? fakeState.statusReplies.shift() : { ok: true, data: { paid: false } });
+const statusQueue = () => (fakeState.statusReplies.length ? fakeState.statusReplies.shift() : { paid: false });
 const fakeApi = {
   payOrder: async () => {
     if (fakeState.payOrderThrows) throw fakeState.payOrderThrows;
@@ -69,14 +72,14 @@ ok('无支付维度（未开通门店）→ 空串', pay.payBadgeText({ pay_stat
 console.log('\n--- 3) 支付状态机（结果以服务端为准）---');
 (async () => {
   // 3.1 服务端说已支付
-  fakeState.payOrderReply = { ok: true, data: { already_paid: true, amount_fen: 5000 } };
+  fakeState.payOrderReply = { already_paid: true, amount_fen: 5000 };
   let r = await pay.payOrder(1);
   ok('服务端已支付 → paid=true（不弹收银台）', r.paid === true && wxCalls.payment.length === 0);
 
   // 3.2 正常流程：拉起收银台成功 + 服务端入账
   wxCalls.payment.length = 0;
-  fakeState.payOrderReply = { ok: true, data: { pay_params: PAY_PARAMS, amount_fen: 5000 } };
-  fakeState.statusReplies = [{ ok: true, data: { paid: true, pay_status: 'paid' } }];
+  fakeState.payOrderReply = { pay_params: PAY_PARAMS, amount_fen: 5000 };
+  fakeState.statusReplies = [{ paid: true, pay_status: 'paid' }];
   r = await pay.payOrder(2);
   ok('拉起收银台用了服务端给的参数', wxCalls.payment.length === 1 && wxCalls.payment[0].package === 'prepay_id=wx_test', JSON.stringify(wxCalls.payment[0] || {}).slice(0, 80));
   ok('timeStamp 传字符串（微信要求）', typeof wxCalls.payment[0].timeStamp === 'string');
@@ -101,7 +104,7 @@ console.log('\n--- 3) 支付状态机（结果以服务端为准）---');
   fakeState.payOrderThrows = null;
 
   // 3.6 服务端没给 pay_params
-  fakeState.payOrderReply = { ok: true, data: {} };
+  fakeState.payOrderReply = {};
   r = await pay.payOrder(6);
   ok('缺支付参数 → 报错不放行', r.paid === false && !!r.error, JSON.stringify(r));
 
@@ -111,8 +114,8 @@ console.log('\n--- 3) 支付状态机（结果以服务端为准）---');
   ok('未开通支付的订单 → 直接跳过（行为与历史一致）', r.skipped === true && wxCalls.modal.length === 0);
 
   // 需要支付 + 用户在确认框点「立即支付」
-  fakeState.payOrderReply = { ok: true, data: { pay_params: PAY_PARAMS } };
-  fakeState.statusReplies = [{ ok: true, data: { paid: true } }];
+  fakeState.payOrderReply = { pay_params: PAY_PARAMS };
+  fakeState.statusReplies = [{ paid: true }];
   r = await pay.handleAfterCreate({ id: 8, need_pay: true, total_price: 50 }, 'booking');
   ok('需要支付 → 先弹确认（含 15 分钟说明）', wxCalls.modal.some((m) => /15 分钟/.test(m.content || '')), JSON.stringify(wxCalls.modal).slice(0, 120));
   ok('确认后完成支付', r.paid === true);
