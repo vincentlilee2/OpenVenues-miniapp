@@ -123,6 +123,10 @@ function buildRows(allSlots, courts, selectedSet, geoOpt) {
     promos.push({
       pid: p.cid + '-' + p.startHour + '-' + p.endHour + '-' + p.promoId,
       promoId: p.promoId,
+      // ★ 2026-09-27 用户要求：「报名人数没有超过上限时其他用户仍可继续点击报名」
+      //   → 满员（已报 ≥ 上限）时标记出来且不给进报名；未满就一直可点。
+      full: Number(p.signed) >= Number(p.maxCap),
+      remaining: Math.max(0, Number(p.maxCap) - Number(p.signed)),
       cid: p.cid,
       col,
       startHour: p.startHour,

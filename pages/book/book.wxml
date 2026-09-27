@@ -43,11 +43,12 @@
         <!-- 畅打浮层：在自己的场地列内，纵向跨整段小时 -->
         <view wx:for="{{promos}}" wx:key="pid" class="gc-promo"
               style="left:{{item.left}}rpx; width:{{item.width}}rpx; top:{{item.top}}rpx; height:{{item.height}}rpx;"
-              bindtap="onPromoTap" data-promo-id="{{item.promoId}}">
+              bindtap="onPromoTap" data-promo-id="{{item.promoId}}" data-full="{{item.full}}">
           <view class="gp-name">{{item.name}}</view>
           <view class="gp-signed">{{item.signed}}/{{item.maxCap}}人</view>
           <view class="gp-price">{{item.priceLabel}}</view>
           <view class="gp-cta" wx:if="{{item.minParticipants > 1}}">≥{{item.minParticipants}}人成团</view>
+          <view class="gp-cta" wx:if="{{item.full}}" style="background:#fff1f0;color:#cf1322">已满</view>
         </view>
 
       </view>
@@ -61,7 +62,7 @@
     <view class="lg lg-available"></view><text>可选</text>
     <view class="lg lg-selected"></view><text>已选择</text>
     <view class="lg lg-mine"></view><text>我的预定</text>
-    <view class="lg lg-promo"></view><text>畅打</text>
+    <view class="lg lg-promo"></view><text>活动</text>
   </view>
 
   <view class="hint">最多选 {{maxCourts}} 个场地（{{selectedCount}}/{{maxCourts}}）</view>

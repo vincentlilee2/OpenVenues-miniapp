@@ -166,7 +166,12 @@ Page({
 
   // 点击畅打块 → 活动详情
   onPromoTap(e) {
-    const promoId = e.currentTarget.dataset.promoId;
+    const { promoId, full } = e.currentTarget.dataset;
+    // ★ 2026-09-27：未满 → 照常进报名（同一时段其他用户仍可报名）；已满 → 明确告知，不给空点
+    if (full) {
+      wx.showToast({ title: '该时段已满，无法报名', icon: 'none' });
+      return;
+    }
     if (promoId) wx.navigateTo({ url: `/pages/promo-detail/promo-detail?id=${promoId}` });
   },
 
