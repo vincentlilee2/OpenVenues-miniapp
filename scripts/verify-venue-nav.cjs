@@ -53,7 +53,9 @@ ok('取到底部操作区', actionsBlock.length > 0);
 ok('底部操作区恰好 3 个 button', footerBtns === 3, '实际 ' + footerBtns);
 ok('底部操作区里没有「导航」', !/导航/.test(actionsBlock));
 ok('导航不在底部按钮行里（在地址行里）', addrRow.includes('nav-link') && !actionsBlock.includes('nav-link'));
-ok('底部操作区仍是 约课/约场/畅打', ['约课', '约场', '畅打'].every((t) => actionsBlock.includes(t)), actionsBlock.replace(/\s+/g, ' ').trim().slice(0, 100));
+// 2026-09-27 起：第二个按钮文字由 bookLabel 决定（有价格时段=约场 / 没有=课表），
+// 第三个按钮已由「畅打」改名为「活动」。这里改成按**绑定与语义**断言，不再钉死字面词。
+ok('底部操作区仍是「约课 / 约场·课表 / 活动」三个按钮', /bindtap="onBookLesson"/.test(actionsBlock) && /bindtap="onBookVenue"/.test(actionsBlock) && /bindtap="onPromoList"/.test(actionsBlock) && actionsBlock.includes('约课') && actionsBlock.includes('{{bookLabel}}') && actionsBlock.includes('活动'), actionsBlock.replace(/\s+/g, ' ').trim().slice(0, 120));
 
 console.log('\n--- ③ 样式：与首页卡片的导航按钮同一套视觉 ---');
 const indexNav = (read('pages/index/index.wxss').match(/\.venue-nav\s*\{[\s\S]*?\}/) || [''])[0];

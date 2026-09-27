@@ -1,3 +1,4 @@
+// 场馆详情页：①「活动」按钮（始终显示）②「约场 / 课表」按钮（按有无价格时段切换）
 // 场馆详情页「活动」按钮：
 //   · 2026-09-27 用户先要求「该馆没有发布畅打活动时不显示这个按钮」，随后改回：
 //     **始终显示**，但按钮文案从「畅打」改成「活动」。
@@ -79,6 +80,15 @@ ok('★★ 按钮文案是「活动」（不再是「畅打」）', btnLabel ===
 ok('js：页面里已无 hasPromo 逻辑', !js.includes('hasPromo'));
 ok('js：onPromoList 仍进该场馆的活动列表', js.includes('onPromoList') && js.includes('/pages/promos/promos?venue_id='));
 ok('js：不再为按钮额外拉一次活动列表（省一次请求）', !js.includes('hasJoinable'));
+
+console.log('\n--- ③ 约场 / 课表：没有价格时段的场馆按钮叫「课表」（2026-09-27 用户要求）---');
+{
+  const btn2 = (wxml.match(/<button[^>]*bindtap="onBookVenue"[^>]*>[^<]*<\/button>/) || [''])[0];
+  ok('约场按钮的文字由 bookLabel 决定', btn2.includes('{{bookLabel}}'), btn2.slice(0, 90));
+  ok('js：按 priced_slots 判断（有价格 → 约场，没有 → 课表）', /Number\(v\.priced_slots\) > 0 \? '约场' : '课表'/.test(js), (js.match(/bookLabel[^;]*/) || [''])[0]);
+  ok('js：data 里给了默认值（未加载前不出现空按钮）', /bookLabel:\s*'约场'/.test(js));
+  ok('★ 服务端字段名对齐（priced_slots）', js.includes('priced_slots'));
+}
 
 console.log(`\n合计 ${pass} 通过 / ${fail} 失败`);
 process.exit(fail ? 1 : 0);

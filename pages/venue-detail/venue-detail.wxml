@@ -58,7 +58,7 @@
     <!-- 操作按钮（参考截图：约课/约场/畅打）——转发按钮已挪到海报右上角小图标（2026-09-24） -->
     <view class="actions">
       <button class="btn-warn" hover-class="btn-hover" bindtap="onBookLesson">约课</button>
-      <button class="btn-outline btn-action" hover-class="btn-hover" bindtap="onBookVenue">约场</button>
+      <button class="btn-outline btn-action" hover-class="btn-hover" bindtap="onBookVenue">{{bookLabel}}</button>
       <!-- 2026-09-27 用户最终决定：不管该馆有没有发布活动，**都显示**这个按钮；文案从「畅打」改成「活动」 -->
       <button class="btn-primary btn-action" hover-class="btn-hover" bindtap="onPromoList">活动</button>
     </view>

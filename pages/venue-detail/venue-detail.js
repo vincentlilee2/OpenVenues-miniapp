@@ -6,7 +6,9 @@ const nav = require('../../utils/nav.js');
 
 
 Page({
-  data: { venue: null, loading: true },
+  // bookLabel：该馆有价格时段 →「约场」；没有（只发课程/活动，如舞蹈馆）→「课表」
+  //   2026-09-27 用户要求；依据 /api/venues/:id 返回的 priced_slots（有价格的格子数）
+  data: { venue: null, loading: true, bookLabel: '约场' },
 
   // 转发 / 分享到朋友圈（2026-09-24）：官方要求朋友圈需 onShareAppMessage + onShareTimeline 同时实现
   onShareAppMessage() {
@@ -27,6 +29,8 @@ Page({
     this.setData({ loading: true });
     try {
       const v = await api.getVenue(this._id);
+      // 按钮文案：没有「价格时段」的场馆（只发课程/活动）把「约场」显示成「课表」
+      this.setData({ bookLabel: Number(v.priced_slots) > 0 ? '约场' : '课表' });
       const apiBase = config.apiBase.replace(/\/$/, '');
       // 背景图统一走 utils/venueCovers.js：服务端给什么用什么（cover 优先，其次 default_cover）
       v.cover = venueCovers.absolute(v.cover, apiBase);
