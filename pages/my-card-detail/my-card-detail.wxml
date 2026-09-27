@@ -3,20 +3,25 @@
   <view wx:if="{{loading}}" class="empty">加载中...</view>
 
   <block wx:elif="{{card}}">
-    <view class="mcard {{card.expired ? 'mcard-off' : ''}}">
+    <view class="mcard {{card.expired || card.voided ? 'mcard-off' : ''}}">
       <view class="mcard-glow"></view>
       <view class="mcard-top">
         <view>
           <view class="mcard-name">{{card.name}}</view>
           <view wx:if="{{card.subtitle}}" class="mcard-sub">{{card.subtitle}}</view>
         </view>
-        <view class="mcard-chip">{{card.expired ? '已过期' : '会员卡'}}</view>
+        <view class="mcard-chip">{{card.statusText}}</view>
       </view>
       <view class="mcard-amount">¥{{card.balance}}<text class="unit">当前余额</text></view>
       <view class="mcard-foot">
         <text class="tag">累计充值 ¥{{card.total}}</text>
         <text class="tag">已消费 ¥{{card.consumed}}</text>
       </view>
+    </view>
+
+    <!-- 已作废：把原因和后续说清楚（充值订单取消 → 卡作废，未消费额度待退） -->
+    <view wx:if="{{card.voided}}" class="void-tip">
+      该卡已作废（对应的充值订单已取消），不能再用于约场/约课/报名；未消费额度由管理员退回。
     </view>
 
     <view class="info-card">

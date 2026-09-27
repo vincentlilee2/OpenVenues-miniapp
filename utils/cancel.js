@@ -30,6 +30,11 @@ function cancelInfoOf(order, now) {
   if (!isActive(order.status)) {
     return { allowed: false, reason: '当前状态不可取消', feePercent: 0, feeText: '', fromServer: false };
   }
+  // 办卡充值订单（2026-09-27）没有场地/时段，兜底规则（距开场 2 小时）不适用：
+  // booking_date 为空会算出 NaN 而永久判"不可取消"。服务端已放行，这里防旧接口/旧数据。
+  if (order.source === 'card') {
+    return { allowed: true, reason: '', feePercent: 0, feeText: '', fromServer: false };
+  }
   // 1) 后端判定优先（按场馆配置，权威）
   if (order.cancel && typeof order.cancel.allowed === 'boolean') {
     return {
@@ -57,6 +62,10 @@ function cancelInfoOf(order, now) {
 
 /** 取消确认弹窗的正文（把扣费说清楚，别让用户点完才发现） */
 function confirmContentOf(order, now) {
+  // 办卡充值订单：没有场地/时段概念，取消的后果是**卡作废 + 未消费额度待退**（服务端行为，2026-09-27）
+  if (order && order.source === 'card') {
+    return '取消后这张会员卡将作废，无法再用于约场/约课/报名；未消费额度由管理员退回（已消费部分不退）。确定取消吗？';
+  }
   var info = cancelInfoOf(order, now);
   if (!info.allowed) return info.reason || '当前不可取消';
   if (info.feeText) return '取消后将释放该时段。' + info.feeText + '，确定取消吗？';

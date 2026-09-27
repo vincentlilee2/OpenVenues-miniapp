@@ -1,6 +1,13 @@
 /* 我的会员卡 · 详情（2026-09-26）—— 卡面样式在 app.wxss 的 .mcard */
 .mcard { margin-bottom: 28rpx; }
 
+/* 已作废提示（充值订单取消 → 卡作废，2026-09-27） */
+.void-tip {
+  margin: 0 0 24rpx; padding: 20rpx 24rpx; border-radius: 14rpx;
+  background: #fff7ed; border: 1rpx solid #fed7aa;
+  color: #9a3412; font-size: 26rpx; line-height: 1.7;
+}
+
 .info-card {
   background: #fff;
   border-radius: 20rpx;

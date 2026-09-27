@@ -327,6 +327,28 @@ console.log('\n--- 9) 会员卡余额支付（阶段 3：约场 / 报名 / 订�
   ok('余额不足 → 未支付（交回微信）', r3.paid === false && r3.reason === 'insufficient', JSON.stringify(r3));
 }
 
+console.log('\n--- 10) 取消充值订单 → 卡作废（"选 2"，2026-09-27）---');
+{
+  const cancel = require('../utils/cancel.js');
+  const cardOrder = { source: 'card', status: 'pending', booking_date: '', start_time: '00:00', total_price: 2000 };
+  // 充值订单没有时段 → 服务端/兜底都必须放行（此前被"距开场不足 2 小时"永久挡住）
+  const ci = cancel.cancelInfoOf(cardOrder);
+  ok('★ 充值订单可取消（不受开场规则影响）', ci.allowed === true, JSON.stringify(ci));
+  const txt = cancel.confirmContentOf(cardOrder);
+  ok('★ 取消确认文案说明"卡将作废"', /作废/.test(txt), txt);
+  ok('★ 文案说明未消费额度退回/已消费不退', /未消费额度/.test(txt) && /已消费部分不退/.test(txt), txt);
+  // 普通订单不被这段文案污染
+  const normalTxt = cancel.confirmContentOf({
+    source: 'hourly', status: 'confirmed', booking_date: '2099-01-01', start_time: '10:00', total_price: 100,
+  });
+  ok('普通订单仍是原取消文案', !/会员卡/.test(normalTxt), normalTxt);
+
+  // 卡状态文案：voided → 已作废（我的会员卡列表 + 详情）
+  ok('★ 我的会员卡列表有「已作废」文案', /voided:\s*'已作废'/.test(read('pages/my-cards/my-cards.js')));
+  ok('★ 卡详情有「已作废」文案与提示块', /voided:\s*'已作废'/.test(read('pages/my-card-detail/my-card-detail.js')) && /class="void-tip"/.test(read('pages/my-card-detail/my-card-detail.wxml')));
+  ok('卡详情 chip 用 statusText（不再是二选一）', /mcard-chip">\{\{card\.statusText\}\}/.test(read('pages/my-card-detail/my-card-detail.wxml')));
+}
+
 console.log(`\n办卡充值（阶段 2 小程序页面）：${pass} 过 / ${fail} 失败`);
 if (fail) process.exit(1);
 })();

@@ -2,7 +2,7 @@
 //   入口：我的 → 我的会员卡
 const api = require('../../api/index.js');
 
-const STATUS_TEXT = { active: '正常', frozen: '已冻结', expired: '已过期', used_up: '已用完' };
+const STATUS_TEXT = { active: '正常', frozen: '已冻结', expired: '已过期', used_up: '已用完', voided: '已作废' };
 
 Page({
   data: { list: [], loading: true, empty: false },

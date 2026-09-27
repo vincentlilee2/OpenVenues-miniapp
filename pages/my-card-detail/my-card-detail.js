@@ -4,6 +4,8 @@ const api = require('../../api/index.js');
 const time = require('../../utils/time.js');
 
 const TX_TEXT = { recharge: '充值', consume: '消费', refund: '退款', adjust: '人工调整' };
+// 卡状态文案（voided = 充值订单被取消 → 卡作废，2026-09-27 用户拍板"选 2"）
+const STATUS_TEXT = { active: '会员卡', frozen: '已冻结', expired: '已过期', used_up: '已用完', voided: '已作废' };
 
 Page({
   data: { card: null, loading: true, txs: [], empty: false },
@@ -26,6 +28,8 @@ Page({
       c.discountText = Number(c.discount) < 1 ? `${c.discount}（${Math.round(Number(c.discount) * 100) / 10} 折）` : '无折扣';
       c.activatedText = time.toLocalText(c.activated_at);
       c.expiresText = c.expires_at ? time.toLocalText(c.expires_at) : '永久有效';
+      c.voided = c.status === 'voided';
+      c.statusText = c.expired ? '已过期' : STATUS_TEXT[c.status] || '会员卡';
       const txs = (c.transactions || []).map((t) => ({
         ...t,
         typeText: TX_TEXT[t.type] || t.type,
