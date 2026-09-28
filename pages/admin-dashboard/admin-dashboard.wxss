@@ -1,0 +1,68 @@
+/* 管理员入口（2026-09-28）：今日经营数据 —— 7 张卡两列排布，最后一格占满整行 */
+.container {
+  padding: 20rpx 24rpx 60rpx;
+  background: #f5f6f7;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+.head-title { font-size: 34rpx; font-weight: 600; }
+.head-date { font-size: 24rpx; color: var(--muted); margin-top: 6rpx; }
+.head-refresh {
+  flex: none;
+  padding: 8rpx 26rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid var(--primary);
+  color: var(--primary);
+  font-size: 24rpx;
+  line-height: 1.6;
+}
+.head-refresh-hover { opacity: 0.6; }
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.card {
+  width: 48.6%;
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 26rpx 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+.card-wide { width: 100%; }
+
+.card-num {
+  font-size: 52rpx;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.2;
+  word-break: break-all;
+}
+.card-label { font-size: 26rpx; font-weight: 500; margin-top: 10rpx; }
+.card-sub { font-size: 22rpx; color: var(--muted); margin-top: 8rpx; line-height: 1.5; }
+.card-note { font-size: 22rpx; color: var(--gold); margin-top: 6rpx; }
+
+.foot {
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--muted);
+  margin-top: 10rpx;
+}
+
+.empty {
+  text-align: center;
+  color: var(--muted);
+  font-size: 26rpx;
+  padding: 120rpx 0;
+}
+.empty-sub { font-size: 22rpx; margin-top: 12rpx; }

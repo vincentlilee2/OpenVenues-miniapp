@@ -11,6 +11,9 @@ Page({
     nickname: '',
     avatar: '',
     statusText: '未登录',
+    // 2026-09-28：小程序管理员（后台仪表盘「今日登录」里设的）——「我的」页据此显示昵称后的
+    //  「管理员」标识、以及「意见反馈」下面的「管理员入口」。非管理员一律不显示。
+    isAdmin: false,
     loggingIn: false,
     editing: false,
     saving: false,
@@ -55,7 +58,14 @@ Page({
       statusText: loggedIn ? '已通过微信登录' : '未登录',
       // 微信不会自动给昵称头像：没设置过就在卡片里给出可点提示
       needProfile: loggedIn && (!profile.nickname || !profile.avatar),
+      // 管理员标记来自服务端（/api/auth/me 的 isAdmin，见 syncProfile）；未登录一律 false
+      isAdmin: loggedIn && !!profile.isAdmin,
     });
+  },
+
+  // 管理员入口（2026-09-28）：只有小程序管理员看得到这个栏目，进去看后台仪表盘的那 7 张卡
+  goAdminDashboard() {
+    wx.navigateTo({ url: '/pages/admin-dashboard/admin-dashboard' });
   },
 
   // 按钮：微信一键登录

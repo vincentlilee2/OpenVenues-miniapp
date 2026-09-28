@@ -1,0 +1,31 @@
+<!-- 管理员入口 → 今日经营数据（2026-09-28）
+     后台仪表盘「今日新下单 / 今日支付金额 / 今日场地占用率 / 今日登录 / 已发会员卡 /
+     进行中的课程 / 进行中的活动」这 7 张卡，原样搬到小程序（数字由服务端算好，与后台一致）。 -->
+<view class="container">
+  <view class="head">
+    <view class="head-left">
+      <view class="head-title">今日经营数据</view>
+      <view class="head-date">{{today}}</view>
+    </view>
+    <view class="head-refresh" hover-class="head-refresh-hover" bindtap="load">刷新</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+
+  <view wx:elif="{{error}}" class="empty">
+    <view>{{error}}</view>
+    <view class="empty-sub">下拉可重新加载</view>
+  </view>
+
+  <block wx:else>
+    <view class="cards">
+      <view wx:for="{{cards}}" wx:key="key" class="card {{index === cards.length - 1 ? 'card-wide' : ''}}">
+        <view class="card-num">{{item.num}}</view>
+        <view class="card-label">{{item.label}}</view>
+        <view wx:if="{{item.sub}}" class="card-sub">{{item.sub}}</view>
+        <view wx:if="{{item.note}}" class="card-note">{{item.note}}</view>
+      </view>
+    </view>
+    <view class="foot">与后台仪表盘同一口径 · 更新于 {{updatedAt}}</view>
+  </block>
+</view>

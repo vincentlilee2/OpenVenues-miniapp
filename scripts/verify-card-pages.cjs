@@ -52,15 +52,20 @@ const json = (data) => ({ statusCode: 200, data: { ok: true, data } });
 
 console.log('\n--- 1) 页面文件与注册 ---');
 {
-  // 2026-09-27：pages/cards（办卡充值列表）已并入 pages/my-cards，页面数 17 → 16
-  for (const p of ['card-detail/card-detail', 'my-cards/my-cards', 'my-card-detail/my-card-detail']) {
+  // 2026-09-27：pages/cards（办卡充值列表）已并入 pages/my-cards（页面数 17 → 16）；
+  // 2026-09-28：新增 pages/admin-dashboard（小程序「管理员入口」）→ 17。
+  //   ★ 断言方式改成「app.json 声明数 == 磁盘上真实页面数」+「已合并的 pages/cards 不许回来」，
+  //     这样以后再加页面不会假红，但删掉/复活页面仍会被抓住。
+  for (const p of ['card-detail/card-detail', 'my-cards/my-cards', 'my-card-detail/my-card-detail', 'admin-dashboard/admin-dashboard']) {
     ok(`pages/${p} 四个文件齐全`, ['.js', '.wxml', '.wxss', '.json'].every((ext) => exists(`pages/${p}${ext}`)));
   }
   const app = JSON.parse(read('app.json'));
   for (const p of ['pages/card-detail/card-detail', 'pages/my-cards/my-cards', 'pages/my-card-detail/my-card-detail']) {
     ok(`app.json 注册 ${p}`, app.pages.includes(p));
   }
-  ok('页面数 16（原 17 − 合并掉的 cards 页）', app.pages.length === 16, app.pages.length);
+  const onDisk = fs.readdirSync(path.join(ROOT, 'pages')).filter((d) => fs.existsSync(path.join(ROOT, 'pages', d, `${d}.wxml`)));
+  ok('app.json 声明的页面数与磁盘上的一致', app.pages.length === onDisk.length, `声明 ${app.pages.length} / 磁盘 ${onDisk.length}`);
+  ok('★ 已合并掉的 pages/cards 没有回来（防复发）', !app.pages.includes('pages/cards/cards'));
 }
 
 console.log('\n--- 2) 卡面样式（app.wxss 共用，用户选定的方案 A）---');

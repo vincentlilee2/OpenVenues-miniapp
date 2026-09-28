@@ -164,7 +164,18 @@ console.log('\n--- ⑦ 我的服务：会员卡一个入口（2026-09-27 与「�
   ok('★「我的服务」里已无「办卡充值」条目（已合并）', !/li-title">办卡充值</.test(service), (service.match(/li-title">[^<]*/g) || []).join(' / '));
   ok('★ 有「我的会员卡」条目', /li-title">我的会员卡</.test(service), (service.match(/li-title">[^<]*/g) || []).join(' / '));
   ok('★ 位置在「我的订单」下面（用户要求）', service.indexOf('我的订单') < service.indexOf('我的会员卡') && service.indexOf('我的订单') >= 0, `订单@${service.indexOf('我的订单')} 卡@${service.indexOf('我的会员卡')}`);
-  ok('★ 我的服务只剩 3 个条目（订单 / 会员卡 / 意见反馈）', ((service.match(/li-title">/g) || []).length === 3), (service.match(/li-title">[^<]*/g) || []).join(' / '));
+  // 2026-09-28：新增「管理员入口」——它**只在管理员登录时渲染**（wx:if="{{isAdmin}}"），
+  //   所以「我的服务」现在是 4 项：订单 / 会员卡 / 意见反馈 / 管理员入口。
+  const titles = (service.match(/li-title">[^<]*/g) || []).map((s) => s.replace('li-title">', ''));
+  ok(
+    '★ 我的服务 4 个条目 = 订单 / 会员卡 / 意见反馈 / 管理员入口',
+    titles.length === 4 && titles.join(',') === '我的订单,我的会员卡,意见反馈,管理员入口',
+    titles.join(' / ')
+  );
+  ok('★ 管理员入口在「意见反馈」下面（用户要求）', service.indexOf('意见反馈') < service.indexOf('管理员入口'));
+  ok('★ 管理员入口**只对管理员可见**（wx:if="{{isAdmin}}"）— 非管理员不许看到', /wx:if="\{\{isAdmin\}\}"[^>]*bindtap="goAdminDashboard"[\s\S]{0,300}管理员入口/.test(service), (service.match(/wx:if="\{\{isAdmin\}\}"[^>]*/g) || []).join(' '));
+  ok('★ 昵称后面挂「管理员」标识（同样只对管理员显示）', /user-name[\s\S]{0,120}wx:if="\{\{isAdmin\}\}"[\s\S]{0,80}管理员/.test(wxml), (wxml.match(/user-name[\s\S]{0,120}/) || [''])[0].replace(/\s+/g, ' ').slice(0, 120));
+  ok('★ 管理员标识/栏目由服务端 isAdmin 决定（不是本地写死）', /isAdmin: loggedIn && !!profile\.isAdmin/.test(js));
   ok('我的会员卡 走 goMyCards', /class="list-item" bindtap="goMyCards"/.test(service) && /goMyCards\(\)\s*\{[\s\S]{0,120}\/pages\/my-cards\/my-cards/.test(js));
   ok('带图标与说明副标题（开通 + 余额/消费）', /li-icon[^>]*>🎫</.test(service) && /li-sub">开通会员卡/.test(service));
   ok('★ 不再有「功能开发中」占位文案（防复发）', !/功能开发中/.test(js) && !/功能开发中/.test(wxml));

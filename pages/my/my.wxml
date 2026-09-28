@@ -12,7 +12,7 @@
       <image wx:if="{{avatar}}" class="avatar-img" src="{{avatar}}" mode="aspectFill"></image>
       <view wx:else class="avatar">👤</view>
       <view class="user-info">
-        <view class="user-name">{{nickname || '微信用户'}}</view>
+        <view class="user-name">{{nickname || '微信用户'}}<text wx:if="{{isAdmin}}" class="admin-tag">管理员</text></view>
         <view class="user-phone">{{statusText}}<text wx:if="{{uidShort}}" class="uid-tag">ID {{uidShort}}</text></view>
         <view wx:if="{{needProfile}}" class="set-profile-hint" bindtap="openEditor">点此设置微信头像昵称 ›</view>
       </view>
@@ -88,6 +88,16 @@
         <view class="li-body">
           <view class="li-title">意见反馈</view>
           <view class="li-sub">提交您的建议或问题</view>
+        </view>
+        <view class="li-arrow">›</view>
+      </view>
+      <!-- 管理员入口（2026-09-28 用户要求）：**只有**被后台设为小程序管理员的人可见；
+           非管理员这一行根本不存在（不是灰掉）。点击进「今日经营数据」页。 -->
+      <view wx:if="{{isAdmin}}" class="list-item" bindtap="goAdminDashboard">
+        <view class="li-icon li-icon-admin">📊</view>
+        <view class="li-body">
+          <view class="li-title">管理员入口</view>
+          <view class="li-sub">查看今日经营数据</view>
         </view>
         <view class="li-arrow">›</view>
       </view>

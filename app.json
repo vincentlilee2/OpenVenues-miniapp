@@ -15,7 +15,8 @@
     "pages/favorites/favorites",
     "pages/card-detail/card-detail",
     "pages/my-cards/my-cards",
-    "pages/my-card-detail/my-card-detail"
+    "pages/my-card-detail/my-card-detail",
+    "pages/admin-dashboard/admin-dashboard"
   ],
   "window": {
     "backgroundTextStyle": "dark",
