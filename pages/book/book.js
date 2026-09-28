@@ -304,12 +304,28 @@ Page({
         if (goPay) {
           let paidCount = 0;
           let pendingCount = 0;
+          let payErr = '';
           for (const o of rest) {
             const r = await pay.payOrder(o.id, { silent: true });
             if (r.paid) paidCount++;
             else if (r.pending) pendingCount++;
+            else if (r.cancelled) payErr = payErr || '已取消支付';
+            else if (r.error) payErr = payErr || r.error;
           }
           if (paidCount) wx.showToast({ title: `已支付 ${paidCount} 单`, icon: 'success' });
+          // ★ 2026-09-28：**失败必须说出来**。原来这里只处理 paid / pending，支付失败被静默吞掉 →
+          //   用户看到的就是「点了预约没弹收银台、直接到了我的订单」，没有任何原因
+          //   （真实事故：服务端 /pay 返回 400，前端一个字都没提示，排障全靠猜）。
+          else if (payErr) {
+            await new Promise((resolve) =>
+              wx.showModal({
+                title: '支付未完成',
+                content: `${payErr}\n\n订单已保留，15 分钟内可在「我的订单」重新支付。`,
+                showCancel: false,
+                success: resolve,
+              })
+            );
+          }
           else if (pendingCount) {
             await new Promise((resolve) =>
               wx.showModal({

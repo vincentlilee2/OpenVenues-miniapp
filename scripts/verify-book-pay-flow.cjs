@@ -34,7 +34,7 @@ global.wx = {
   switchTab: (o) => { events.push({ t: 'nav', url: 'SWITCH:' + o.url }); },
   showToast: (o) => { events.push({ t: 'toast', title: o.title }); },
   showModal: (o) => {
-    events.push({ t: 'modal', title: o.title || '' });
+    events.push({ t: 'modal', title: o.title || '', content: o.content || '' });
     if (o.success) o.success({ confirm: true }); // 一律点确认
   },
   setNavigationBarTitle: () => {},
@@ -43,22 +43,20 @@ global.wx = {
 
 // ===== 假 api：模拟"未配商户号但开了模拟支付模式"的服务端 =====
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const fakeApi = new Proxy(
-  {
-    createOrder: async () => ({ id: 900, order_no: 'V_TEST', need_pay: true, total_price: 180 }), // 已解包形态
-    usableCards: async () => [],
-    payOrder: async () => ({ mock: true, order_id: 900, amount_yuan: '180.00' }),
-    mockConfirmOrder: async () => ({ paid: true, mock: true, amount_yuan: '180.00' }),
-    payStatus: async () => ({ paid: false }),
-    payConfig: async () => ({ enabled: false, mock_active: true }),
+const apiImpl = {
+  createOrder: async () => ({ id: 900, order_no: 'V_TEST', need_pay: true, total_price: 180 }), // 已解包形态
+  usableCards: async () => [],
+  payOrder: async () => ({ mock: true, order_id: 900, amount_yuan: '180.00' }),
+  mockConfirmOrder: async () => ({ paid: true, mock: true, amount_yuan: '180.00' }),
+  payStatus: async () => ({ paid: false }),
+  payConfig: async () => ({ enabled: false, mock_active: true }),
+};
+const fakeApi = new Proxy(apiImpl, {
+  get(target, prop) {
+    if (prop in target) return target[prop];
+    return async () => ({}); // 其余接口（资料保存之类）不关心，返回空对象
   },
-  {
-    get(target, prop) {
-      if (prop in target) return target[prop];
-      return async () => ({}); // 其余接口（资料保存之类）不关心，返回空对象
-    },
-  }
-);
+});
 const apiPath = require.resolve(path.join(ROOT, 'api', 'index.js'));
 require.cache[apiPath] = { id: apiPath, filename: apiPath, loaded: true, exports: fakeApi };
 
@@ -124,6 +122,47 @@ console.log('\n--- 2) 真调 onBook()：提交 → 直接收银台 → 入账 �
   ok('★ 支付成功提示（说明走完了入账）', events.some((e) => e.t === 'toast' && /已支付/.test(e.title || '')), JSON.stringify(events.filter((e) => e.t === 'toast')));
   ok('★ 收银台只弹一次（不是每单/每步都弹）', events.filter((e) => e.t === 'modal' && /微信支付/.test(e.title)).length === 1);
   ok('没有走到"下单选时段"的报错分支（groups 解析正常）', !events.some((e) => e.t === 'toast' && /请填写|请选择/.test(e.title || '')), JSON.stringify(events.filter((e) => e.t === 'toast')));
+}
+
+console.log('\n--- 3) 支付失败：必须让用户看见原因（2026-09-28 真实事故防复发）---');
+{
+  // 事故：线上 /api/orders/:id/pay 返回 400（服务端 ReferenceError），
+  // 而 book.js 当时只处理 paid / pending → 失败被静默吞掉 →
+  // 用户看到的就是「点了预约没弹收银台、直接到了我的订单」，一个字的原因都没有。
+  events.length = 0;
+  apiImpl.payOrder = async () => {
+    throw Object.assign(new Error('失败'), { error: 'parseSqliteUtc is not defined', code: 'PAY_ERROR' });
+  };
+
+  const p = pageObj;
+  const j = Object.create(p);
+  j.data = Object.assign({}, p.data, {
+    venueId: 1,
+    venueName: '室外网球场',
+    activeDate: '2026-09-28',
+    rows: [{ hour: 14, cells: [{ cid: 3, slot: '14:00', price: 1 }] }],
+    selectedKeys: { '3|14:00': true },
+    selectedCount: 1,
+    totalPrice: 1,
+    contact_name: '测试用户',
+    contact_phone: '13800138000',
+    courts: [{ id: 3, name: '1 号场' }],
+  });
+  j.setData = (d) => Object.assign(j.data, d);
+
+  await j.onBook();
+  await sleep(1100);
+
+  const modals = events.filter((e) => e.t === 'modal');
+  const failModal = modals.find((e) => e.title === '支付未完成');
+  ok('★ 支付失败时弹出「支付未完成」（不再静默跳走）', !!failModal, JSON.stringify(modals.map((m) => m.title)));
+  ok('★ 弹窗里带上服务端给的原因（用户/客服能据此排障）', !!failModal && /parseSqliteUtc|PAY_ERROR|失败/.test(failModal.content || ''), String(failModal && failModal.content));
+  ok('★ 提示发生在「跳我的订单」之前', !!failModal, JSON.stringify(events.map((e) => e.t + ':' + (e.title || e.url || ''))));
+  ok('没把失败当成成功（不弹「已支付」）', !events.some((e) => e.t === 'toast' && /已支付/.test(e.title || '')));
+
+  // 静态兜底：失败分支必须真的存在于源码里（防止以后被"顺手清理"掉）
+  const book = read('pages/book/book.js');
+  ok('★ book.js 里 payOrder 的返回值必须处理 error 分支', /\bpayErr\b/.test(book) && /r\.error/.test(book) && /支付未完成/.test(book));
 }
 
 console.log(`\n约场提交流程：${pass} 过 / ${fail} 失败`);
